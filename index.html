@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload and Plot Data</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <p>Load a Database and a Log to start!</p>
+            <button onclick="loadDatabase()">Load Database</button>
+            <button onclick="loadLog()">Load Log</button>
+        
+            <p>Source selection</p>
+            <select id="filterOptions">
+                <option value="noFilter">No Filter</option>
+                <option value="filterById">Filter By ID</option>
+                <option value="filterByNode">Filter by Node</option>
+            </select>
+
+            <div class="checkbox-container" id="checkbox-sources">
+                <label>Filter Sources</label>
+                <div class="checkbox-group">
+                <p>Apply a filter to see the sources.</p>
+                   <!-- Checkboxes go here -->
+                </div>
+            </div>
+
+            <div class="checkbox-container" id="checkbox-signals">
+                <label>Filter Signals</label>
+                <div class="checkbox-group">
+                <p>Select a source to see the signals.</p>
+                   <!-- Checkboxes go here -->
+                </div>
+            </div>
+
+            <button id="showConfigBtn">Show Configuration</button>
+        </div>
+
+
+        <div class="content">
+            <div id="plot"></div>
+        </div>
+
+        <!-- Right sidebar, initially hidden -->
+        <div id="rightSidebar" class="right-sidebar">
+            <h3>Configuration Settings</h3>
+            <div id="lineConfigurations">
+                <!-- Configuration options for lines will appear here dynamically -->
+            </div>
+        </div>
+
+    </div>
+
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="main.js"></script>
+    <script src="log.js"></script>
+    <script src="database.js"></script>
+    <script src="plot.js"></script>
+</body>
+</html>
