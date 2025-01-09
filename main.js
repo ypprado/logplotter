@@ -4,6 +4,48 @@
  * processes in js. 
  */
 
+/******************** Permanent Sidebar ********************/
+
+/**
+ * Monitor "arrowButton" which is responsible for hide/unhide 
+ * the sidepanel.
+ * Consequently, the plot are (container) must be resized and
+ * the plot updated
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    const arrowButton = document.getElementById('arrowButton');
+    const sidebar = document.querySelector('.sidebar');
+    const content = document.querySelector('.content');
+
+    function toggleSidebar() {
+
+        sidebar.classList.toggle('collapsed');
+        if (sidebar.classList.contains('collapsed')) {
+            arrowButton.textContent = '→';
+            arrowButton.title = 'Expand Sidebar';
+            content.style.width = `100%`; // Adjust content width dynamically
+        } else {
+            arrowButton.textContent = '←';
+            arrowButton.title = 'Collapse Sidebar';
+            const sidebarWidth = sidebar.getBoundingClientRect().width; // Get current sidebar width
+            content.style.width = `calc(100% - ${sidebarWidth}px)`; // Adjust content width dynamically
+            //console.log("sidebarWidth:", sidebarWidth);
+        }
+
+        Plotly.Plots.resize('plot');
+    }
+
+    arrowButton.addEventListener('click', toggleSidebar);
+
+    window.addEventListener('resize', () => {
+        Plotly.Plots.resize('plot');
+    });
+});
+
+
+
+
+/******************** Main Sidebar ********************/
 // On button click: Load Database
 function loadDatabase() {
     console.log("Button Load Database clicked");
