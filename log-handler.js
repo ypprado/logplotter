@@ -1,7 +1,7 @@
 
 
-function handleFileSelect(event) {
-    console.log("3 File selected:", event);
+function handleFileSelectLog(event) {
+    console.log("Log selected:", event);
 
     const file = event.target.files[0];
     if (!file) {
@@ -12,7 +12,7 @@ function handleFileSelect(event) {
     const reader = new FileReader();
     reader.onload = function (e) {
         const fileContent = e.target.result;
-        console.log("Data loaded.");
+        console.log("Log loaded.");
         processCSVAndPlot(fileContent);
     };
 

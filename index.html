@@ -17,14 +17,14 @@
             <select id="filterOptions">
                 <option value="noFilter">No Filter</option>
                 <option value="filterById">Filter By ID</option>
-                <option value="filterByNode">Filter by Node</option>
+                <option value="filterByECU">Filter by ECU</option>
+                <option value="filterByNode">Filter by Network Nodes</option>
             </select>
 
             <div class="checkbox-container" id="checkbox-sources">
                 <label>Filter Sources</label>
                 <div class="checkbox-group">
                 <p>Apply a filter to see the sources.</p>
-                   <!-- Checkboxes go here -->
                 </div>
             </div>
 
@@ -32,7 +32,6 @@
                 <label>Filter Signals</label>
                 <div class="checkbox-group">
                 <p>Select a source to see the signals.</p>
-                   <!-- Checkboxes go here -->
                 </div>
             </div>
 
@@ -56,7 +55,9 @@
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="main.js"></script>
-    <script src="file.js"></script>
+    <script src="database-handler.js"></script>
+    <script src="log-handler.js"></script>
+    <script src="app-state.js"></script>
     <script src="plot.js"></script>
 </body>
 </html>

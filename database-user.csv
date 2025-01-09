@@ -1,0 +1,4 @@
+ECU, ECU1, ECU2, ECU3,
+Nodes, Node1, Node2,NodeY,
+ID, 0x100, 0x358, 0x18AABBCC, 0x10FABC10
+Signals, Voltage, Current, State, Error

@@ -81,6 +81,7 @@ function createLayoutSettings() {
     const layout = {
         //title: 'Multiple Lines Plot',
         //xaxis: { title: 'X Axis' },
+        responsive: true, // Enables automatic resizing
         yaxis: {
             title: {
                 text: '', // Y-axis title text
