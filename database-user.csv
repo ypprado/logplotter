@@ -1,4 +1,16 @@
-ECU, ECU1, ECU2, ECU3,
-Nodes, Node1, Node2,NodeY,
-ID, 0x100, 0x358, 0x18AABBCC, 0x10FABC10
-Signals, Voltage, Current, State, Error
+SIGNALS,ID,ECU,NODE
+Voltage, 0x100,Main ECU,Internal
+Current, 0x100,Main ECU,Internal
+State, 0x100,Main ECU,External
+Error, 0x358,Main ECU,External
+HV, 0x18AABBCC,Slave ECU,Internal
+HV_DC, 0x10FABC10,Slave ECU,Internal
+PWM, 0x10FABC10,Slave ECU,Internal
+V_IN, 0x358,Main ECU,Internal
+VOUT, 0x18AABBCC,Slave ECU,Internal
+I_IN, 0x10FABC10,Slave ECU,Internal
+I_OUT, 0x358,Main ECU,Internal
+Temp, 0x18AABBCC,Slave ECU,Internal
+Debug1,0x123,Main ECU,Internal
+Debug2, 0x358,Main ECU,Internal
+Debug_3, 0x18AABBCC,PC,Internal

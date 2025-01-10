@@ -24,7 +24,7 @@ p {
 .permanent-sidebar {
     width: 60px; /* Fixed width */
     height: 100vh;
-    background-color: #333;
+    background-color: #929292;
     color: white;
     display: flex;
     flex-direction: column;
@@ -41,8 +41,8 @@ p {
 .permanent-sidebar .icon-btn {
     width: 40px;
     height: 40px;
-    background-color: #555;
-    color: white;
+    background-color: #ffffff;
+    color: black;
     border: none;
     border-radius: 10px;
     display: flex;
@@ -52,10 +52,34 @@ p {
     margin-bottom: 15px;
     font-size: 18px;
     transition: background-color 0.3s ease;
+    overflow: hidden; /* Ensures the background fits inside the rounded border */
+    padding: 0; /* Removes any padding */
 }
 
 .permanent-sidebar .icon-btn:hover {
-    background-color: #777;
+    background-color: #c0c0c0;
+}
+
+.icon {
+    width: 80%;
+    height: 80%;
+    /*background-size: cover; /* Scale icons to fill the container */
+    background-size: contain; /* Scales the icon proportionally to fit the button */
+    background-position: center; /* Centers the icon within the button */
+    background-repeat: no-repeat; /* Prevents tiling of the icon */
+}
+
+/* Icon-specific styles */
+.icon-file {
+    background-image: url('./images/file-icon.png'); /* Relative path to the file-icon */
+}
+
+.icon-brush {
+    background-image: url('./images/brush-icon.png'); /* Replace with the path to your brush icon */
+}
+
+.icon-gear {
+    background-image: url('./images/gear-icon.png'); /* Replace with the path to your gear icon */
 }
 
 .sidebar {
@@ -69,6 +93,7 @@ p {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    /*height: 100%; /* Ensure it spans the full height of the parent container */
     /*transition: width 0.5s ease, transform 0.5s ease;/**/
 }
 
@@ -101,6 +126,16 @@ p {
     box-sizing: border-box; /* Prevent overflow from padding or borders */
 }
 
+#filterOptions {
+    width: 200px; /* Adjust as needed */
+    cursor: pointer; /* Indicate interactivity */
+}
+
+#filterOptions:hover {
+    background-color: #e6e6e6; /* Highlight dropdown on hover */
+}
+
+
 button {
     padding: 10px;
     margin-bottom: 10px;
@@ -113,15 +148,30 @@ select {
 
 .checkbox-container {
     margin-bottom: 10px;
+    display: flex; /* Enable flexbox for contained .checkbox-group */
+    flex-direction: column; /* Align children vertically */
+    overflow: auto; /* Add scroll if the content overflows */
+}
+
+#checkbox-signals {
+    flex-grow: 1; /* Allow this container to grow */
+    display: flex; /* Enable flexbox for .checkbox-group inside */
+    flex-direction: column; /* Ensure vertical alignment for content */
+    overflow: auto; /* Add scroll if content overflows */
+}
+
+#checkbox-sources {
+    height: 150px; /* Static height for this container */
 }
 
 .checkbox-group {
-    height: 100px;
-    overflow-y: scroll;
+    flex-grow: 1; /* Make the border container grow with the parent */
+    overflow-y: scroll; /* Add scrolling if content exceeds height */
     overflow-x: hidden;
     border: 1px solid #ddd;
     padding: 10px;
 }
+
 
 .checkbox-group label {
     display: block;
