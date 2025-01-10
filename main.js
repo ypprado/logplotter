@@ -105,6 +105,52 @@ function addConfigListeners() {
     });
 }
 
+
+
+/******************** Droplist Filter Options ********************/
+const filterOptions = document.getElementById("filterOptions");
+
+// Change the selected item when scrolling over the dropdown
+filterOptions.addEventListener("wheel", (event) => {
+    event.preventDefault(); // Prevent the page from scrolling
+
+    // Get the current selected index
+    const currentIndex = filterOptions.selectedIndex;
+
+    // Calculate the new index based on scroll direction
+    let newIndex = currentIndex;
+    if (event.deltaY > 0) {
+        // Scroll down, move to the next item
+        newIndex = Math.min(currentIndex + 1, filterOptions.options.length - 1);
+    } else {
+        // Scroll up, move to the previous item
+        newIndex = Math.max(currentIndex - 1, 0);
+    }
+
+    // Set the new index as the selected option
+    filterOptions.selectedIndex = newIndex;
+
+    // Update the selected index
+    if (newIndex !== currentIndex) {
+        filterOptions.selectedIndex = newIndex;
+
+        // Manually trigger the change event
+        const changeEvent = new Event("change", { bubbles: true });
+        filterOptions.dispatchEvent(changeEvent);
+    }
+});
+
+// Optional: highlight the dropdown on hover
+/*filterOptions.addEventListener("mouseover", () => {
+    filterOptions.focus();
+});
+
+filterOptions.addEventListener("mouseout", () => {
+    filterOptions.blur();
+});*/
+
+
+
 /******************** Checkbox Sources ********************/
 
 // Event listener for the dropdown selection change
@@ -162,9 +208,9 @@ function populateCheckboxList(list, container, emptyMessage) {
 
 /******************** Checkbox Signals ********************/
 // Event listener for changes in the checkbox-sources
-document.querySelector('#checkbox-sources .checkbox-group').addEventListener('change', function(event) {
+document.querySelector('#checkbox-sources .checkbox-group').addEventListener('change', function (event) {
     if (event.target.tagName === 'INPUT' && event.target.type === 'checkbox') {
-        populateSignals(event.target.value, event.target.checked);
+        populateSignals();
     }
 });
 
@@ -186,7 +232,7 @@ function populateSignals() {
         return;
     }
 
-    // Collect and merge signals for all selected sources
+    // Collect unique signals associated with the selected sources
     const allSignals = new Set();
     selectedSources.forEach(source => {
         const signals = getSignalsForSource(source);
@@ -207,21 +253,48 @@ function populateSignals() {
 /**
  * Retrieves a list of signals for a given source.
  *
- * @param {string} source - The selected source.
+ * @param {string} source - The selected source (ECU, Node, or ID).
  * @returns {string[]} - A list of signals associated with the source.
  */
 function getSignalsForSource(source) {
-    // Example mapping (replace with actual signal retrieval logic)
-    const signalMapping = {
-        ECU1: ['Voltage', 'Current'],
-        ECU2: ['Temperature', 'Pressure'],
-        ECU3: ['State', 'Error'],
-    };
+    // Ensure the appState is available
+    if (!appState.parsedCSV || appState.parsedCSV.length === 0) {
+        console.error("No CSV data loaded.");
+        return [];
+    }
 
-    return signalMapping[source] || [];
+    // Extract the relevant indices for filtering
+    const headerRow = appState.parsedCSV[0]; // Assuming the first row is the header
+    const signalIndex = headerRow.findIndex(col => col.toUpperCase() === 'SIGNALS');
+    const ecuIndex = headerRow.findIndex(col => col.toUpperCase() === 'ECU');
+    const nodeIndex = headerRow.findIndex(col => col.toUpperCase() === 'NODE');
+    const idIndex = headerRow.findIndex(col => col.toUpperCase() === 'ID');
+
+    if (signalIndex === -1) {
+        console.error("SIGNALS column not found in CSV.");
+        return [];
+    }
+
+    // Identify the column to compare against based on the source type
+    const sourceColumnIndex =
+        appState.ECUs.includes(source) ? ecuIndex :
+        appState.Nodes.includes(source) ? nodeIndex :
+        appState.IDs.includes(source) ? idIndex : -1;
+
+    if (sourceColumnIndex === -1) {
+        console.error("Invalid source type.");
+        return [];
+    }
+
+    // Filter signals associated with the selected source
+    const matchingSignals = appState.parsedCSV
+        .slice(1) // Skip the header row
+        .filter(row => row[sourceColumnIndex]?.trim() === source)
+        .map(row => row[signalIndex]?.trim()) // Extract the signal column
+        .filter(signal => signal); // Exclude undefined or empty values
+
+    return [...new Set(matchingSignals)]; // Return unique signals
 }
-
-
 
 /******************** Right Sidebar ********************/
 // Right Sidebar Show/Hide
@@ -242,13 +315,3 @@ document.getElementById('showConfigBtn').addEventListener('click', function() {
 window.addEventListener('resize', () => {
     Plotly.Plots.resize('plot'); // Resizes the Plotly chart
 });
-
-/*
-    //sample code: populate checkbox
-    const checkboxGroup = document.querySelector(`#checkbox-signals .checkbox-group`);
-    checkboxGroup.innerHTML = ` 
-    <label><input type="checkbox" id="cb-log-1"> Log Option 1</label> 
-    <label><input type="checkbox" id="cb-log-2"> Log Option 2</label> 
-    <label><input type="checkbox" id="cb-log-3"> Log Option 3</label> 
-    <label><input type="checkbox" id="cb1-1"> Option 1</label>
-    `;*/
