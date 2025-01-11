@@ -60,7 +60,7 @@ p {
     background-color: #c0c0c0;
 }
 
-.icon {
+.permanent-sidebar .icon-btn .icon {
     width: 80%;
     height: 80%;
     /*background-size: cover; /* Scale icons to fill the container */
@@ -135,6 +135,34 @@ p {
     background-color: #e6e6e6; /* Highlight dropdown on hover */
 }
 
+/* Style for the Show Configuration button */
+#PlotButton {
+    padding: 10px;
+    background-color: #1faf24f3;
+    color: white;
+    border: none;
+    cursor: pointer;
+    width: 100%;
+    font-size: 16px;
+}
+
+#PlotButton:hover {
+    background-color: #17791c;
+}
+
+#PlotButton:disabled {
+    background-color: #ccc; /* Gray background */
+    color: #888; /* Lighter text color */
+    cursor: not-allowed; /* Indicate it's disabled */
+    opacity: 0.6; /* Reduce opacity */
+}
+
+button:disabled {
+    background-color: #ccc; /* Gray background */
+    color: #888; /* Lighter text color */
+    cursor: not-allowed; /* Indicate it's disabled */
+    opacity: 0.6; /* Reduce opacity */
+}
 
 button {
     padding: 10px;
@@ -192,20 +220,7 @@ select {
     transition: right 0.3s ease-in-out; /* Smooth transition when sliding in/out */
 }
 
-/* Style for the Show Configuration button */
-#showConfigBtn {
-    padding: 10px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    font-size: 16px;
-}
 
-#showConfigBtn:hover {
-    background-color: #45a049;
-}
 
 /* Style the configuration controls */
 #rightSidebar h3 {

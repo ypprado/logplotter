@@ -14,6 +14,9 @@ function handleFileSelectLog(event) {
         const fileContent = e.target.result;
         console.log("Log loaded.");
         processCSVAndPlot(fileContent);
+        //TODO ADD CHECKS FOR PLAUSABILITY
+        appState.isLogLoaded = true; // Mark the log as loaded
+        document.getElementById("PlotButton").disabled = false;
     };
 
     reader.onerror = function () {
@@ -25,70 +28,79 @@ function handleFileSelectLog(event) {
 }
 
 function processCSVAndPlot(fileContent) {
-    const data = processCSV(fileContent);
-
-    // Layout settings
-    const layout = createLayoutSettings();
-
-    console.log("7 Data To be Plotted.");
-
-    // Plot the data using Plotly
-    generatePlot(data, layout);  
-
+    
+    handleLogFile(fileContent);
+    
+    //plotData.addData(generatePlotlyDataset("HV_DC"));
+    //console.log("plotData: ", plotData.traces);
+ 
 }
 
+// Extract data from CSV and store in appState
+function handleLogFile(fileContent) {
+    const logData = [];
 
-/**
- * Processes a CSV file, extracts datasets, and creates Plotly trace objects.
- * 
- * @param {string} csvContent - The raw content of the CSV file.
- * @returns {Object[]} - An array of Plotly trace objects ready for plotting.
- */
-function processCSV(csvContent) {
-    console.log("5 Data to be Processed.");
-    const lines = csvContent.split("\n");
-    const headers = lines[0].split(","); // Extract column headers
+    // Split the content into lines
+    const lines = fileContent.split('\n');
 
-    // Extract datasets
-    const datasets = [];
-    for (let i = 1; i < headers.length; i++) {
-        datasets.push({ x: [], y: [] });
-    }
+    lines.forEach((line, index) => {
+        // Skip the header
+        if (index === 0) return;
 
-    // Populate datasets
-    for (let i = 1; i < lines.length; i++) {
-        const values = lines[i].split(",");
-        if (values.length !== headers.length) continue; // Skip invalid lines
+        const parts = line.split(',');
+        if (parts.length >= 4) {
+            const time = parseFloat(parts[0]); // Time in ms
+            const signal = parts[2].trim();   // Signal name
+            const value = parseFloat(parts[3]); // Signal value
 
-        const xValue = parseFloat(values[0]);
-        if (isNaN(xValue)) continue; // Skip invalid x-values
-
-        datasets.forEach((dataset, index) => {
-            const yValue = parseFloat(values[index + 1]);
-            if (!isNaN(yValue)) {
-                dataset.x.push(xValue);
-                dataset.y.push(yValue);
-            }
-        });
-    }
-
-    // Create traces and combine them into a single array
-    const data = [];
-    datasets.forEach((dataset, index) => {
-        const trace = createTrace(
-            dataset,
-            "scatter",
-            "lines+markers",
-            `Line ${index + 1}`
-        );
-        if (trace) {
-            data.push(trace);
+            // Push the parsed data into the logData array
+            logData.push({ time, signal, value });
         }
     });
 
-    console.log("6 Data Processed.");
-    return data;
+    // Store the parsed data in appState.rawLog
+    appState.rawLog = logData;
+    console.log("Log processed successfully:", appState.rawLog);
 }
+
+/**
+ * Generates a Plotly-ready dataset for a specific signal from appState.rawLog.
+ * 
+ * @param {string} signalName - The name of the signal to generate the dataset for.
+ * @returns {Object} - A Plotly trace object for the given signal.
+ */
+function generatePlotlyDataset(signalName) {
+    if (!appState || !appState.rawLog) {
+        console.error("No raw log data found in appState.");
+        return null;
+    }
+
+    // Extract data for the specified signal
+    const x = []; // Time (x-axis)
+    const y = []; // Value (y-axis)
+
+    appState.rawLog.forEach(entry => {
+        if (entry.signal === signalName) {
+            x.push(entry.time);  // Push the time value
+            y.push(entry.value); // Push the signal value
+        }
+    });
+
+    if (x.length === 0 || y.length === 0) {
+        console.warn(`No data found for signal: ${signalName}`);
+        return null;
+    }
+
+    // Create and return the Plotly trace object
+    return {
+        x: x,
+        y: y,
+        mode: "lines+markers",
+        type: "scatter",
+        name: signalName, // Use the signal name as the trace label
+    };
+}
+
 
 /**
  * Creates a Plotly trace object from the given dataset.

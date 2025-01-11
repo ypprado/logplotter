@@ -24,7 +24,10 @@ function handleFileSelectDatabase(event) {
         appState.ECUs = ExtractList(fileContent,Index.ECU);
         appState.IDs = ExtractList(fileContent,Index.ID);
         appState.Nodes = ExtractList(fileContent,Index.NODE);
-        appState.isCSVLoaded = true; // Mark the database as loaded
+        appState.isDatabaseLoaded = true; // Mark the database as loaded
+
+        // Enable the "Load Log" button TODO place on main every interface related feature
+        document.getElementById("loadLogButton").disabled = false;
 
         // Log the parsed content
         //console.log("Extracted ECUs:", appState.ECUs);

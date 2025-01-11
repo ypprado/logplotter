@@ -171,7 +171,7 @@ function populateCheckboxGroup(filter) {
     checkboxGroup.innerHTML = '';
 
     // Handle case where CSV is not loaded
-    if (!appState.isCSVLoaded) {
+    if (!appState.isDatabaseLoaded) {
         checkboxGroup.innerHTML = `<p>Please load a database to apply filters.</p>`;
         return;
     }
@@ -298,7 +298,7 @@ function getSignalsForSource(source) {
 
 /******************** Right Sidebar ********************/
 // Right Sidebar Show/Hide
-document.getElementById('showConfigBtn').addEventListener('click', function() {
+document.getElementById('brushButton').addEventListener('click', function() {
     const rightSidebar = document.getElementById('rightSidebar');
     const currentRightPosition = rightSidebar.style.right;
 
@@ -309,6 +309,50 @@ document.getElementById('showConfigBtn').addEventListener('click', function() {
         rightSidebar.style.right = '0'; // Show the sidebar
     }
 });
+
+
+/******************** Button Plot ********************/
+/**
+ * Processes all selected checkboxes within the container checkbox-signals, 
+ * generates a Plotly trace for each selected signal, and adds the traces to the global plotData. 
+ * This function is triggered when the "PlotButton" is clicked.
+ */
+function handleGenerateTraces() {
+    // Get the checkbox container
+    const checkboxContainer = document.getElementById('checkbox-signals');
+
+    // Check if the container exists
+    if (!checkboxContainer) {
+        console.error("Checkbox container with ID 'checkbox-signals' not found.");
+        return;
+    }
+
+    // Get all checked checkboxes within the container
+    const selectedCheckboxes = Array.from(
+        checkboxContainer.querySelectorAll('input[type="checkbox"]:checked')
+    );
+
+    if (selectedCheckboxes.length === 0) {
+        console.warn("No signals selected for trace generation.");
+        return;
+    }
+
+    // Clear any previous traces to generate a fresh plot
+    plotData.clearTraces();
+
+    // Loop through the selected checkboxes and generate traces
+    selectedCheckboxes.forEach(checkbox => {
+        const signalName = checkbox.value; // Assuming the checkbox's value contains the signal name
+        const trace = generatePlotlyDataset(signalName); // Generate the trace
+        if (trace) {
+            plotData.addData(trace); // Add the trace to the global plotData
+        }
+    });
+
+    console.log(`Generated and added traces for ${selectedCheckboxes.length} signal(s).`);
+
+    generatePlot();
+}
 
 
 /******************** Plot Container ********************/

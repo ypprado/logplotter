@@ -26,8 +26,9 @@
         <div class="sidebar">
             <p>Load a Database and a Log to start!</p>
             <button onclick="loadDatabase()">Load Database</button>
-            <button onclick="loadLog()">Load Log</button>
-        
+            <!--<button id="loadLogButton" onclick="loadLog()">Load Log</button>-->
+            <button id="loadLogButton" onclick="loadLog()" disabled>Load Log</button>         
+            
             <p>Source selection</p>
             <select id="filterOptions" size="1">
                 <option value="noFilter">No Filter</option>
@@ -50,7 +51,8 @@
                 </div>
             </div>
 
-            <button id="showConfigBtn">Show Configuration</button>
+            <button id="PlotButton" onclick="handleGenerateTraces()" disabled>Generate Plot!</button>         
+
         </div>
 
 

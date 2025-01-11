@@ -2,16 +2,26 @@
  * Generate a brand new plot on the given HTML container id "plot" 
  * @param {Object[]} data - An array of Plotly trace objects ready for plotting.
  */
-function generatePlot(data, layout) {
+function generatePlot() {
+    // Layout settings
+    const layout = createLayoutSettings();
+
+    // Check if there is an existing plot and clear it
+    const plotElement = document.getElementById('plot');
+    if (plotElement) {
+        Plotly.purge(plotElement); // Clear any existing plot
+    }
+
     // Plot the data using Plotly
-    if (data.length > 0) {
-        Plotly.newPlot('plot', data, layout);  
+    if (plotData.traces.length > 0) {
+        Plotly.newPlot('plot', plotData.traces, layout);  
         // Show the configuration panel and populate it with the controls
-        displayConfigurationControls(data); 
+        displayConfigurationControls(plotData.traces); 
     } else {
         console.error("No valid data for plotting.");
     }
 }
+
 
 function displayConfigurationControls(data) {
     // Clear previous configurations
