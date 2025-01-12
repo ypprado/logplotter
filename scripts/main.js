@@ -1,11 +1,9 @@
-
 /**
  * main.js aims to make the integration between user interface and
  * processes in js. 
  */
 
 /******************** Permanent Sidebar ********************/
-
 /**
  * Monitor "arrowButton" which is responsible for hide/unhide 
  * the sidepanel.
@@ -41,6 +39,8 @@ document.addEventListener('DOMContentLoaded', function () {
         Plotly.Plots.resize('plot');
     });
 });
+
+
 
 
 
@@ -179,6 +179,8 @@ function populateCheckboxGroup(filter) {
     // Populate checkboxes based on the selected filter
     if (filter === 'noFilter') {
         checkboxGroup.innerHTML = `<p>No filter applied.</p>`;
+        // Do not populate sources, but populate signals with all content available
+        populateSignals();
     } else if (filter === 'filterByECU') {
         populateCheckboxList(appState.ECUs, checkboxGroup, 'No ECUs available.');
     } else if (filter === 'filterById') {
@@ -226,18 +228,22 @@ function populateSignals() {
     // Clear the existing content
     checkboxGroup.innerHTML = '';
 
-    // If no sources are selected, show a default message
-    if (selectedSources.length === 0) {
-        checkboxGroup.innerHTML = `<p>Select a source to see the signals.</p>`;
-        return;
-    }
-
-    // Collect unique signals associated with the selected sources
     const allSignals = new Set();
-    selectedSources.forEach(source => {
-        const signals = getSignalsForSource(source);
-        signals.forEach(signal => allSignals.add(signal)); // Add to Set to ensure uniqueness
-    });
+    
+    // If no sources are selected, load signals from all available sources
+    if (selectedSources.length === 0) {
+        const allAvailableSources = appState.IDs; // Function to return all sources
+        allAvailableSources.forEach(source => {
+            const signals = getSignalsForSource(source);
+            signals.forEach(signal => allSignals.add(signal)); // Add to Set to ensure uniqueness
+        });
+    } else {
+        // Collect signals associated with the selected sources
+        selectedSources.forEach(source => {
+            const signals = getSignalsForSource(source);
+            signals.forEach(signal => allSignals.add(signal)); // Add to Set to ensure uniqueness
+        });
+    }
 
     // Populate signals
     if (allSignals.size > 0) {
@@ -295,21 +301,6 @@ function getSignalsForSource(source) {
 
     return [...new Set(matchingSignals)]; // Return unique signals
 }
-
-/******************** Right Sidebar ********************/
-// Right Sidebar Show/Hide
-document.getElementById('brushButton').addEventListener('click', function() {
-    const rightSidebar = document.getElementById('rightSidebar');
-    const currentRightPosition = rightSidebar.style.right;
-
-    // Toggle sidebar visibility by adjusting the right property
-    if (currentRightPosition === '0px') {
-        rightSidebar.style.right = '-400px'; // Hide the sidebar
-    } else {
-        rightSidebar.style.right = '0'; // Show the sidebar
-    }
-});
-
 
 /******************** Button Plot ********************/
 /**

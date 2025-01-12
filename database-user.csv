@@ -14,3 +14,8 @@ Temp, 0x18AABBCC,Slave ECU,Internal
 Debug1,0x123,Main ECU,Internal
 Debug2, 0x358,Main ECU,Internal
 Debug_3, 0x18AABBCC,PC,Internal
+Not Used 1,0x001,,
+Not used 2,0x001,,
+Not used 3,0x001,,
+Not used 4,0x001,,
+Not used 5,,,

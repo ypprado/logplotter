@@ -2,18 +2,28 @@
  * This file contains information that shall be used across the application
  */
 
+// Iindexes are linked to columns in the database as follows. Used in database-handler.js
+const Index = {
+    ECU: 0,
+    NODE: 1,
+    ID: 2,
+    SIGNAL: 3,
+};
+
 // Global state to store the extracted data
 const appState = {
+    // Lists that will populate the checkboxes
     ECUs: [],
     IDs: [],
     Nodes: [],
-    isDatabaseLoaded: false, // Tracks if database has been loaded
-    isLogLoaded: false,     // Tracks if log has been loaded
-    rawCSV: '',         // Raw CSV content as a string
-    parsedCSV: [],      // Parsed CSV content as an array of rows
-    rawLog: [],         // Global container to store the extracted log data
+    // Global status for loaded files
+    isDatabaseLoaded: false,
+    isLogLoaded: false,
+    // Global containers for parsed database and log
+    parsedCSV: [],
+    rawLog: [],
+    // Data manipulation 
     loadCSV(content) {
-        this.rawCSV = content;
         this.parsedCSV = this.parseCSV(content);
     },
     parseCSV(content) {
@@ -70,9 +80,3 @@ const plotData = {
 };
 
 
-const Index = {
-    ECU: 0,
-    NODE: 1,
-    ID: 2,
-    SIGNAL: 3,
-};

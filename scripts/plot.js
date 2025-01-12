@@ -125,3 +125,71 @@ function createLayoutSettings() {
 
     return layout;
 }
+
+/**
+ * Generates a Plotly-ready dataset for a specific signal from appState.rawLog.
+ * 
+ * @param {string} signalName - The name of the signal to generate the dataset for.
+ * @returns {Object} - A Plotly trace object for the given signal.
+ */
+function generatePlotlyDataset(signalName) {
+    if (!appState || !appState.rawLog) {
+        console.error("No raw log data found in appState.");
+        return null;
+    }
+
+    // Extract data for the specified signal
+    const x = []; // Time (x-axis)
+    const y = []; // Value (y-axis)
+
+    appState.rawLog.forEach(entry => {
+        if (entry.signal === signalName) {
+            x.push(entry.time);  // Push the time value
+            y.push(entry.value); // Push the signal value
+        }
+    });
+
+    if (x.length === 0 || y.length === 0) {
+        console.warn(`No data found for signal: ${signalName}`);
+        return null;
+    }
+
+    // Create and return the Plotly trace object
+    return {
+        x: x,
+        y: y,
+        mode: "lines+markers",
+        type: "scatter",
+        name: signalName, // Use the signal name as the trace label
+    };
+}
+
+/* example for two subplots
+var trace1 = {
+  x: [1, 2, 3, 4, 5],
+  y: [10, 15, 13, 17, 12],
+  type: 'scatter',
+  xaxis: 'x1',
+  yaxis: 'y1'
+};
+
+var trace2 = {
+  x: [1, 2, 3, 4, 5],
+  y: [16, 5, 11, 9, 20],
+  type: 'scatter',
+  xaxis: 'x2',
+  yaxis: 'y2'
+};
+
+var data = [trace1, trace2];
+
+var layout = {
+  grid: {rows: 1, columns: 2, pattern: 'independent'},
+  xaxis: {title: 'X Axis 1', domain: [0, 0.5]},
+  yaxis: {title: 'Y Axis 1'},
+  xaxis2: {title: 'X Axis 2', domain: [0.5, 1]},
+  yaxis2: {title: 'Y Axis 2'}
+};
+
+Plotly.newPlot('myDiv', data, layout);
+*/

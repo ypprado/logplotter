@@ -1,6 +1,9 @@
-
+/**
+ * Handles the selection of a database file, parses its content, and updates the global state with 
+ * extracted data (ECUs, IDs, Nodes).  
+ * Enables the "Load Log" button upon successful loading and sets the database as loaded.  
+ */
 function handleFileSelectDatabase(event) {
-    console.log("Database selected:", event);
 
     const file = event.target.files[0];
     if (!file) {
@@ -11,14 +14,9 @@ function handleFileSelectDatabase(event) {
     const reader = new FileReader();
     reader.onload = function (e) {
         const fileContent = e.target.result;
-        console.log("Database loaded.");
 
         // Load the CSV data into the global state
         appState.loadCSV(fileContent);
-
-        // Log the parsed content
-        //console.log("Raw appState:", appState.rawCSV);
-        console.log("Parsed appState:", appState.parsedCSV);
         
         // Extract lists and update global state
         appState.ECUs = ExtractList(fileContent,Index.ECU);
@@ -28,6 +26,9 @@ function handleFileSelectDatabase(event) {
 
         // Enable the "Load Log" button TODO place on main every interface related feature
         document.getElementById("loadLogButton").disabled = false;
+
+        // Populate signals box with all signals
+        populateSignals();
 
         // Log the parsed content
         //console.log("Extracted ECUs:", appState.ECUs);
@@ -40,7 +41,6 @@ function handleFileSelectDatabase(event) {
     };
 
     reader.readAsText(file); // Read file as text. todo: WHY?
-    console.log("End!");
 }
 
 /**

@@ -4,77 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload and Plot Data</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/styles.css">
 </head>
 <body>
 
     <div class="permanent-sidebar">
         <button id="arrowButton" class="icon-btn" title="Toggle Sidebar">←</button>
-        <button id="fileButton" class="icon-btn" title="File">
+        <button id="fileButton" class="icon-btn" title="File" onclick="toggleSidebarContent('main')">
             <i class="icon icon-file"></i>
         </button>
-        <button id="brushButton" class="icon-btn" title="Brush">
+        <button id="brushButton" class="icon-btn" title="Brush" onclick="toggleSidebarContent('brush')">
             <i class="icon icon-brush"></i>
         </button>
-        <button id="gearButton" class="icon-btn" title="Settings">
+        <button id="gearButton" class="icon-btn" title="Settings" onclick="toggleSidebarContent('gear')">
             <i class="icon icon-gear"></i>
         </button>
     </div>
 
-
     <div class="container">
         <div class="sidebar">
-            <p>Load a Database and a Log to start!</p>
-            <button onclick="loadDatabase()">Load Database</button>
-            <!--<button id="loadLogButton" onclick="loadLog()">Load Log</button>-->
-            <button id="loadLogButton" onclick="loadLog()" disabled>Load Log</button>         
-            
-            <p>Source selection</p>
-            <select id="filterOptions" size="1">
-                <option value="noFilter">No Filter</option>
-                <option value="filterById">Filter By ID</option>
-                <option value="filterByECU">Filter by ECU</option>
-                <option value="filterByNode">Filter by Network Nodes</option>
-            </select>
 
-            <div class="checkbox-container" id="checkbox-sources">
-                <label>Filter Sources</label>
-                <div class="checkbox-group">
-                <p>Apply a filter to see the sources.</p>
+            <!-- Invisible container that holds all sidebar configurations -->
+            <div id="sidebarContainer">
+
+                <!-- Main Configuration Content -->
+                <div class="sidebar-content active" id="mainConfig">
+                    <p>Load a Database</p>
+                    <button onclick="loadDatabase()">Load Database</button>
+                    <p>Source selection</p>
+                    <select id="filterOptions" size="1">
+                        <option value="noFilter">No Filter</option>
+                        <option value="filterById">Filter By ID</option>
+                        <option value="filterByECU">Filter by ECU</option>
+                        <option value="filterByNode">Filter by Network Nodes</option>
+                    </select>
+                    <div class="checkbox-container" id="checkbox-sources">
+                        <label>Filter Sources</label>
+                        <div class="checkbox-group">
+                        <p>Apply a filter to see the sources.</p>
+                        </div>
+                    </div>
+                    <div class="checkbox-container" id="checkbox-signals">
+                        <label>Filter Signals</label>
+                        <div class="checkbox-group">
+                        <p>Select a source to see the signals.</p>
+                        </div>
+                    </div>
+                    <p>Load a Log</p>
+                    <button id="loadLogButton" onclick="loadLog()" disabled>Load Log</button>         
+                    <button id="PlotButton" onclick="handleGenerateTraces()" disabled>Generate Plot!</button>         
+                </div>
+
+                <!-- Brush Configuration Content -->
+                <div class="sidebar-content" id="brushConfig">
+                    <div id="lineConfigurations"></div>
+                </div>
+
+                <!-- Gear Configuration Content -->
+                <div class="sidebar-content" id="gearConfig">
+                    <p>Gear Settings will be shown here.</p>
                 </div>
             </div>
-
-            <div class="checkbox-container" id="checkbox-signals">
-                <label>Filter Signals</label>
-                <div class="checkbox-group">
-                <p>Select a source to see the signals.</p>
-                </div>
-            </div>
-
-            <button id="PlotButton" onclick="handleGenerateTraces()" disabled>Generate Plot!</button>         
-
         </div>
-
-
         <div class="content">
             <div id="plot"></div>
         </div>
-
-        <!-- Right sidebar, initially hidden -->
-        <div id="rightSidebar" class="right-sidebar">
-            <h3>Configuration Settings</h3>
-            <div id="lineConfigurations">
-                <!-- Configuration options for lines will appear here dynamically -->
-            </div>
-        </div>
-
     </div>
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="main.js"></script>
-    <script src="database-handler.js"></script>
-    <script src="log-handler.js"></script>
-    <script src="app-state.js"></script>
-    <script src="plot.js"></script>
+    <script src="scripts/main.js"></script>
+    <script src="scripts/database-handler.js"></script>
+    <script src="scripts/log-handler.js"></script>
+    <script src="scripts/app-state.js"></script>
+    <script src="scripts/plot.js"></script>
+    <script src="scripts/sidebar.js"></script>
 </body>
 </html>
