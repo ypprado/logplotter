@@ -1,0 +1,21 @@
+/***************************** plot area *****************************/
+.content {
+    flex-grow: 1; /* Let .content grow to fill the available space */
+    padding: 5px;
+    display: flex;
+    flex-direction: column;
+    /*width: 100%;*/
+    height: 100%; /* Set height to fully stretch */
+    min-height: 400px; /* Ensure the plot area is never smaller than 500px */
+    min-width: 500px; /* Ensure the plot area is never smaller than 500px */
+    box-sizing: border-box; /* Ensure padding is included in the size */
+    /*transition: width 0.3s ease;/**/
+}
+
+#plot {
+    flex-grow: 1; /* Allow #plot to grow with .content */
+    width: 100%; /* Set width to fill the parent container */
+    height: 100%; /* Set height to fill the parent container */
+    background-color: #fff; /* Optional: Add a background for better visualization */
+    box-sizing: border-box; /* Prevent overflow from padding or borders */
+}

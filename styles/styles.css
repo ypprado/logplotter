@@ -6,71 +6,14 @@ body {
 }
 
 p {
+    /*line-height: 1.5; /* Adjust to provide enough vertical space */
+    height: 20px;
+    padding: 5px 0; /* Add vertical padding for better spacing */
     white-space: nowrap; /* Prevent text from wrapping to the next line */
     overflow: hidden; /* Hide overflowing text if the container is too small */
     text-overflow: ellipsis; /* Add "..." to indicate truncated text */
 }
 
-/***************************** permanent sidebar *****************************/
-.permanent-sidebar {
-    width: 60px; /* Fixed width */
-    height: 100vh;
-    background-color: #929292;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px 0;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    position: fixed; /* Fix it to the viewport */
-    left: 0;
-    top: 0;
-    z-index: 2;
-}
-
-/* Permanent Sidebar Buttons */
-.permanent-sidebar .icon-btn {
-    width: 40px;
-    height: 40px;
-    background-color: #ffffff;
-    color: black;
-    border: none;
-    border-radius: 10px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    margin-bottom: 15px;
-    font-size: 18px;
-    transition: background-color 0.3s ease;
-    overflow: hidden; /* Ensures the background fits inside the rounded border */
-    padding: 0; /* Removes any padding */
-}
-
-.permanent-sidebar .icon-btn:hover {
-    background-color: #c0c0c0;
-}
-
-.permanent-sidebar .icon-btn .icon {
-    width: 80%;
-    height: 80%;
-    /*background-size: cover; /* Scale icons to fill the container */
-    background-size: contain; /* Scales the icon proportionally to fit the button */
-    background-position: center; /* Centers the icon within the button */
-    background-repeat: no-repeat; /* Prevents tiling of the icon */
-}
-
-.icon-file {
-    background-image: url('../images/file-icon.png'); /* Relative path to the file-icon */
-}
-
-.icon-brush {
-    background-image: url('../images/brush-icon.png'); /* Replace with the path to your brush icon */
-}
-
-.icon-gear {
-    background-image: url('../images/gear-icon.png'); /* Replace with the path to your gear icon */
-}
 
 /***************************** main container *****************************/
 /* Main Container shifted right to accommodate permanent-sidebar */
@@ -79,13 +22,13 @@ p {
     height: 100vh;
     width: calc(100% - 60px); /* Subtract permanent-sidebar width */
     margin-left: 60px; /* Offset by permanent-sidebar width */
-    /*overflow: hidden; /* Prevent horizontal scroll */
+    overflow: hidden; /* Prevent horizontal scroll */
 }
 
 /***************************** sidebar *****************************/
 .sidebar {
     width: 20%; /* Initial width */
-    min-width: 250px;/**/
+    min-width: 250px;
     max-width: 400px;
     background-color: #f4f4f4;
     color: black;
@@ -94,8 +37,11 @@ p {
     display: flex;
     flex-direction: column;
     gap: 10px;
-    /*height: 100%; /* Ensure it spans the full height of the parent container */
-    transition: width 0.5s ease, transform 0.5s ease;/**/
+    overflow-y: auto; /* Enable vertical scrolling for the sidebar itself */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    height: 100vh; /* Match the height of the viewport */
+    box-sizing: border-box; /* Include padding in height calculation */
+    transition: width 0.5s ease, transform 0.5s ease;
 }
 
 .sidebar.collapsed {
@@ -118,12 +64,25 @@ p {
     display: none;
     height: 100%;
     flex-grow: 1; /* Allow the active content to take up available space */
+
+    overflow-y: auto; /* Add a scroll if the content exceeds available space */
+    padding-bottom: 10px; /* Ensure space below the last element */
+    box-sizing: border-box; /* Include padding in size calculations */
 }
 
 /* Visible content when selected */
 .sidebar-content.active {
     display: block;
     flex-grow: 1; /* Allow the active content to take up available space */
+}
+
+#mainConfig {
+    display: flex;
+    flex-direction: column; /* Stack content vertically */
+    flex-grow: 1; /* Allow it to grow to take available space */
+    /*overflow-y: auto; /* Add a scroll if the content exceeds available space */
+    /*padding-bottom: 10px; /* Ensure space below the last element */
+    /*box-sizing: border-box; /* Include padding in size calculations */
 }
 
 /***************************** sidebar:mainConfig *****************************/
@@ -179,7 +138,9 @@ button {
     flex-grow: 1; /* Allow this container to grow */
     display: flex; /* Enable flexbox for .checkbox-group inside */
     flex-direction: column; /* Ensure vertical alignment for content */
+    max-height: 850px; /* Limit the height */
     overflow: auto; /* Add scroll if content overflows */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
 }
 
 
@@ -193,6 +154,8 @@ button {
     cursor: pointer;
     width: 100%;
     font-size: 16px;
+    margin-bottom: 10px;
+    box-sizing: border-box; /* Ensure padding is included in the button height */
 }
 
 #PlotButton:hover {
@@ -206,48 +169,7 @@ button {
     opacity: 0.6; /* Reduce opacity */
 }
 
-/***************************** plot area *****************************/
-.content {
-    flex-grow: 1; /* Let .content grow to fill the available space */
-    padding: 5px;
-    display: flex;
-    flex-direction: column;
-    /*width: 100%;*/
-    height: 100%; /* Set height to fully stretch */
-    min-height: 400px; /* Ensure the plot area is never smaller than 500px */
-    min-width: 500px; /* Ensure the plot area is never smaller than 500px */
-    box-sizing: border-box; /* Ensure padding is included in the size */
-    /*transition: width 0.3s ease;/**/
-}
-
-#plot {
-    flex-grow: 1; /* Allow #plot to grow with .content */
-    width: 100%; /* Set width to fill the parent container */
-    height: 100%; /* Set height to fill the parent container */
-    background-color: #fff; /* Optional: Add a background for better visualization */
-    box-sizing: border-box; /* Prevent overflow from padding or borders */
-}
-
 select {
     margin-bottom: 10px;
     padding: 10px;
 }
-
-
-/*
-.line-config {
-    margin-bottom: 15px;
-}
-
-.line-config select,
-.line-config input[type="range"] {
-    width: 100%;
-    padding: 5px;
-    margin-top: 5px;
-}
-
-.line-config label {
-    font-size: 16px;
-    display: block;
-    margin-bottom: 5px;
-}*/

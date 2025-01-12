@@ -46,6 +46,44 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 /******************** Main Sidebar ********************/
+/*
+const sidebar = document.getElementById('sidebar');
+const resizer = document.getElementById('resizer');
+
+let isResizing = false;
+
+resizer.addEventListener('mousedown', (e) => {
+    isResizing = true;
+
+    // Disable text selection while resizing
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none';
+    document.body.style.pointerEvents = 'none';
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (!isResizing) return;
+
+    // Calculate the new width
+    const newWidth = e.clientX - sidebar.getBoundingClientRect().left;
+
+    // Respect minimum and maximum widths
+    if (newWidth >= 200 && newWidth <= 400) {
+        sidebar.style.width = `${newWidth}px`;
+    }
+});
+
+document.addEventListener('mouseup', () => {
+    if (isResizing) {
+        isResizing = false;
+
+        // Restore default styles
+        document.body.style.cursor = '';
+        document.body.style.userSelect = '';
+        document.body.style.pointerEvents = '';
+    }
+});/* */
+
 // On button click: Load Database
 function loadDatabase() {
     console.log("Button Load Database clicked");

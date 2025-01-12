@@ -1,0 +1,60 @@
+/***************************** permanent sidebar *****************************/
+.permanent-sidebar {
+    width: 60px; /* Fixed width */
+    height: 100vh;
+    background-color: #929292;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed; /* Fix it to the viewport */
+    left: 0;
+    top: 0;
+    z-index: 2;
+}
+
+/* Permanent Sidebar Buttons */
+.permanent-sidebar .icon-btn {
+    width: 40px;
+    height: 40px;
+    background-color: #ffffff;
+    color: black;
+    border: none;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 15px;
+    font-size: 18px;
+    transition: background-color 0.3s ease;
+    overflow: hidden; /* Ensures the background fits inside the rounded border */
+    padding: 0; /* Removes any padding */
+}
+
+.permanent-sidebar .icon-btn:hover {
+    background-color: #c0c0c0;
+}
+
+.permanent-sidebar .icon-btn .icon {
+    width: 80%;
+    height: 80%;
+    /*background-size: cover; /* Scale icons to fill the container */
+    background-size: contain; /* Scales the icon proportionally to fit the button */
+    background-position: center; /* Centers the icon within the button */
+    background-repeat: no-repeat; /* Prevents tiling of the icon */
+}
+
+.icon-file {
+    background-image: url('../images/file-icon.png'); /* Relative path to the file-icon */
+}
+
+.icon-brush {
+    background-image: url('../images/brush-icon.png'); /* Replace with the path to your brush icon */
+}
+
+.icon-gear {
+    background-image: url('../images/gear-icon.png'); /* Replace with the path to your gear icon */
+}
