@@ -39,12 +39,6 @@ function displayConfigurationControls(data) {
         lineConfig.innerHTML = `
             <label>Line ${index + 1} Configuration</label>
 
-            <label>Type</label>
-            <select class="line-type" data-index="${index}">
-                <option value="scatter" ${trace.type === 'scatter' ? 'selected' : ''}>Scatter</option>
-                <option value="bar" ${trace.type === 'bar' ? 'selected' : ''}>Bar</option>
-            </select>
-
             <label>Mode</label>
             <select class="line-mode" data-index="${index}">
                 <option value="lines" ${trace.mode === 'lines' ? 'selected' : ''}>Lines</option>
