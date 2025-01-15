@@ -78,6 +78,30 @@ function ExtractList(csvContent, index) {
         }
     }
 
-    // Convert the Set to an array and return it
-    return Array.from(uniqueValues);
+    // Convert the Set to an array and sort it
+    const sortedList = sortAlphabetically(Array.from(uniqueValues));
+    
+    return sortedList;
 }
+
+/**
+ * Sort an array of words. Prioritize shorter IDs.
+ * Exame: 0x7FF comes before of 0x1FFFFFFFF
+ * @param {string[]} - string of words to be sorted 
+ * @returns  - string of words sorted
+ */
+function sortAlphabetically(arr) {
+    return arr.sort((a, b) => {
+      const startsWith0xOrEndsWithH = (str) => str.startsWith('0x') || str.endsWith('h');
+  
+      if (startsWith0xOrEndsWithH(a) && startsWith0xOrEndsWithH(b)) {
+        if (a.length !== b.length) {
+          return a.length - b.length; // Shorter words first
+        }
+        return a.localeCompare(b); // Alphabetical order
+      }
+  
+      return a.localeCompare(b); // Default alphabetical sorting for other cases
+    });
+  }
+  
