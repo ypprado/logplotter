@@ -31,12 +31,7 @@ function displayConfigurationControls(data) {
         lineConfig.classList.add('line-config');
         const lineWidth = trace.line && trace.line.width ? trace.line.width : 2;
         lineConfig.innerHTML = `
-            <label>Line ${index + 1} Configuration</label>
-            <label>Type</label>
-            <select class="line-type" data-index="${index}">
-                <option value="scatter" ${trace.type === 'scatter' ? 'selected' : ''}>Scatter</option>
-                <option value="bar" ${trace.type === 'bar' ? 'selected' : ''}>Bar</option>
-            </select>
+            <label>Signal ${trace.name}</label>
 
             <label>Mode</label>
             <select class="line-mode" data-index="${index}">
@@ -45,11 +40,22 @@ function displayConfigurationControls(data) {
                 <option value="lines+markers" ${trace.mode === 'lines+markers' ? 'selected' : ''}>Lines + Markers</option>
             </select>
 
-            <label>Line Width</label>
+            <div class="line-width-row">
+                <label>Line Width:</label>
+                <span class="line-width-value">${lineWidth}</span>
+            </div>
             <input type="range" class="line-width" data-index="${index}" min="1" max="10" value="${lineWidth}" />
-            <span class="line-width-value">${lineWidth}</span>
+
         `;
         configContainer.appendChild(lineConfig);
     });
     addConfigListeners();
 }
+
+/*
+            <label>Line Width</label>
+            <input type="range" class="line-width" data-index="${index}" min="1" max="10" value="${lineWidth}" />
+            <span class="line-width-value">${lineWidth}</span>
+
+    
+            */

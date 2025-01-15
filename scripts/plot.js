@@ -22,54 +22,16 @@ function generatePlot() {
     }
 }
 
-
-function displayConfigurationControls(data) {
-    // Clear previous configurations
-    const configContainer = document.getElementById('lineConfigurations');
-    configContainer.innerHTML = '';
-
-    // Loop through the lines (traces) and generate the controls
-    data.forEach((trace, index) => {
-        const lineConfig = document.createElement('div');
-        lineConfig.classList.add('line-config');
-
-        // Set default line width if not available
-        const lineWidth = trace.line && trace.line.width ? trace.line.width : 2;
-
-        lineConfig.innerHTML = `
-            <label>Line ${index + 1} Configuration</label>
-
-            <label>Mode</label>
-            <select class="line-mode" data-index="${index}">
-                <option value="lines" ${trace.mode === 'lines' ? 'selected' : ''}>Lines</option>
-                <option value="markers" ${trace.mode === 'markers' ? 'selected' : ''}>Markers</option>
-                <option value="lines+markers" ${trace.mode === 'lines+markers' ? 'selected' : ''}>Lines + Markers</option>
-            </select>
-
-            <label>Line Width</label>
-            <input type="range" class="line-width" data-index="${index}" min="1" max="10" value="${lineWidth}" />
-            <span class="line-width-value">${lineWidth}</span>
-        `;
-
-        // Add the line configuration to the container
-        configContainer.appendChild(lineConfig);
-    });
-
-    // Add event listeners to update the plot based on configuration changes
-    addConfigListeners();
-}
-
 function updatePlot() {
     const data = [];
     const traces = Plotly.d3.select('#plot').node().data;
 
     // Update each trace based on configuration
     traces.forEach((trace, index) => {
-        const type = document.querySelector(`.line-type[data-index="${index}"]`).value;
         const mode = document.querySelector(`.line-mode[data-index="${index}"]`).value;
         const width = document.querySelector(`.line-width[data-index="${index}"]`).value;
 
-        trace.type = type;
+        trace.type = "scatter";
         trace.mode = mode;
         trace.line = { width: parseInt(width) };
 

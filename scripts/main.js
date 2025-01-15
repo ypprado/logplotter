@@ -120,12 +120,6 @@ function loadLog() {
 
 // Update plot according to changes in configuration sidebar
 function addConfigListeners() {
-    // Add listener for type selection
-    const typeSelectors = document.querySelectorAll('.line-type');
-    typeSelectors.forEach(selector => {
-        selector.addEventListener('change', updatePlot);
-    });
-
     // Add listener for mode selection
     const modeSelectors = document.querySelectorAll('.line-mode');
     modeSelectors.forEach(selector => {
@@ -137,10 +131,13 @@ function addConfigListeners() {
     widthSliders.forEach(slider => {
         slider.addEventListener('input', function (event) {
             const lineWidthValue = event.target.value;
-            event.target.nextElementSibling.textContent = lineWidthValue;
+            // Find the .line-width-value within the same container
+            const lineWidthSpan = event.target.previousElementSibling.querySelector('.line-width-value');
+            lineWidthSpan.textContent = lineWidthValue;
             updatePlot();
         });
     });
+    
 }
 
 
@@ -283,9 +280,12 @@ function populateSignals() {
         });
     }
 
-    // Populate signals
-    if (allSignals.size > 0) {
-        Array.from(allSignals).forEach(signal => {
+    // Retrieve list from the set, sort it alphabetically and load in an array
+    const sortedSignals = Array.from(allSignals).sort((a, b) => a.localeCompare(b));
+    
+    // Populate signals checkbox
+    if (sortedSignals.length > 0) {
+        sortedSignals.forEach(signal => {
             checkboxGroup.innerHTML += `
                 <label><input type="checkbox" value="${signal}"> ${signal}</label>`;
         });

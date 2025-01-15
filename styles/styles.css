@@ -83,6 +83,33 @@ p {
     /*box-sizing: border-box; /* Include padding in size calculations */
 }
 
+/* Brush sidebar */
+/* Style for each line configuration block */
+.line-config {
+    margin: 10px 0;
+    padding: 10px;
+    gap: 5px;
+    border: 1px solid #ddd;
+    background-color: #f9f9f9;
+    display: flex;
+    flex-direction: column; /* Ensure vertical stacking */
+}
+
+/* Style for the select dropdown */
+.line-mode {
+    margin: 5px 0;
+    padding: 5px;
+}
+
+/* Style for the range input and associated span */
+.line-width {
+    margin: 5px 0;
+}
+
+.line-width-value {
+    margin-left: 10px;
+}
+
 
 /***************************** sidebar:mainConfig *****************************/
 
