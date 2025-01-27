@@ -29,7 +29,7 @@ p {
 .sidebar {
     width: 20%; /* Initial width */
     min-width: 250px;
-    max-width: 400px;
+    max-width: 800px;
     background-color: #f4f4f4;
     color: black;
     padding: 10px;
@@ -41,7 +41,20 @@ p {
     overflow-x: hidden; /* Prevent horizontal scrolling */
     height: 100vh; /* Match the height of the viewport */
     box-sizing: border-box; /* Include padding in height calculation */
-    transition: width 0.5s ease, transform 0.5s ease;
+    /*transition: width 0.5s ease, transform 0.5s ease;*/
+    position: relative;
+    resize: horizontal;
+}
+
+#resizeHandle {
+    width: 3px;
+    background-color: #ccc;
+    cursor: ew-resize;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
 }
 
 .sidebar.collapsed {
@@ -163,17 +176,35 @@ select {
     display: block;
 }
 
-#checkbox-sources {
-    height: 150px; /* Static height for this container */
+/* Styling the resize handle for checkbox-sources */
+#resizeHandleSources {
+    height: 3px; /* Increase the height for easier interaction */
+    background-color: #ccc; /* Light gray color for visibility */
+    cursor: ns-resize; /* North-South resize cursor */
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    margin-top: 10px; /* Add a gap between the sources container and the handle */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add subtle shadow for separation */
+    border-radius: 5px; /* Rounded corners for a smoother look */
 }
 
+/* Update #checkbox-sources to ensure proper spacing */
+#checkbox-sources {
+    height: 150px; /* Initial height */
+    min-height: 100px; /* Minimum height */
+    max-height: 400px; /* Maximum height */
+    overflow: hidden; /* Prevent overflow of the container */
+    resize: none; /* Disable default resize, handled programmatically */
+    padding-bottom: 5px; /* Optional: Add padding for visual separation */
+}
 #checkbox-signals {
-    flex-grow: 1; /* Allow this container to grow */
-    display: flex; /* Enable flexbox for .checkbox-group inside */
-    flex-direction: column; /* Ensure vertical alignment for content */
-    max-height: 800px; /* Limit the height */
-    overflow: auto; /* Add scroll if content overflows */
-    overflow-x: hidden; /* Prevent horizontal scrolling */
+    flex-grow: 1; /* Allow this container to grow dynamically */
+    display: flex; /* Flexbox for inner alignment */
+    flex-direction: column; /* Ensure vertical alignment */
+    max-height: calc(100vh - 200px); /* Dynamically adjust for remaining space */
+    overflow: auto; /* Add scrolling for content overflow */
+    overflow-x: hidden;
 }
 
 

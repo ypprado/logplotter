@@ -55,6 +55,7 @@ async function loadDatabaseButton() {
         const parsedData = await parseFile(file);
 
         // Step 3: Load the global database in unified JSON format
+        resetGlobalState();
         database = buildUnifiedDatabase(parsedData);
         console.log("Database loaded:", database);
 

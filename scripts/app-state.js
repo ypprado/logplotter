@@ -50,3 +50,13 @@ const plotData = {
 };
 
 
+function resetGlobalState() {
+    // Clear the global database variable
+    database = null;
+
+    // Clear the dropdownContent object
+    dropdownContent.ID = [];
+    dropdownContent.MsgName = [];
+    dropdownContent.Sender = [];
+    dropdownContent.Signal = [];
+}

@@ -51,3 +51,113 @@ function displayConfigurationControls(data) {
     });
     addConfigListeners();
 }
+
+
+/******************** Resize Sidebar  ********************/
+const sidebar = document.querySelector('.sidebar');
+const content = document.querySelector('.content'); // Select the content area
+const container = document.querySelector('.container'); // Select the container
+
+let isResizing = false;
+let throttleTimeout = null;
+
+// Listen for the window resize event
+window.addEventListener('resize', adjustSidebarOnResize);
+
+function adjustSidebarOnResize() {
+    // Ensure the sidebar stays proportional to the container
+    const containerWidth = container.offsetWidth;
+    const sidebarWidth = sidebar.offsetWidth;
+    const sidebarRatio = sidebarWidth / containerWidth;
+
+    const newSidebarWidth = containerWidth * sidebarRatio;
+    const minWidth = 200; // Minimum sidebar width
+    const maxWidth = 600; // Maximum sidebar width
+
+    if (newSidebarWidth >= minWidth && newSidebarWidth <= maxWidth) {
+        sidebar.style.width = `${newSidebarWidth}px`; // Adjust sidebar width
+        content.style.width = `calc(100% - ${newSidebarWidth}px)`; // Adjust content width
+    }
+}
+
+// Existing resizing logic for manual adjustment
+const resizeHandle = document.getElementById('resizeHandle');
+resizeHandle.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none'; // Disable text selection
+    document.addEventListener('mousemove', throttledResizeSidebar);
+    document.addEventListener('mouseup', stopResize);
+});
+
+function throttledResizeSidebar(e) {
+    if (!throttleTimeout) {
+        throttleTimeout = setTimeout(() => {
+            resizeSidebar(e);
+            throttleTimeout = null; // Reset the timeout
+        }, 16); // ~60fps (16ms interval)
+    }
+}
+
+function resizeSidebar(e) {
+    if (!isResizing) return;
+
+    const containerOffset = container.getBoundingClientRect().left;
+    const newWidth = e.clientX - containerOffset;
+
+    const minWidth = 200;
+    const maxWidth = 600;
+
+    if (newWidth >= minWidth && newWidth <= maxWidth) {
+        sidebar.style.width = `${newWidth}px`;
+        content.style.width = `calc(100% - ${newWidth}px)`;
+    }
+}
+
+function stopResize() {
+    isResizing = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = ''; // Re-enable text selection
+    document.removeEventListener('mousemove', throttledResizeSidebar);
+    document.removeEventListener('mouseup', stopResize);
+}
+
+/******************** Resize Sources checkbox  ********************/
+
+const sourcesContainer = document.getElementById('checkbox-sources');
+const signalsContainer = document.getElementById('checkbox-signals');
+const resizeHandleSources = document.getElementById('resizeHandleSources');
+
+let isResizingSources = false;
+
+resizeHandleSources.addEventListener('mousedown', (e) => {
+    isResizingSources = true;
+    document.body.style.cursor = 'ns-resize';
+    document.body.style.userSelect = 'none'; // Prevent text selection during drag
+    document.addEventListener('mousemove', resizeSources);
+    document.addEventListener('mouseup', stopResizingSources);
+});
+
+function resizeSources(e) {
+    if (!isResizingSources) return;
+
+    // Calculate the new height for checkbox-sources
+    const containerRect = sourcesContainer.getBoundingClientRect();
+    const newHeight = e.clientY - containerRect.top;
+
+    const minHeight = 100; // Minimum height for sources
+    const maxHeight = 400; // Maximum height for sources
+
+    if (newHeight >= minHeight && newHeight <= maxHeight) {
+        sourcesContainer.style.height = `${newHeight}px`; // Resize sources container
+        signalsContainer.style.maxHeight = `calc(100vh - ${newHeight + 50}px)`; // Adjust signals container
+    }
+}
+
+function stopResizingSources() {
+    isResizingSources = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = ''; // Re-enable text selection
+    document.removeEventListener('mousemove', resizeSources);
+    document.removeEventListener('mouseup', stopResizingSources);
+}
