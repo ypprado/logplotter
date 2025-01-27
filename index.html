@@ -31,13 +31,12 @@
                 <!-- Main Configuration Content -->
                 <div class="sidebar-content active" id="mainConfig">
                     <p>Load a Database</p>
-                    <button onclick="loadDatabase()">Load Database</button>
+                    <button onclick="loadDatabaseButton()">Load Database</button>
                     <p>Source selection</p>
                     <select id="filterOptions" size="1">
                         <option value="noFilter">No Filter</option>
-                        <option value="filterById">Filter By ID</option>
-                        <option value="filterByECU">Filter by ECU</option>
-                        <option value="filterByNode">Filter by Network Nodes</option>
+                        <option value="filterById">Filter by ID</option>
+                        <option value="filterBySender">Filter by Sender</option>
                     </select>
                     <div class="checkbox-container" id="checkbox-sources">
                         <label>Filter Sources</label>
@@ -80,7 +79,10 @@
 
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="scripts/main.js"></script>
-    <script src="scripts/database-handler.js"></script>
+    <script src="scripts/main-db-loader.js"></script>    
+    <script src="scripts/parser-json.js"></script>
+    <script src="scripts/parser-dbc.js"></script>
+    <script src="scripts/parser-sym.js"></script>
     <script src="scripts/log-handler.js"></script>
     <script src="scripts/app-state.js"></script>
     <script src="scripts/plot.js"></script>

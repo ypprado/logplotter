@@ -2,47 +2,17 @@
  * This file contains information that shall be used across the application
  */
 
-// Iindexes are linked to columns in the database as follows. Used in database-handler.js
-const Index = {
-    ECU: 0,
-    NODE: 1,
-    ID: 2,
-    SIGNAL: 3,
-};
 
-// Global state to store the extracted data
-const appState = {
+let database = null; // Global variable to store the JSON database
+
+const dropdownContent ={
     // Lists that will populate the checkboxes
-    ECUs: [],
-    IDs: [],
-    Nodes: [],
-    // Global status for loaded files
-    isDatabaseLoaded: false,
-    isLogLoaded: false,
-    // Global containers for parsed database and log
-    parsedCSV: [],
-    rawLog: [],
-    // Data manipulation 
-    loadCSV(content) {
-        this.parsedCSV = this.parseCSV(content);
-    },
-    parseCSV(content) {
-        // Split the content into rows and parse each row into columns
-        return content
-            .trim() // Remove unnecessary leading/trailing whitespace
-            .split("\n") // Split into rows
-            .map(row => row.split(",").map(value => value.trim())); // Parse columns
-    },
-};
+    ID: [],
+    MsgName: [],
+    Sender: [],
+    Signal: [],
+}
 
-/**
- * Sample of a trace
- *      x: [ 1, 2, 3],
-        y: [24,24,26],
-        mode: "lines+markers",
-        type: "scatter",
-        name: signalName, // Use the signal name as the trace label
- */
 
 // Global Storage for data sets ready to be plotted (traces)
 const plotData = {

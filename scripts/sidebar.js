@@ -51,11 +51,3 @@ function displayConfigurationControls(data) {
     });
     addConfigListeners();
 }
-
-/*
-            <label>Line Width</label>
-            <input type="range" class="line-width" data-index="${index}" min="1" max="10" value="${lineWidth}" />
-            <span class="line-width-value">${lineWidth}</span>
-
-    
-            */

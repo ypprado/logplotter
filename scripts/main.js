@@ -40,67 +40,42 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-
-
-
-
-
-/******************** Main Sidebar ********************/
-/*
-const sidebar = document.getElementById('sidebar');
-const resizer = document.getElementById('resizer');
-
-let isResizing = false;
-
-resizer.addEventListener('mousedown', (e) => {
-    isResizing = true;
-
-    // Disable text selection while resizing
-    document.body.style.cursor = 'ew-resize';
-    document.body.style.userSelect = 'none';
-    document.body.style.pointerEvents = 'none';
-});
-
-document.addEventListener('mousemove', (e) => {
-    if (!isResizing) return;
-
-    // Calculate the new width
-    const newWidth = e.clientX - sidebar.getBoundingClientRect().left;
-
-    // Respect minimum and maximum widths
-    if (newWidth >= 200 && newWidth <= 400) {
-        sidebar.style.width = `${newWidth}px`;
-    }
-});
-
-document.addEventListener('mouseup', () => {
-    if (isResizing) {
-        isResizing = false;
-
-        // Restore default styles
-        document.body.style.cursor = '';
-        document.body.style.userSelect = '';
-        document.body.style.pointerEvents = '';
-    }
-});/* */
-
+/******************** Button Database ********************/
 // On button click: Load Database
-function loadDatabase() {
+async function loadDatabaseButton() {
     console.log("Button Load Database clicked");
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = '.csv';
 
-    // Wait a little before triggering the click
-    setTimeout(() => {
-        fileInput.addEventListener('change', function(event) {
-            console.log("File selected (event listener triggered)");
-            handleFileSelectDatabase(event);
-        });
-        fileInput.click();
-    }, 5);
+    try {
+        console.log("Starting database load process...");
+
+        // Step 1: Let the user select a file
+        const file = await selectFile();
+
+        // Step 2: Parse the file content
+        const parsedData = await parseFile(file);
+
+        // Step 3: Load the global database in unified JSON format
+        database = buildUnifiedDatabase(parsedData);
+        console.log("Database loaded:", database);
+
+        if(isDatabaseLoaded){
+            extractDropdownContent(database); 
+
+            populateSignals();
+
+            // Enable the "Load Log" button TODO place on main every interface related feature
+            document.getElementById("loadLogButton").disabled = false;
+        }
+
+        // Step 4: Take further steps after the database is loaded
+        //proceedWithNextSteps();
+
+    } catch (error) {
+        console.error("Error during database loading process:", error);
+    }
 }
 
+/******************** Button Log ********************/
 // On button click: Load Log
 function loadLog() {
     console.log("Button Load Log clicked");
@@ -118,6 +93,7 @@ function loadLog() {
     }, 5);
 }
 
+/******************** Plot listener ********************/
 // Update plot according to changes in configuration sidebar
 function addConfigListeners() {
     // Add listener for mode selection
@@ -139,8 +115,6 @@ function addConfigListeners() {
     });
     
 }
-
-
 
 /******************** Droplist Filter Options ********************/
 const filterOptions = document.getElementById("filterOptions");
@@ -175,21 +149,10 @@ filterOptions.addEventListener("wheel", (event) => {
     }
 });
 
-// Optional: highlight the dropdown on hover
-/*filterOptions.addEventListener("mouseover", () => {
-    filterOptions.focus();
-});
-
-filterOptions.addEventListener("mouseout", () => {
-    filterOptions.blur();
-});*/
-
-
-
 /******************** Checkbox Sources ********************/
 
 // Event listener for the dropdown selection change
-document.getElementById('filterOptions').addEventListener('change', function() {
+document.getElementById('filterOptions').addEventListener('change', function () {
     populateCheckboxGroup(this.value);
 });
 
@@ -201,12 +164,12 @@ document.getElementById('filterOptions').addEventListener('change', function() {
 function populateCheckboxGroup(filter) {
     // Get the checkbox group container
     const checkboxGroup = document.querySelector('#checkbox-sources .checkbox-group');
-    
+
     // Clear existing content
     checkboxGroup.innerHTML = '';
 
-    // Handle case where CSV is not loaded
-    if (!appState.isDatabaseLoaded) {
+    // Handle case where the database is not loaded
+    if (!database || !dropdownContent) {
         checkboxGroup.innerHTML = `<p>Please load a database to apply filters.</p>`;
         return;
     }
@@ -214,14 +177,14 @@ function populateCheckboxGroup(filter) {
     // Populate checkboxes based on the selected filter
     if (filter === 'noFilter') {
         checkboxGroup.innerHTML = `<p>No filter applied.</p>`;
-        // Do not populate sources, but populate signals with all content available
+        // Do not populate sources, but call a function to handle signals if needed
         populateSignals();
-    } else if (filter === 'filterByECU') {
-        populateCheckboxList(appState.ECUs, checkboxGroup, 'No ECUs available.');
     } else if (filter === 'filterById') {
-        populateCheckboxList(appState.IDs, checkboxGroup, 'No IDs available.');
-    } else if (filter === 'filterByNode') {
-        populateCheckboxList(appState.Nodes, checkboxGroup, 'No Nodes available.');
+        // Combine IDs and message names into "ID Name" format
+        const idLabels = dropdownContent.ID.map((id, index) => `${id} ${dropdownContent.MsgName[index]}`);
+        populateCheckboxList(idLabels, checkboxGroup, 'No IDs available.');
+    } else if (filter === 'filterBySender') {
+        populateCheckboxList(dropdownContent.Sender, checkboxGroup, 'No senders available.');
     }
 }
 
@@ -243,6 +206,7 @@ function populateCheckboxList(list, container, emptyMessage) {
     }
 }
 
+
 /******************** Checkbox Signals ********************/
 // Event listener for changes in the checkbox-sources
 document.querySelector('#checkbox-sources .checkbox-group').addEventListener('change', function (event) {
@@ -254,6 +218,9 @@ document.querySelector('#checkbox-sources .checkbox-group').addEventListener('ch
 /**
  * Populates the checkbox-signals container based on all selected sources.
  */
+/**
+ * Populates the checkbox-signals container based on selected sources (or displays all signals if no source is selected).
+ */
 function populateSignals() {
     const checkboxGroup = document.querySelector('#checkbox-signals .checkbox-group');
     const selectedSources = Array.from(
@@ -263,29 +230,54 @@ function populateSignals() {
     // Clear the existing content
     checkboxGroup.innerHTML = '';
 
+    // Use a Set to collect unique signals
     const allSignals = new Set();
-    
-    // If no sources are selected, load signals from all available sources
+
+    // If no sources are selected, display all available signals
     if (selectedSources.length === 0) {
-        const allAvailableSources = appState.IDs; // Function to return all sources
-        allAvailableSources.forEach(source => {
-            const signals = getSignalsForSource(source);
-            signals.forEach(signal => allSignals.add(signal)); // Add to Set to ensure uniqueness
+        database.messages.forEach((message) => {
+            message.signals.forEach((signal) => {
+                allSignals.add(`${signal.name} (${message.name})`);
+            });
         });
     } else {
-        // Collect signals associated with the selected sources
-        selectedSources.forEach(source => {
-            const signals = getSignalsForSource(source);
-            signals.forEach(signal => allSignals.add(signal)); // Add to Set to ensure uniqueness
+        // If sources are selected, filter by ID or Sender
+        selectedSources.forEach((source) => {
+        // Determine filter type based on dropdown selection
+        const filterType = document.getElementById('filterOptions').value;
+
+        selectedSources.forEach((source) => {
+            if (filterType === 'filterById') {
+                // Extract only the ID (remove the concatenated message name)
+                const idOnly = source.split(' ')[0];
+
+                // Filter by ID using the extracted ID
+                const message = database.messages.find((msg) => msg.id === idOnly);
+                if (message) {
+                    message.signals.forEach((signal) => {
+                        allSignals.add(`${signal.name} (${message.name})`);
+                    });
+                }
+            } else if (filterType === 'filterBySender') {
+                // Filter by Sender
+                database.messages
+                    .filter((msg) => msg.sender === source)
+                    .forEach((message) => {
+                        message.signals.forEach((signal) => {
+                            allSignals.add(`${signal.name} (${message.name})`);
+                        });
+                    });
+            }
+        });
+
         });
     }
 
-    // Retrieve list from the set, sort it alphabetically and load in an array
+    // Convert the Set to an array, sort it alphabetically, and populate the checkboxes
     const sortedSignals = Array.from(allSignals).sort((a, b) => a.localeCompare(b));
-    
-    // Populate signals checkbox
+
     if (sortedSignals.length > 0) {
-        sortedSignals.forEach(signal => {
+        sortedSignals.forEach((signal) => {
             checkboxGroup.innerHTML += `
                 <label><input type="checkbox" value="${signal}"> ${signal}</label>`;
         });
@@ -293,6 +285,7 @@ function populateSignals() {
         checkboxGroup.innerHTML = `<p>No signals available for the selected sources.</p>`;
     }
 }
+
 
 /**
  * Retrieves a list of signals for a given source.
