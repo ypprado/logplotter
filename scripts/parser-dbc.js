@@ -23,7 +23,9 @@ function parseDBC(content) {
             }
 
             currentMessage = {
-                id: `0x${parseInt(messageMatch[1], 10).toString(16).toUpperCase()}`,
+                id: (parseInt(messageMatch[1], 10) & 0x80000000) !== 0 ? // the leading bit indicates EXT 
+                `0x${(parseInt(messageMatch[1], 10) & 0x7FFFFFFF).toString(16).padStart(8, '0').toUpperCase()}` : 
+                `0x${parseInt(messageMatch[1], 10).toString(16).padStart(3, '0').toUpperCase()}`,
                 name: messageMatch[2],
                 dlc: parseInt(messageMatch[3], 10),
                 sender: messageMatch[4],

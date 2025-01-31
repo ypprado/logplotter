@@ -1,0 +1,392 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_:
+
+
+BO_ 2566879889 ThermoHV_4_Debug_0: 8 Vector__XXX
+ SG_ IOut_perc_by_derating m9 : 48|8@1+ (1,0) [0|255] "%" Vector__XXX
+ SG_ ThermoHV_4_Debug_0_Mux M : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2566879888 ThermoHV_3_Debug_0: 8 Vector__XXX
+ SG_ IOut_perc_by_derating m9 : 48|8@1+ (1,0) [0|255] "%" Vector__XXX
+ SG_ ThermoHV_3_Debug_0_Mux M : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2566879813 ThermoHV_2_Debug_0: 8 Vector__XXX
+ SG_ IOut_perc_by_derating m9 : 48|8@1+ (1,0) [0|255] "%" Vector__XXX
+ SG_ ThermoHV_2_Debug_0_Mux M : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2566879812 ThermoHV_1_Debug_0: 8 Vector__XXX
+ SG_ IOut_perc_by_derating m9 : 48|8@1+ (1,0) [0|255] "%" Vector__XXX
+ SG_ ThermoHV_1_Debug_0_Mux M : 0|8@1+ (1,0) [0|0] "" Vector__XXX
+
+BO_ 2566877209 ThermoHV_1_Control: 8 Vector__XXX
+ SG_ D_HVH1WaterTempSetpoint : 8|8@1+ (1,-40) [-40|210] "°C" Vector__XXX
+ SG_ D_HVH1PowerLimitation : 16|8@1+ (0.1,0) [0|25.5] "kW" Vector__XXX
+ SG_ D_HVH1ModeRequest : 0|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ D_HVH1DiagnosticRequests : 32|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ D_HVH1MaxCurrentAllow : 24|8@1+ (0.1,0) [0|25.5] "A" Vector__XXX
+
+BO_ 2566877508 ThermoHV_1_Status_0: 8 Vector__XXX
+ SG_ D_HVH1PowerStatus : 40|8@1+ (0.1,0) [0|25.5] "kW" Vector__XXX
+ SG_ D_HVH1CoolantInletTemp : 48|8@1+ (1,-40) [-40|149] "°C" Vector__XXX
+ SG_ D_HVH1CoolantOutletTemp : 56|8@1+ (1,-40) [-40|149] "°C" Vector__XXX
+ SG_ D_HVH1OperatingIndicator : 5|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ D_HVH1HeatingIndicator : 6|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ D_HVH1CurrentStatus : 32|8@1+ (0.1,0) [0|25.5] "A" Vector__XXX
+ SG_ D_HVH1StateNumber : 0|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ D_HVH1PumpRequest : 4|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ D_HVH1SetpointStatus : 8|8@1+ (1,-40) [0|85] "°C" Vector__XXX
+ SG_ D_HVH1HVVoltageOutStatus : 16|16@1+ (1,0) [0|65535] "V" Vector__XXX
+
+BO_ 2566879300 ThermoHV_1_Status_1: 8 Vector__XXX
+ SG_ D_HVH1_FaultCode : 40|8@1+ (1,0) [0|108] "" Vector__XXX
+ SG_ D_HVH1HvilStatus : 0|3@1+ (1,0) [0|7] "" Vector__XXX
+ SG_ D_HVH1FcHvil : 3|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH1_SLI_Undervolt_Fail : 16|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH1_SLI_Overvolt_Fail : 18|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH1_HV_Undervolt_Fail : 20|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH1_HV_Overvolt_Fail : 22|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH1_CAN_Timeout : 10|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH1_TC_OHP_Fail : 26|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH1_Internal_Fault : 48|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH1_HeaterLock : 12|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH1_FaultLock : 14|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH1_DryRun_Fail : 52|2@1+ (1,0) [0|3] "" Vector__XXX
+
+BO_ 2566877465 ThermoHV_2_Control: 8 Vector__XXX
+ SG_ D_HVH2WaterTempSetpoint : 8|8@1+ (1,-40) [-40|210] "°C" Vector__XXX
+ SG_ D_HVH2PowerLimitation : 16|8@1+ (0.1,0) [0|25.5] "kW" Vector__XXX
+ SG_ D_HVH2ModeRequest : 0|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ D_HVH2DiagnosticRequests : 32|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ D_HVH2MaxCurrentAllow : 24|8@1+ (0.1,0) [0|25.5] "A" Vector__XXX
+
+BO_ 2566877509 ThermoHV_2_Status_0: 8 Vector__XXX
+ SG_ D_HVH2PowerStatus : 40|8@1+ (0.1,0) [0|25.5] "kW" Vector__XXX
+ SG_ D_HVH2CoolantInletTemp : 48|8@1+ (1,-40) [-40|149] "°C" Vector__XXX
+ SG_ D_HVH2CoolantOutletTemp : 56|8@1+ (1,-40) [-40|149] "°C" Vector__XXX
+ SG_ D_HVH2OperatingIndicator : 5|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ D_HVH2HeatingIndicator : 6|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ D_HVH2CurrentStatus : 32|8@1+ (0.1,0) [0|25.5] "A" Vector__XXX
+ SG_ D_HVH2StateNumber : 0|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ D_HVH2PumpRequest : 4|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ D_HVH2SetpointStatus : 8|8@1+ (1,-40) [0|85] "°C" Vector__XXX
+ SG_ D_HVH2HVVoltageOutStatus : 16|16@1+ (1,0) [0|65535] "V" Vector__XXX
+
+BO_ 2566877721 ThermoHV_3_Control: 8 Vector__XXX
+ SG_ D_HVH3WaterTempSetpoint : 8|8@1+ (1,-40) [-40|210] "°C" Vector__XXX
+ SG_ D_HVH3PowerLimitation : 16|8@1+ (0.1,0) [0|25.5] "kW" Vector__XXX
+ SG_ D_HVH3ModeRequest : 0|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ D_HVH3DiagnosticRequests : 32|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ D_HVH3MaxCurrentAllow : 24|8@1+ (0.1,0) [0|25.5] "A" Vector__XXX
+
+BO_ 2566877584 ThermoHV_3_Status_0: 8 Vector__XXX
+ SG_ D_HVH3PowerStatus : 40|8@1+ (0.1,0) [0|25.5] "kW" Vector__XXX
+ SG_ D_HVH3CoolantInletTemp : 48|8@1+ (1,-40) [-40|149] "°C" Vector__XXX
+ SG_ D_HVH3CoolantOutletTemp : 56|8@1+ (1,-40) [-40|149] "°C" Vector__XXX
+ SG_ D_HVH3OperatingIndicator : 5|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ D_HVH3HeatingIndicator : 6|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ D_HVH3CurrentStatus : 32|8@1+ (0.1,0) [0|25.5] "A" Vector__XXX
+ SG_ D_HVH3StateNumber : 0|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ D_HVH3PumpRequest : 4|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ D_HVH3SetpointStatus : 8|8@1+ (1,-40) [0|85] "°C" Vector__XXX
+ SG_ D_HVH3HVVoltageOutStatus : 16|16@1+ (1,0) [0|65535] "V" Vector__XXX
+
+BO_ 2566879376 ThermoHV_3_Status_1: 8 Vector__XXX
+ SG_ D_HVH3_FaultCode : 40|8@1+ (1,0) [0|108] "" Vector__XXX
+ SG_ D_HVH3HvilStatus : 0|3@1+ (1,0) [0|7] "" Vector__XXX
+ SG_ D_HVH3FcHvil : 3|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH3_SLI_Undervolt_Fail : 16|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH3_SLI_Overvolt_Fail : 18|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH3_HV_Undervolt_Fail : 20|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH3_HV_Overvolt_Fail : 22|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH3_CAN_Timeout : 10|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH3_TC_OHP_Fail : 26|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH3_Internal_Fault : 48|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH3_HeaterLock : 12|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH3_FaultLock : 14|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH3_DryRun_Fail : 52|2@1+ (1,0) [0|3] "" Vector__XXX
+
+BO_ 2566877977 ThermoHV_4_Control: 8 Vector__XXX
+ SG_ D_HVH4WaterTempSetpoint : 8|8@1+ (1,-40) [-40|210] "°C" Vector__XXX
+ SG_ D_HVH4PowerLimitation : 16|8@1+ (0.1,0) [0|25.5] "kW" Vector__XXX
+ SG_ D_HVH4ModeRequest : 0|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ D_HVH4DiagnosticRequests : 32|8@1+ (1,0) [0|255] "" Vector__XXX
+ SG_ D_HVH4MaxCurrentAllow : 24|8@1+ (0.1,0) [0|25.5] "A" Vector__XXX
+
+BO_ 2566877585 ThermoHV_4_Status_0: 8 Vector__XXX
+ SG_ D_HVH4PowerStatus : 40|8@1+ (0.1,0) [0|25.5] "kW" Vector__XXX
+ SG_ D_HVH4CoolantInletTemp : 48|8@1+ (1,-40) [-40|149] "°C" Vector__XXX
+ SG_ D_HVH4CoolantOutletTemp : 56|8@1+ (1,-40) [-40|149] "°C" Vector__XXX
+ SG_ D_HVH4OperatingIndicator : 5|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ D_HVH4HeatingIndicator : 6|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ D_HVH4CurrentStatus : 32|8@1+ (0.1,0) [0|25.5] "A" Vector__XXX
+ SG_ D_HVH4StateNumber : 0|4@1+ (1,0) [0|15] "" Vector__XXX
+ SG_ D_HVH4PumpRequest : 4|1@1+ (1,0) [0|1] "" Vector__XXX
+ SG_ D_HVH4SetpointStatus : 8|8@1+ (1,-40) [0|85] "°C" Vector__XXX
+ SG_ D_HVH4HVVoltageOutStatus : 16|16@1+ (1,0) [0|65535] "V" Vector__XXX
+
+BO_ 2566879377 ThermoHV_4_Status_1: 8 Vector__XXX
+ SG_ D_HVH4_FaultCode : 40|8@1+ (1,0) [0|108] "" Vector__XXX
+ SG_ D_HVH4HvilStatus : 0|3@1+ (1,0) [0|7] "" Vector__XXX
+ SG_ D_HVH4FcHvil : 3|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH4_SLI_Undervolt_Fail : 16|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH4_SLI_Overvolt_Fail : 18|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH4_HV_Undervolt_Fail : 20|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH4_HV_Overvolt_Fail : 22|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH4_CAN_Timeout : 10|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH4_TC_OHP_Fail : 26|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH4_Internal_Fault : 48|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH4_HeaterLock : 12|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH4_FaultLock : 14|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH4_DryRun_Fail : 52|2@1+ (1,0) [0|3] "" Vector__XXX
+
+BO_ 2566879301 ThermoHV_2_Status_1: 8 Vector__XXX
+ SG_ D_HVH2_FaultCode : 40|8@1+ (1,0) [0|108] "" Vector__XXX
+ SG_ D_HVH2HvilStatus : 0|3@1+ (1,0) [0|7] "" Vector__XXX
+ SG_ D_HVH2FcHvil : 3|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH2_SLI_Undervolt_Fail : 16|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH2_SLI_Overvolt_Fail : 18|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH2_HV_Undervolt_Fail : 20|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH2_HV_Overvolt_Fail : 22|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH2_CAN_Timeout : 10|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH2_TC_OHP_Fail : 26|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH2_Internal_Fault : 48|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH2_HeaterLock : 12|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH2_FaultLock : 14|2@1+ (1,0) [0|3] "" Vector__XXX
+ SG_ D_HVH2_DryRun_Fail : 52|2@1+ (1,0) [0|3] "" Vector__XXX
+
+
+
+CM_ SG_ 2566877209 D_HVH1WaterTempSetpoint "SAEtp01";
+CM_ SG_ 2566877209 D_HVH1PowerLimitation "SAEpw07";
+CM_ SG_ 2566877209 D_HVH1ModeRequest "SAEbs04";
+CM_ SG_ 2566877209 D_HVH1DiagnosticRequests "SAEbs04";
+CM_ SG_ 2566877508 D_HVH1PowerStatus "SAEpw07";
+CM_ SG_ 2566877508 D_HVH1CoolantInletTemp "SAEtp01";
+CM_ SG_ 2566877508 D_HVH1CoolantOutletTemp "SAEtp01";
+CM_ SG_ 2566877508 D_HVH1CurrentStatus "SAEec03";
+CM_ SG_ 2566877508 D_HVH1SetpointStatus "SAEtp01";
+CM_ SG_ 2566877508 D_HVH1HVVoltageOutStatus "SAEev02";
+CM_ SG_ 2566879300 D_HVH1HvilStatus "0: HVIL_Out_Fail; 1: HVIL_In_Fail; 2: HVIL_In_Unit_Fail";
+CM_ SG_ 2566879300 D_HVH1_SLI_Undervolt_Fail "SLI voltage too low (error codes 7 and 8)";
+CM_ SG_ 2566879300 D_HVH1_SLI_Overvolt_Fail "SLI voltage too high (error codes 9 and 10)";
+CM_ SG_ 2566879300 D_HVH1_HV_Undervolt_Fail "HV voltage too low (error code 11)";
+CM_ SG_ 2566879300 D_HVH1_HV_Overvolt_Fail "HV voltage too high (error codes 12, 13, 14)";
+CM_ SG_ 2566879300 D_HVH1_CAN_Timeout "(error code 35)";
+CM_ SG_ 2566879300 D_HVH1_TC_OHP_Fail "Overheat comparator triggered (error code 27)";
+CM_ SG_ 2566879300 D_HVH1_Internal_Fault "Error msg from HV software";
+CM_ SG_ 2566879300 D_HVH1_HeaterLock "(error code 35)";
+CM_ SG_ 2566879300 D_HVH1_FaultLock "(error code 35)";
+CM_ SG_ 2566879300 D_HVH1_DryRun_Fail "Overheat Protection water temperature sensor is defect (error codes 22 and 23)";
+CM_ SG_ 2566877465 D_HVH2WaterTempSetpoint "SAEtp01";
+CM_ SG_ 2566877465 D_HVH2PowerLimitation "SAEpw07";
+CM_ SG_ 2566877465 D_HVH2ModeRequest "SAEbs04";
+CM_ SG_ 2566877465 D_HVH2DiagnosticRequests "SAEbs04";
+CM_ SG_ 2566877509 D_HVH2PowerStatus "SAEpw07";
+CM_ SG_ 2566877509 D_HVH2CoolantInletTemp "SAEtp01";
+CM_ SG_ 2566877509 D_HVH2CoolantOutletTemp "SAEtp01";
+CM_ SG_ 2566877509 D_HVH2CurrentStatus "SAEec03";
+CM_ SG_ 2566877509 D_HVH2SetpointStatus "SAEtp01";
+CM_ SG_ 2566877509 D_HVH2HVVoltageOutStatus "SAEev02";
+CM_ SG_ 2566877721 D_HVH3WaterTempSetpoint "SAEtp01";
+CM_ SG_ 2566877721 D_HVH3PowerLimitation "SAEpw07";
+CM_ SG_ 2566877721 D_HVH3ModeRequest "SAEbs04";
+CM_ SG_ 2566877721 D_HVH3DiagnosticRequests "SAEbs04";
+CM_ SG_ 2566877584 D_HVH3PowerStatus "SAEpw07";
+CM_ SG_ 2566877584 D_HVH3CoolantInletTemp "SAEtp01";
+CM_ SG_ 2566877584 D_HVH3CoolantOutletTemp "SAEtp01";
+CM_ SG_ 2566877584 D_HVH3CurrentStatus "SAEec03";
+CM_ SG_ 2566877584 D_HVH3SetpointStatus "SAEtp01";
+CM_ SG_ 2566877584 D_HVH3HVVoltageOutStatus "SAEev02";
+CM_ SG_ 2566879376 D_HVH3HvilStatus "0: HVIL_Out_Fail; 1: HVIL_In_Fail; 2: HVIL_In_Unit_Fail";
+CM_ SG_ 2566879376 D_HVH3_SLI_Undervolt_Fail "SLI voltage too low (error codes 7 and 8)";
+CM_ SG_ 2566879376 D_HVH3_SLI_Overvolt_Fail "SLI voltage too high (error codes 9 and 10)";
+CM_ SG_ 2566879376 D_HVH3_HV_Undervolt_Fail "HV voltage too low (error code 11)";
+CM_ SG_ 2566879376 D_HVH3_HV_Overvolt_Fail "HV voltage too high (error codes 12, 13, 14)";
+CM_ SG_ 2566879376 D_HVH3_CAN_Timeout "(error code 35)";
+CM_ SG_ 2566879376 D_HVH3_TC_OHP_Fail "Overheat comparator triggered (error code 27)";
+CM_ SG_ 2566879376 D_HVH3_Internal_Fault "Error msg from HV software";
+CM_ SG_ 2566879376 D_HVH3_HeaterLock "(error code 35)";
+CM_ SG_ 2566879376 D_HVH3_FaultLock "(error code 35)";
+CM_ SG_ 2566879376 D_HVH3_DryRun_Fail "Overheat Protection water temperature sensor is defect (error codes 22 and 23)";
+CM_ SG_ 2566877977 D_HVH4WaterTempSetpoint "SAEtp01";
+CM_ SG_ 2566877977 D_HVH4PowerLimitation "SAEpw07";
+CM_ SG_ 2566877977 D_HVH4ModeRequest "SAEbs04";
+CM_ SG_ 2566877977 D_HVH4DiagnosticRequests "SAEbs04";
+CM_ SG_ 2566877585 D_HVH4PowerStatus "SAEpw07";
+CM_ SG_ 2566877585 D_HVH4CoolantInletTemp "SAEtp01";
+CM_ SG_ 2566877585 D_HVH4CoolantOutletTemp "SAEtp01";
+CM_ SG_ 2566877585 D_HVH4CurrentStatus "SAEec03";
+CM_ SG_ 2566877585 D_HVH4SetpointStatus "SAEtp01";
+CM_ SG_ 2566877585 D_HVH4HVVoltageOutStatus "SAEev02";
+CM_ SG_ 2566879377 D_HVH4HvilStatus "0: HVIL_Out_Fail; 1: HVIL_In_Fail; 2: HVIL_In_Unit_Fail";
+CM_ SG_ 2566879377 D_HVH4_SLI_Undervolt_Fail "SLI voltage too low (error codes 7 and 8)";
+CM_ SG_ 2566879377 D_HVH4_SLI_Overvolt_Fail "SLI voltage too high (error codes 9 and 10)";
+CM_ SG_ 2566879377 D_HVH4_HV_Undervolt_Fail "HV voltage too low (error code 11)";
+CM_ SG_ 2566879377 D_HVH4_HV_Overvolt_Fail "HV voltage too high (error codes 12, 13, 14)";
+CM_ SG_ 2566879377 D_HVH4_CAN_Timeout "(error code 35)";
+CM_ SG_ 2566879377 D_HVH4_TC_OHP_Fail "Overheat comparator triggered (error code 27)";
+CM_ SG_ 2566879377 D_HVH4_Internal_Fault "Error msg from HV software";
+CM_ SG_ 2566879377 D_HVH4_HeaterLock "(error code 35)";
+CM_ SG_ 2566879377 D_HVH4_FaultLock "(error code 35)";
+CM_ SG_ 2566879377 D_HVH4_DryRun_Fail "Overheat Protection water temperature sensor is defect (error codes 22 and 23)";
+CM_ SG_ 2566879301 D_HVH2HvilStatus "0: HVIL_Out_Fail; 1: HVIL_In_Fail; 2: HVIL_In_Unit_Fail";
+CM_ SG_ 2566879301 D_HVH2_SLI_Undervolt_Fail "SLI voltage too low (error codes 7 and 8)";
+CM_ SG_ 2566879301 D_HVH2_SLI_Overvolt_Fail "SLI voltage too high (error codes 9 and 10)";
+CM_ SG_ 2566879301 D_HVH2_HV_Undervolt_Fail "HV voltage too low (error code 11)";
+CM_ SG_ 2566879301 D_HVH2_HV_Overvolt_Fail "HV voltage too high (error codes 12, 13, 14)";
+CM_ SG_ 2566879301 D_HVH2_CAN_Timeout "(error code 35)";
+CM_ SG_ 2566879301 D_HVH2_TC_OHP_Fail "Overheat comparator triggered (error code 27)";
+CM_ SG_ 2566879301 D_HVH2_Internal_Fault "Error msg from HV software";
+CM_ SG_ 2566879301 D_HVH2_HeaterLock "(error code 35)";
+CM_ SG_ 2566879301 D_HVH2_FaultLock "(error code 35)";
+CM_ SG_ 2566879301 D_HVH2_DryRun_Fail "Overheat Protection water temperature sensor is defect (error codes 22 and 23)";
+BA_DEF_  "BusType" STRING ;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 65535;
+BA_DEF_ SG_  "GenSigStartValue" FLOAT -3.4E+038 3.4E+038;
+BA_DEF_DEF_  "BusType" "CAN";
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_ "BusType" "CAN";
+BA_ "GenMsgCycleTime" BO_ 2566879889 100;
+BA_ "GenMsgCycleTime" BO_ 2566879888 100;
+BA_ "GenMsgCycleTime" BO_ 2566879813 100;
+BA_ "GenMsgCycleTime" BO_ 2566879812 100;
+BA_ "GenMsgCycleTime" BO_ 2566877209 1000;
+BA_ "GenMsgCycleTime" BO_ 2566877508 100;
+BA_ "GenMsgCycleTime" BO_ 2566879300 100;
+BA_ "GenMsgCycleTime" BO_ 2566877465 1000;
+BA_ "GenMsgCycleTime" BO_ 2566877509 100;
+BA_ "GenMsgCycleTime" BO_ 2566877721 1000;
+BA_ "GenMsgCycleTime" BO_ 2566877584 100;
+BA_ "GenMsgCycleTime" BO_ 2566879376 100;
+BA_ "GenMsgCycleTime" BO_ 2566877977 1000;
+BA_ "GenMsgCycleTime" BO_ 2566877585 100;
+BA_ "GenMsgCycleTime" BO_ 2566879377 100;
+BA_ "GenMsgCycleTime" BO_ 2566879301 100;
+BA_ "GenSigStartValue" SG_ 2566877508 D_HVH1SetpointStatus 40;
+BA_ "GenSigStartValue" SG_ 2566877509 D_HVH2SetpointStatus 40;
+BA_ "GenSigStartValue" SG_ 2566877584 D_HVH3SetpointStatus 40;
+BA_ "GenSigStartValue" SG_ 2566877585 D_HVH4SetpointStatus 40;
+VAL_ 2566879889 ThermoHV_4_Debug_0_Mux 9 "HVH1_MUX_CurrLimits" ;
+VAL_ 2566879888 ThermoHV_3_Debug_0_Mux 9 "HVH1_MUX_CurrLimits" ;
+VAL_ 2566879813 ThermoHV_2_Debug_0_Mux 9 "HVH1_MUX_CurrLimits" ;
+VAL_ 2566879812 ThermoHV_1_Debug_0_Mux 9 "HVH1_MUX_CurrLimits" ;
+VAL_ 2566877209 D_HVH1ModeRequest 0 "De-activate" 3 "Normal mode" 4 "Ext_CoolantPump_RQ" ;
+VAL_ 2566877209 D_HVH1DiagnosticRequests 20 "Discharge" 19 "Send_MUX_All" 0 "Off" 2 "ExtResetHeaterLock" 3 "ExtResetFaultLock" ;
+VAL_ 2566877508 D_HVH1CoolantInletTemp 255 "Not Available" 254 "Error (out of range)" ;
+VAL_ 2566877508 D_HVH1CoolantOutletTemp 255 "Not Available" 254 "Error (out of range)" ;
+VAL_ 2566877508 D_HVH1OperatingIndicator 1 "ON" 0 "OFF" ;
+VAL_ 2566877508 D_HVH1HeatingIndicator 1 "ON" 0 "OFF" ;
+VAL_ 2566877508 D_HVH1StateNumber 12 "Pre-Run Extended" 0 "None" 1 "Ready" 2 "Pre-Run" 7 "Heating" 9 "Cool Down" 11 "CPRC" ;
+VAL_ 2566877508 D_HVH1PumpRequest 1 "ON" 0 "OFF" ;
+VAL_ 2566879300 D_HVH1_FaultCode 255 "No error active" 1 "ADC reference overvoltage" 2 "ADC reference undervoltage" 3 "Second ADC reference overvoltage" 4 "Second ADC reference undervoltage" 5 "Failed initialization: Clock" 6 "Failed initialization: Watchdog" 7 "Failed initialization: GPIO" 8 "Failed initialization: ADC" 9 "Failed initialization: NVM" 10 "Failed initialization: CAN" 11 "Failed initialization: PWM" 12 "Failed initialization: Compatibility checks" 13 "Failed initialization: Configuration" 14 "Safety Switch Disable is set" 15 "Safety Switch Latch is set" 16 "Fault on IGBT1" 17 "Fault on IGBT2" 18 "Fault on IGBT3" 19 "Overvoltage threshold 1" 20 "Overvoltage threshold 2 <5 s (see also error 63)" 21 "Overvoltage threshold 3" 22 "Undervoltage" 23 "HV plausibility check failed" 24 "Overcurrent" 25 "Current plausibility failed" 26 "Open load detection" 27 "Max output power reached, CAN signal CMD_POWER_LIMITATION" 28 "Max output power reached, parameter POWER_OUT_MAX" 29 "Max output power reached, parameter POWER_OUT_MAX_ABS" 30 "Max output power reached, parameter I_IN_MAX" 31 "Max output power reached, signal CMD_CURRENT_LIMITATION" 32 "Max output power reached, signal POWER_OUT_MAX_DERATING" 33 "Input current exceeded limit" 34 "Derating: onboard temperature above threshold" 35 "HW over-temperature protection IGBT1" 36 "HW over-temperature protection IGBT2" 37 "HW over-temperature protection IGBT3" 38 "HW over-temperature protection PCB" 39 "HW over-temperature protection SS" 40 "HW over-temperature protection OUT" 41 "HW over-temperature protection OHP" 42 "HW overcurrent protection OCP" 43 "HW overvoltage protection OVP <5 s (see also error 64)" 44 "Over-temperature IGBT1" 45 "Over-temperature IGBT2" 46 "Over-temperature IGBT3" 47 "Unbalance on IGBT temperatures" 48 "Over-temperature PCB" 49 "Over-temperature SS" 50 "Safety shutdown active" 51 "Active discharge active" 52 "E2E failed: wrong number" 53 "E2E failed: lost or timeout" 54 "HV check, fault A" 55 "HV check, fault B" 56 "HV check, fault C" 57 "HV check, fault D" 58 "HV check, fault E" 59 "HV check, fault F" 60 "HV check, fault G" 61 "Safety switch latch failed to reset" 62 "E2E failed: data from LV is incorrect" 63 "Overvoltage threshold 2 - Extended >5 s (see also error 20)" 64 "HW over-voltage protection OVP - Extended >5 s (see also error 43)" 65 "Failed initialization: Clock" 66 "Failed initialization: Watchdog" 67 "Failed initialization: GPIO" 68 "Failed initialization: ADC" 69 "Failed initialization: NVM" 70 "Failed initialization: I2C" 71 "Failed initialization: CAN" 72 "Failed initialization: PWM" 73 "Failed initialization: Compatibility checks" 74 "Failed initialization: Configuration" 75 "LV power supply - undervoltage" 76 "LV power supply - overvoltage" 77 "6V0 power supply - undervoltage" 78 "6V0 power supply - overvoltage" 79 "HVIL above limit" 80 "HVIL under limit" 81 "HVIL Fault at OUT direction" 82 "HVIL Fault at IN direction" 83 "HVIL Fault at the unit" 84 "Coolant sensor inlet – signal interruption" 85 "Coolant sensor inlet – short circuit" 86 "Coolant sensor outlet – signal interruption" 87 "Coolant sensor outlet – short circuit" 88 "OHP sensor – signal interruption" 89 "OHP sensor – short circuit" 90 "OHP sensor – overheating" 91 "Temperature plausibility check PRE-RUN" 92 "Temperature plausibility check HEATING" 93 "Rapid coolant temperature rise" 94 "HV MCU could not be reset." 95 "EXTERNAL CAN TRANCEIVER FAULT" 96 "E2E wrong number received from HV" 97 "E2E no message received from HV" 98 "External communication timeout" 99 "Coolant temperature overshoot" 100 "Heater Lock counter" 101 "Error Counter" 102 "Active reset fail: IGBT failure or disconnected load" 103 "ADC reference overvoltage" 104 "ADC reference undervoltage" 105 "Second ADC reference overvoltage" 106 "Second ADC reference undervoltage" 107 "E2E failed: data from HV is incorrect" 108 "Signal [D_ReqHVILMonitoring] timeout" ;
+VAL_ 2566879300 D_HVH1HvilStatus 7 "Not available" ;
+VAL_ 2566879300 D_HVH1FcHvil 3 "Not available" ;
+VAL_ 2566879300 D_HVH1_SLI_Undervolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879300 D_HVH1_SLI_Overvolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879300 D_HVH1_HV_Undervolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879300 D_HVH1_HV_Overvolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879300 D_HVH1_CAN_Timeout 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879300 D_HVH1_TC_OHP_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879300 D_HVH1_Internal_Fault 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879300 D_HVH1_HeaterLock 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879300 D_HVH1_FaultLock 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879300 D_HVH1_DryRun_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566877465 D_HVH2ModeRequest 0 "De-activate" 3 "Normal mode" 4 "Ext_CoolantPump_RQ" ;
+VAL_ 2566877465 D_HVH2DiagnosticRequests 20 "Discharge" 19 "Send_MUX_All" 0 "Off" 2 "ExtResetHeaterLock" 3 "ExtResetFaultLock" ;
+VAL_ 2566877509 D_HVH2CoolantInletTemp 255 "Not Available" 254 "Error (out of range)" ;
+VAL_ 2566877509 D_HVH2CoolantOutletTemp 255 "Not Available" 254 "Error (out of range)" ;
+VAL_ 2566877509 D_HVH2OperatingIndicator 1 "ON" 0 "OFF" ;
+VAL_ 2566877509 D_HVH2HeatingIndicator 1 "ON" 0 "OFF" ;
+VAL_ 2566877509 D_HVH2StateNumber 12 "Pre-Run Extended" 0 "None" 1 "Ready" 2 "Pre-Run" 7 "Heating" 9 "Cool Down" 11 "CPRC" ;
+VAL_ 2566877509 D_HVH2PumpRequest 1 "ON" 0 "OFF" ;
+VAL_ 2566877721 D_HVH3ModeRequest 0 "De-activate" 3 "Normal mode" 4 "Ext_CoolantPump_RQ" ;
+VAL_ 2566877721 D_HVH3DiagnosticRequests 20 "Discharge" 19 "Send_MUX_All" 0 "Off" 2 "ExtResetHeaterLock" 3 "ExtResetFaultLock" ;
+VAL_ 2566877584 D_HVH3CoolantInletTemp 255 "Not Available" 254 "Error (out of range)" ;
+VAL_ 2566877584 D_HVH3CoolantOutletTemp 255 "Not Available" 254 "Error (out of range)" ;
+VAL_ 2566877584 D_HVH3OperatingIndicator 1 "ON" 0 "OFF" ;
+VAL_ 2566877584 D_HVH3HeatingIndicator 1 "ON" 0 "OFF" ;
+VAL_ 2566877584 D_HVH3StateNumber 12 "Pre-Run Extended" 0 "None" 1 "Ready" 2 "Pre-Run" 7 "Heating" 9 "Cool Down" 11 "CPRC" ;
+VAL_ 2566877584 D_HVH3PumpRequest 1 "ON" 0 "OFF" ;
+VAL_ 2566879376 D_HVH3_FaultCode 255 "No error active" 1 "ADC reference overvoltage" 2 "ADC reference undervoltage" 3 "Second ADC reference overvoltage" 4 "Second ADC reference undervoltage" 5 "Failed initialization: Clock" 6 "Failed initialization: Watchdog" 7 "Failed initialization: GPIO" 8 "Failed initialization: ADC" 9 "Failed initialization: NVM" 10 "Failed initialization: CAN" 11 "Failed initialization: PWM" 12 "Failed initialization: Compatibility checks" 13 "Failed initialization: Configuration" 14 "Safety Switch Disable is set" 15 "Safety Switch Latch is set" 16 "Fault on IGBT1" 17 "Fault on IGBT2" 18 "Fault on IGBT3" 19 "Overvoltage threshold 1" 20 "Overvoltage threshold 2 <5 s (see also error 63)" 21 "Overvoltage threshold 3" 22 "Undervoltage" 23 "HV plausibility check failed" 24 "Overcurrent" 25 "Current plausibility failed" 26 "Open load detection" 27 "Max output power reached, CAN signal CMD_POWER_LIMITATION" 28 "Max output power reached, parameter POWER_OUT_MAX" 29 "Max output power reached, parameter POWER_OUT_MAX_ABS" 30 "Max output power reached, parameter I_IN_MAX" 31 "Max output power reached, signal CMD_CURRENT_LIMITATION" 32 "Max output power reached, signal POWER_OUT_MAX_DERATING" 33 "Input current exceeded limit" 34 "Derating: onboard temperature above threshold" 35 "HW over-temperature protection IGBT1" 36 "HW over-temperature protection IGBT2" 37 "HW over-temperature protection IGBT3" 38 "HW over-temperature protection PCB" 39 "HW over-temperature protection SS" 40 "HW over-temperature protection OUT" 41 "HW over-temperature protection OHP" 42 "HW overcurrent protection OCP" 43 "HW overvoltage protection OVP <5 s (see also error 64)" 44 "Over-temperature IGBT1" 45 "Over-temperature IGBT2" 46 "Over-temperature IGBT3" 47 "Unbalance on IGBT temperatures" 48 "Over-temperature PCB" 49 "Over-temperature SS" 50 "Safety shutdown active" 51 "Active discharge active" 52 "E2E failed: wrong number" 53 "E2E failed: lost or timeout" 54 "HV check, fault A" 55 "HV check, fault B" 56 "HV check, fault C" 57 "HV check, fault D" 58 "HV check, fault E" 59 "HV check, fault F" 60 "HV check, fault G" 61 "Safety switch latch failed to reset" 62 "E2E failed: data from LV is incorrect" 63 "Overvoltage threshold 2 - Extended >5 s (see also error 20)" 64 "HW over-voltage protection OVP - Extended >5 s (see also error 43)" 65 "Failed initialization: Clock" 66 "Failed initialization: Watchdog" 67 "Failed initialization: GPIO" 68 "Failed initialization: ADC" 69 "Failed initialization: NVM" 70 "Failed initialization: I2C" 71 "Failed initialization: CAN" 72 "Failed initialization: PWM" 73 "Failed initialization: Compatibility checks" 74 "Failed initialization: Configuration" 75 "LV power supply - undervoltage" 76 "LV power supply - overvoltage" 77 "6V0 power supply - undervoltage" 78 "6V0 power supply - overvoltage" 79 "HVIL above limit" 80 "HVIL under limit" 81 "HVIL Fault at OUT direction" 82 "HVIL Fault at IN direction" 83 "HVIL Fault at the unit" 84 "Coolant sensor inlet – signal interruption" 85 "Coolant sensor inlet – short circuit" 86 "Coolant sensor outlet – signal interruption" 87 "Coolant sensor outlet – short circuit" 88 "OHP sensor – signal interruption" 89 "OHP sensor – short circuit" 90 "OHP sensor – overheating" 91 "Temperature plausibility check PRE-RUN" 92 "Temperature plausibility check HEATING" 93 "Rapid coolant temperature rise" 94 "HV MCU could not be reset." 95 "EXTERNAL CAN TRANCEIVER FAULT" 96 "E2E wrong number received from HV" 97 "E2E no message received from HV" 98 "External communication timeout" 99 "Coolant temperature overshoot" 100 "Heater Lock counter" 101 "Error Counter" 102 "Active reset fail: IGBT failure or disconnected load" 103 "ADC reference overvoltage" 104 "ADC reference undervoltage" 105 "Second ADC reference overvoltage" 106 "Second ADC reference undervoltage" 107 "E2E failed: data from HV is incorrect" 108 "Signal [D_ReqHVILMonitoring] timeout" ;
+VAL_ 2566879376 D_HVH3HvilStatus 7 "Not available" ;
+VAL_ 2566879376 D_HVH3FcHvil 3 "Not available" ;
+VAL_ 2566879376 D_HVH3_SLI_Undervolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879376 D_HVH3_SLI_Overvolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879376 D_HVH3_HV_Undervolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879376 D_HVH3_HV_Overvolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879376 D_HVH3_CAN_Timeout 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879376 D_HVH3_TC_OHP_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879376 D_HVH3_Internal_Fault 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879376 D_HVH3_HeaterLock 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879376 D_HVH3_FaultLock 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879376 D_HVH3_DryRun_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566877977 D_HVH4ModeRequest 0 "De-activate" 3 "Normal mode" 4 "Ext_CoolantPump_RQ" ;
+VAL_ 2566877977 D_HVH4DiagnosticRequests 20 "Discharge" 19 "Send_MUX_All" 0 "Off" 2 "ExtResetHeaterLock" 3 "ExtResetFaultLock" ;
+VAL_ 2566877585 D_HVH4CoolantInletTemp 255 "Not Available" 254 "Error (out of range)" ;
+VAL_ 2566877585 D_HVH4CoolantOutletTemp 255 "Not Available" 254 "Error (out of range)" ;
+VAL_ 2566877585 D_HVH4OperatingIndicator 1 "ON" 0 "OFF" ;
+VAL_ 2566877585 D_HVH4HeatingIndicator 1 "ON" 0 "OFF" ;
+VAL_ 2566877585 D_HVH4StateNumber 12 "Pre-Run Extended" 0 "None" 1 "Ready" 2 "Pre-Run" 7 "Heating" 9 "Cool Down" 11 "CPRC" ;
+VAL_ 2566877585 D_HVH4PumpRequest 1 "ON" 0 "OFF" ;
+VAL_ 2566879377 D_HVH4_FaultCode 255 "No error active" 1 "ADC reference overvoltage" 2 "ADC reference undervoltage" 3 "Second ADC reference overvoltage" 4 "Second ADC reference undervoltage" 5 "Failed initialization: Clock" 6 "Failed initialization: Watchdog" 7 "Failed initialization: GPIO" 8 "Failed initialization: ADC" 9 "Failed initialization: NVM" 10 "Failed initialization: CAN" 11 "Failed initialization: PWM" 12 "Failed initialization: Compatibility checks" 13 "Failed initialization: Configuration" 14 "Safety Switch Disable is set" 15 "Safety Switch Latch is set" 16 "Fault on IGBT1" 17 "Fault on IGBT2" 18 "Fault on IGBT3" 19 "Overvoltage threshold 1" 20 "Overvoltage threshold 2 <5 s (see also error 63)" 21 "Overvoltage threshold 3" 22 "Undervoltage" 23 "HV plausibility check failed" 24 "Overcurrent" 25 "Current plausibility failed" 26 "Open load detection" 27 "Max output power reached, CAN signal CMD_POWER_LIMITATION" 28 "Max output power reached, parameter POWER_OUT_MAX" 29 "Max output power reached, parameter POWER_OUT_MAX_ABS" 30 "Max output power reached, parameter I_IN_MAX" 31 "Max output power reached, signal CMD_CURRENT_LIMITATION" 32 "Max output power reached, signal POWER_OUT_MAX_DERATING" 33 "Input current exceeded limit" 34 "Derating: onboard temperature above threshold" 35 "HW over-temperature protection IGBT1" 36 "HW over-temperature protection IGBT2" 37 "HW over-temperature protection IGBT3" 38 "HW over-temperature protection PCB" 39 "HW over-temperature protection SS" 40 "HW over-temperature protection OUT" 41 "HW over-temperature protection OHP" 42 "HW overcurrent protection OCP" 43 "HW overvoltage protection OVP <5 s (see also error 64)" 44 "Over-temperature IGBT1" 45 "Over-temperature IGBT2" 46 "Over-temperature IGBT3" 47 "Unbalance on IGBT temperatures" 48 "Over-temperature PCB" 49 "Over-temperature SS" 50 "Safety shutdown active" 51 "Active discharge active" 52 "E2E failed: wrong number" 53 "E2E failed: lost or timeout" 54 "HV check, fault A" 55 "HV check, fault B" 56 "HV check, fault C" 57 "HV check, fault D" 58 "HV check, fault E" 59 "HV check, fault F" 60 "HV check, fault G" 61 "Safety switch latch failed to reset" 62 "E2E failed: data from LV is incorrect" 63 "Overvoltage threshold 2 - Extended >5 s (see also error 20)" 64 "HW over-voltage protection OVP - Extended >5 s (see also error 43)" 65 "Failed initialization: Clock" 66 "Failed initialization: Watchdog" 67 "Failed initialization: GPIO" 68 "Failed initialization: ADC" 69 "Failed initialization: NVM" 70 "Failed initialization: I2C" 71 "Failed initialization: CAN" 72 "Failed initialization: PWM" 73 "Failed initialization: Compatibility checks" 74 "Failed initialization: Configuration" 75 "LV power supply - undervoltage" 76 "LV power supply - overvoltage" 77 "6V0 power supply - undervoltage" 78 "6V0 power supply - overvoltage" 79 "HVIL above limit" 80 "HVIL under limit" 81 "HVIL Fault at OUT direction" 82 "HVIL Fault at IN direction" 83 "HVIL Fault at the unit" 84 "Coolant sensor inlet – signal interruption" 85 "Coolant sensor inlet – short circuit" 86 "Coolant sensor outlet – signal interruption" 87 "Coolant sensor outlet – short circuit" 88 "OHP sensor – signal interruption" 89 "OHP sensor – short circuit" 90 "OHP sensor – overheating" 91 "Temperature plausibility check PRE-RUN" 92 "Temperature plausibility check HEATING" 93 "Rapid coolant temperature rise" 94 "HV MCU could not be reset." 95 "EXTERNAL CAN TRANCEIVER FAULT" 96 "E2E wrong number received from HV" 97 "E2E no message received from HV" 98 "External communication timeout" 99 "Coolant temperature overshoot" 100 "Heater Lock counter" 101 "Error Counter" 102 "Active reset fail: IGBT failure or disconnected load" 103 "ADC reference overvoltage" 104 "ADC reference undervoltage" 105 "Second ADC reference overvoltage" 106 "Second ADC reference undervoltage" 107 "E2E failed: data from HV is incorrect" 108 "Signal [D_ReqHVILMonitoring] timeout" ;
+VAL_ 2566879377 D_HVH4HvilStatus 7 "Not available" ;
+VAL_ 2566879377 D_HVH4FcHvil 3 "Not available" ;
+VAL_ 2566879377 D_HVH4_SLI_Undervolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879377 D_HVH4_SLI_Overvolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879377 D_HVH4_HV_Undervolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879377 D_HVH4_HV_Overvolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879377 D_HVH4_CAN_Timeout 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879377 D_HVH4_TC_OHP_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879377 D_HVH4_Internal_Fault 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879377 D_HVH4_HeaterLock 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879377 D_HVH4_FaultLock 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879377 D_HVH4_DryRun_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879301 D_HVH2_FaultCode 255 "No error active" 1 "ADC reference overvoltage" 2 "ADC reference undervoltage" 3 "Second ADC reference overvoltage" 4 "Second ADC reference undervoltage" 5 "Failed initialization: Clock" 6 "Failed initialization: Watchdog" 7 "Failed initialization: GPIO" 8 "Failed initialization: ADC" 9 "Failed initialization: NVM" 10 "Failed initialization: CAN" 11 "Failed initialization: PWM" 12 "Failed initialization: Compatibility checks" 13 "Failed initialization: Configuration" 14 "Safety Switch Disable is set" 15 "Safety Switch Latch is set" 16 "Fault on IGBT1" 17 "Fault on IGBT2" 18 "Fault on IGBT3" 19 "Overvoltage threshold 1" 20 "Overvoltage threshold 2 <5 s (see also error 63)" 21 "Overvoltage threshold 3" 22 "Undervoltage" 23 "HV plausibility check failed" 24 "Overcurrent" 25 "Current plausibility failed" 26 "Open load detection" 27 "Max output power reached, CAN signal CMD_POWER_LIMITATION" 28 "Max output power reached, parameter POWER_OUT_MAX" 29 "Max output power reached, parameter POWER_OUT_MAX_ABS" 30 "Max output power reached, parameter I_IN_MAX" 31 "Max output power reached, signal CMD_CURRENT_LIMITATION" 32 "Max output power reached, signal POWER_OUT_MAX_DERATING" 33 "Input current exceeded limit" 34 "Derating: onboard temperature above threshold" 35 "HW over-temperature protection IGBT1" 36 "HW over-temperature protection IGBT2" 37 "HW over-temperature protection IGBT3" 38 "HW over-temperature protection PCB" 39 "HW over-temperature protection SS" 40 "HW over-temperature protection OUT" 41 "HW over-temperature protection OHP" 42 "HW overcurrent protection OCP" 43 "HW overvoltage protection OVP <5 s (see also error 64)" 44 "Over-temperature IGBT1" 45 "Over-temperature IGBT2" 46 "Over-temperature IGBT3" 47 "Unbalance on IGBT temperatures" 48 "Over-temperature PCB" 49 "Over-temperature SS" 50 "Safety shutdown active" 51 "Active discharge active" 52 "E2E failed: wrong number" 53 "E2E failed: lost or timeout" 54 "HV check, fault A" 55 "HV check, fault B" 56 "HV check, fault C" 57 "HV check, fault D" 58 "HV check, fault E" 59 "HV check, fault F" 60 "HV check, fault G" 61 "Safety switch latch failed to reset" 62 "E2E failed: data from LV is incorrect" 63 "Overvoltage threshold 2 - Extended >5 s (see also error 20)" 64 "HW over-voltage protection OVP - Extended >5 s (see also error 43)" 65 "Failed initialization: Clock" 66 "Failed initialization: Watchdog" 67 "Failed initialization: GPIO" 68 "Failed initialization: ADC" 69 "Failed initialization: NVM" 70 "Failed initialization: I2C" 71 "Failed initialization: CAN" 72 "Failed initialization: PWM" 73 "Failed initialization: Compatibility checks" 74 "Failed initialization: Configuration" 75 "LV power supply - undervoltage" 76 "LV power supply - overvoltage" 77 "6V0 power supply - undervoltage" 78 "6V0 power supply - overvoltage" 79 "HVIL above limit" 80 "HVIL under limit" 81 "HVIL Fault at OUT direction" 82 "HVIL Fault at IN direction" 83 "HVIL Fault at the unit" 84 "Coolant sensor inlet – signal interruption" 85 "Coolant sensor inlet – short circuit" 86 "Coolant sensor outlet – signal interruption" 87 "Coolant sensor outlet – short circuit" 88 "OHP sensor – signal interruption" 89 "OHP sensor – short circuit" 90 "OHP sensor – overheating" 91 "Temperature plausibility check PRE-RUN" 92 "Temperature plausibility check HEATING" 93 "Rapid coolant temperature rise" 94 "HV MCU could not be reset." 95 "EXTERNAL CAN TRANCEIVER FAULT" 96 "E2E wrong number received from HV" 97 "E2E no message received from HV" 98 "External communication timeout" 99 "Coolant temperature overshoot" 100 "Heater Lock counter" 101 "Error Counter" 102 "Active reset fail: IGBT failure or disconnected load" 103 "ADC reference overvoltage" 104 "ADC reference undervoltage" 105 "Second ADC reference overvoltage" 106 "Second ADC reference undervoltage" 107 "E2E failed: data from HV is incorrect" 108 "Signal [D_ReqHVILMonitoring] timeout" ;
+VAL_ 2566879301 D_HVH2HvilStatus 7 "Not available" ;
+VAL_ 2566879301 D_HVH2FcHvil 3 "Not available" ;
+VAL_ 2566879301 D_HVH2_SLI_Undervolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879301 D_HVH2_SLI_Overvolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879301 D_HVH2_HV_Undervolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879301 D_HVH2_HV_Overvolt_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879301 D_HVH2_CAN_Timeout 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879301 D_HVH2_TC_OHP_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879301 D_HVH2_Internal_Fault 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879301 D_HVH2_HeaterLock 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879301 D_HVH2_FaultLock 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+VAL_ 2566879301 D_HVH2_DryRun_Fail 0 "Inactive fault" 1 "Active fault" 2 "Error" 3 "Void" ;
+

@@ -10,6 +10,7 @@
 </head>
 <body>
 
+    <!-- Small static sidebar on the left side. Not affected by interface events -->
     <div class="permanent-sidebar">
         <button id="arrowButton" class="icon-btn" title="Toggle Sidebar">←</button>
         <button id="fileButton" class="icon-btn" title="File" onclick="toggleSidebarContent('main')">
@@ -23,12 +24,13 @@
         </button>
     </div>
 
+    <!-- Main container made of a "sidebar" and the log region "content" -->
     <div class="container">
+        <!-- Dynamic sidebar that changes according to interface events -->
         <div class="sidebar">
-            <div id="resizeHandle"></div> <!-- Draggable handle -->
+            <div id="resizeHandle"></div>
             <!-- Invisible container that holds all sidebar configurations -->
             <div id="sidebarContainer">
-
                 <!-- Main Configuration Content -->
                 <div class="sidebar-content active" id="mainConfig">
                     <p>Load a Database</p>
@@ -44,7 +46,7 @@
                         <div class="checkbox-group">
                             <p>Apply a filter to see the sources.</p>
                         </div>
-                    <div id="resizeHandleSources"></div> <!-- Resizing handle -->
+                    <div id="resizeHandleSources"></div>
                     </div>
                     <div class="checkbox-container" id="checkbox-signals">
                         <label>Filter Signals</label>
@@ -53,10 +55,9 @@
                         </div>
                     </div>
                     <p>Load a Log</p>
-                    <button id="loadLogButton" onclick="loadLog()" disabled>Load Log</button>         
-                    <button id="PlotButton" onclick="handleGenerateTraces()" disabled>Generate Plot!</button>         
+                    <button id="loadLogButton" onclick="loadLogButton()">Load Log</button>         
+                    <button id="PlotButton" onclick="handleGenerateTraces()">Generate Plot!</button>         
                 </div>
-
                 <!-- Brush Configuration Content -->
                 <div class="sidebar-content" id="brushConfig">
                     <div id="lineConfigurations">
@@ -64,7 +65,6 @@
                         once a plot has been generated.</p>
                     </div>
                 </div>
-
                 <!-- Gear Configuration Content -->
                 <div class="sidebar-content" id="gearConfig">
                     <p>Gear Settings will be shown here.</p>
@@ -74,20 +74,27 @@
                 </div>
             </div>
         </div>
+        <!-- Plot area -->
         <div class="content">
             <div id="plot"></div>
         </div>
     </div>
 
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!-- Scripts: User Interface -->
     <script src="scripts/main.js"></script>
+    <script src="scripts/sidebar.js"></script>
+    <script src="scripts/app-state.js"></script>
+    <!-- Scripts: Database -->
     <script src="scripts/main-db-loader.js"></script>    
     <script src="scripts/parser-json.js"></script>
     <script src="scripts/parser-dbc.js"></script>
     <script src="scripts/parser-sym.js"></script>
-    <script src="scripts/log-handler.js"></script>
-    <script src="scripts/app-state.js"></script>
+    <!-- Scripts: Log -->
+    <script src="scripts/main-log-loader.js"></script>
+    <script src="scripts/parser-blf.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pako/dist/pako.min.js"></script>
+    <!-- Scripts: Plot -->
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="scripts/plot.js"></script>
-    <script src="scripts/sidebar.js"></script>
 </body>
 </html>

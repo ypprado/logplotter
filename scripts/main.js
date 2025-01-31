@@ -49,13 +49,13 @@ async function loadDatabaseButton() {
         console.log("Starting database load process...");
 
         // Step 1: Let the user select a file
-        const file = await selectFile();
+        const file = await selectFileDB();
 
         // Step 2: Parse the file content
-        const parsedData = await parseFile(file);
+        const parsedData = await parseFileDB(file);
 
         // Step 3: Load the global database in unified JSON format
-        resetGlobalState();
+        resetDatabase();
         database = buildUnifiedDatabase(parsedData);
         console.log("Database loaded:", database);
 
@@ -65,7 +65,7 @@ async function loadDatabaseButton() {
             populateSignals();
 
             // Enable the "Load Log" button TODO place on main every interface related feature
-            document.getElementById("loadLogButton").disabled = false;
+            //document.getElementById("loadLogButton").disabled = false;
         }
 
         // Step 4: Take further steps after the database is loaded
@@ -78,21 +78,33 @@ async function loadDatabaseButton() {
 
 /******************** Button Log ********************/
 // On button click: Load Log
-function loadLog() {
+async function loadLogButton() {
     console.log("Button Load Log clicked");
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = '.csv';
+    try {
+        console.log("Starting Log load process...");
 
-    // Wait a little before triggering the click
-    setTimeout(() => {
-        fileInput.addEventListener('change', function(event) {
-            console.log("File selected (event listener triggered)");
-            handleFileSelectLog(event);
-        });
-        fileInput.click();
-    }, 5);
+        // Step 1: Let the user select a file
+        const file = await selectFileLOG();
+
+        // Step 2: Parse the file content
+        const parsedData = await parseFileLOG(file);
+
+        // Step 3: Load the global log in unified JSON format
+        buildUnifiedLog(parsedData);
+        console.log("Log loaded:", log);
+        
+        if(isLogLoaded()){
+            // something
+        }
+
+        // Enable the "Generate Plot" button
+         document.getElementById("PlotButton").disabled = false;
+
+    } catch (error) {
+        console.error("Error during log loading process:", error);
+    }
 }
+
 
 /******************** Plot listener ********************/
 // Update plot according to changes in configuration sidebar
@@ -360,21 +372,140 @@ function handleGenerateTraces() {
         return;
     }
 
+    // Get signals selected in the checkbox
+    const selectedSignals = getSelectedSignals();
+
+    // sort and convert log based on signals selected
+    const processedLogs = processSelectedSignals(selectedSignals);
+
     // Clear any previous traces to generate a fresh plot
     plotData.clearTraces();
 
-    // Loop through the selected checkboxes and generate traces
-    selectedCheckboxes.forEach(checkbox => {
-        const signalName = checkbox.value; // Assuming the checkbox's value contains the signal name
-        const trace = generatePlotlyDataset(signalName); // Generate the trace
-        if (trace) {
-            plotData.addData(trace); // Add the trace to the global plotData
-        }
-    });
+    // Generate traces based on processed log
+    const traces = generatePlotlyDatasets(processedLogs);
+
+    // Add the trace to the global plotData
+    plotData.addData(traces); 
+    
 
     console.log(`Generated and added traces for ${selectedCheckboxes.length} signal(s).`);
 
     generatePlot();
+}
+
+/**
+ * Extracts the names of selected signals from the checkbox-signals container.
+ * @returns {Array<string>} - Array of selected signal names.
+ */
+function getSelectedSignals() {
+    const checkboxes = document.querySelectorAll('#checkbox-signals .checkbox-group input[type="checkbox"]:checked');
+    const selectedSignals = Array.from(checkboxes).map((checkbox) => {
+        // Extract signal name from "Signal1 (Message1)" format
+        const fullName = checkbox.value; // Example: "Signal1 (Message1)"
+        return fullName.split(' (')[0]; // Extract "Signal1"
+    });
+    return selectedSignals;
+}
+
+/**
+ * Processes the log to extract values for selected signals.
+ * @param {Array<string>} selectedSignals - List of selected signal names.
+ */
+function processSelectedSignals(selectedSignals) {
+    const processedLogs = {}; // Object to store processed logs for each signal
+
+    // Iterate over the selected signals
+    selectedSignals.forEach((signalName) => {
+        // Find the corresponding messages in the database
+        const databaseSignal = findSignalInDatabase(signalName);
+        if (!databaseSignal) {
+            console.warn(`Signal "${signalName}" not found in the database.`);
+            return; // Skip if the signal is not in the database
+        }
+
+        // Find all message IDs associated with this signal
+        const messageId = databaseSignal.messageId;
+
+        // Filter log entries by message ID
+        const filteredMessages = log.filter((msg) => msg.id === messageId);
+
+        // Process the log entries for this signal
+        const signalLog = filteredMessages.map((msg) => {
+            const rawValue = extractRawValue(
+                msg.data,
+                databaseSignal.startBit,
+                databaseSignal.length,
+                databaseSignal.byteOrder
+            );
+
+            // Apply scaling and offset
+            const scaledValue = rawValue * databaseSignal.scaling + databaseSignal.offset;
+
+            return {
+                timestamp: msg.timestamp, // Timestamp in seconds
+                value: scaledValue        // Scaled signal value
+            };
+        });
+
+        // Store the processed log for this signal
+        processedLogs[signalName] = signalLog;
+    });
+
+    console.log("Processed Logs:", processedLogs);
+    return processedLogs; // Return the processed logs for further use
+}
+
+/**
+ * Finds a signal in the database by its name.
+ * @param {string} signalName - Name of the signal.
+ * @returns {Object|null} - Signal object with messageId and properties, or null if not found.
+ */
+function findSignalInDatabase(signalName) {
+    for (const message of database.messages) {
+        for (const signal of message.signals) {
+            if (signal.name === signalName) {
+                return {
+                    messageId: message.id,
+                    startBit: signal.startBit,
+                    length: signal.length,
+                    byteOrder: signal.byteOrder,
+                    scaling: signal.scaling,
+                    offset: signal.offset,
+                    valueType: signal.valueType
+                };
+            }
+        }
+    }
+    return null; // Signal not found
+}
+
+/**
+ * Extracts a raw value from a CAN message payload.
+ * @param {Array} data - CAN message data as an array of bytes.
+ * @param {number} startBit - The start bit of the signal.
+ * @param {number} length - The length of the signal in bits.
+ * @param {string} byteOrder - "LittleEndian" or "BigEndian".
+ * @returns {number} - Extracted raw value.
+ */
+function extractRawValue(data, startBit, length, byteOrder) {
+    const startByte = Math.floor(startBit / 8);
+    const endByte = Math.ceil((startBit + length) / 8);
+    const bitOffset = startBit % 8;
+
+    // Extract relevant bytes
+    let valueBytes = data.slice(startByte, endByte);
+
+    // Handle byte order
+    if (byteOrder === "BigEndian") {
+        valueBytes = valueBytes.reverse();
+    }
+
+    // Convert to binary and extract bits
+    const binaryString = valueBytes.map((byte) => byte.toString(2).padStart(8, '0')).join('');
+    const rawBinary = binaryString.substring(bitOffset, bitOffset + length);
+
+    // Convert binary to integer
+    return parseInt(rawBinary, 2);
 }
 
 

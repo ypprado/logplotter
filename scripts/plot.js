@@ -84,41 +84,45 @@ function createLayoutSettings() {
 
 /**
  * Generates a Plotly-ready dataset for a specific signal from appState.rawLog.
- * 
- * @param {string} signalName - The name of the signal to generate the dataset for.
- * @returns {Object} - A Plotly trace object for the given signal.
  */
-function generatePlotlyDataset(signalName) {
-    if (!appState || !appState.rawLog) {
-        console.error("No raw log data found in appState.");
-        return null;
-    }
+function generatePlotlyDatasets(processedLogs) {
+    // Initialize an array to store the plotly traces
+    const traces = [];
 
-    // Extract data for the specified signal
-    const x = []; // Time (x-axis)
-    const y = []; // Value (y-axis)
+    // Loop through each signal in the processed logs
+    for (const signalName in processedLogs) {
+        if (processedLogs.hasOwnProperty(signalName)) {
+            const signalArray = processedLogs[signalName];
 
-    appState.rawLog.forEach(entry => {
-        if (entry.signal === signalName) {
-            x.push(entry.time);  // Push the time value
-            y.push(entry.value); // Push the signal value
+            // Extract data from the signal array
+            const x = signalArray.map(entry => entry.timestamp); // Time (x-axis)
+            const y = signalArray.map(entry => entry.value);     // Value (y-axis)
+
+            if (x.length === 0 || y.length === 0) {
+                console.warn(`No data found for signal "${signalName}".`);
+                continue; // Skip to the next signal if no data is found
+            }
+
+            // Create a Plotly trace object for each signal
+            const trace = {
+                x: x,
+                y: y,
+                mode: "lines+markers",
+                type: "scatter",
+                name: signalName, // Directly use the signalName here
+            };
+
+            // Add the trace to the traces array
+            traces.push(trace);
         }
-    });
-
-    if (x.length === 0 || y.length === 0) {
-        console.warn(`No data found for signal: ${signalName}`);
-        return null;
     }
 
-    // Create and return the Plotly trace object
-    return {
-        x: x,
-        y: y,
-        mode: "lines+markers",
-        type: "scatter",
-        name: signalName, // Use the signal name as the trace label
-    };
+    // Return the array of traces
+    return traces;
 }
+
+
+
 
 /* example for two subplots
 var trace1 = {

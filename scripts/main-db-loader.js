@@ -1,4 +1,35 @@
-function selectFile() {
+let database = null; // Global variable to store the JSON database
+
+const dropdownContent ={
+    // Lists that will populate the checkboxes
+    ID: [],
+    MsgName: [],
+    Sender: [],
+    Signal: [],
+}
+
+function resetDatabase() {
+    // Clear the global database variable
+    database = null;
+
+    // Clear the dropdownContent object
+    dropdownContent.ID = [];
+    dropdownContent.MsgName = [];
+    dropdownContent.Sender = [];
+    dropdownContent.Signal = [];
+}
+
+function isDatabaseLoaded() {
+    if (!database || !database.messages) {
+        console.error("Database is not loaded or is invalid.");
+        return false;
+    } else {
+        console.log("Database loaded.");
+        return true;
+    }
+}
+
+function selectFileDB() {
     return new Promise((resolve, reject) => {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
@@ -21,7 +52,7 @@ function selectFile() {
     });
 }
 
-async function parseFile(file) {
+async function parseFileDB(file) {
     const fileExtension = file.name.split('.').pop();
 
     return new Promise((resolve, reject) => {
@@ -58,21 +89,6 @@ async function parseFile(file) {
         reader.readAsText(file); // Start reading the file as text
     });
 }
-
-
-/**
- * Check if the database is loaded.
- */
-function isDatabaseLoaded() {
-    if (!database || !database.messages) {
-        console.error("Database is not loaded or is invalid.");
-        return false;
-    } else {
-        console.log("Database loaded.");
-        return true;
-    }
-}
-
 
 function extractDropdownContent() {
     database.messages.forEach((message) => {
