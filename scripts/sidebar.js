@@ -150,7 +150,7 @@ function resizeSources(e) {
 
     if (newHeight >= minHeight && newHeight <= maxHeight) {
         sourcesContainer.style.height = `${newHeight}px`; // Resize sources container
-        signalsContainer.style.maxHeight = `calc(100vh - ${newHeight + 50}px)`; // Adjust signals container
+        //signalsContainer.style.maxHeight = `calc(100vh - ${newHeight + 50}px)`; // Adjust signals container
     }
 }
 
@@ -160,4 +160,21 @@ function stopResizingSources() {
     document.body.style.userSelect = ''; // Re-enable text selection
     document.removeEventListener('mousemove', resizeSources);
     document.removeEventListener('mouseup', stopResizingSources);
+}
+
+
+function updateButtonColor(buttonId, condition) {
+    let button = document.getElementById(buttonId);
+
+    if (button) {
+        if (condition) {
+            button.style.backgroundColor = "#9bf59ef3"; // Green (Hex)
+            //button.style.color = "#FFFFFF"; // White text (Hex)
+        } else {
+            button.style.backgroundColor = "#fffffff3"; // white (Hex)
+            //button.style.color = "#FFFFFF"; // White text (Hex)
+        }
+    } else {
+        console.error(`Button with ID '${buttonId}' not found.`);
+    }
 }

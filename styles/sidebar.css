@@ -1,0 +1,73 @@
+/***************************** sidebar *****************************/
+.sidebar {
+    width: 30%; /* Initial width */
+    min-width: 250px;
+    max-width: 800px;
+    background-color: #f4f4f4;
+    color: black;
+    padding: 10px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    overflow-y: auto; /* Enable vertical scrolling for the sidebar itself */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    height: 100vh; /* Match the height of the viewport */
+    box-sizing: border-box; /* Include padding in height calculation */
+    /*transition: width 0.5s ease, transform 0.5s ease;*/
+    position: relative;
+    resize: horizontal;
+}
+
+#resizeHandle {
+    width: 3px;
+    background-color: #ccc;
+    cursor: ew-resize;
+    height: 100%;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 2;
+}
+
+.sidebar.collapsed {
+    /*width: 0; /* Collapse to hidden */
+    display: none;/**/
+    overflow: hidden; /* Hide content */
+    /*transform: translateX(-100%); /* Slide off-screen */
+}
+
+/* Invisible container holding all sidebar configurations */
+#sidebarContainer {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    flex-grow: 1; /* Allow the active content to take up available space */
+}
+
+/* Initially hide all sidebar contents */
+.sidebar-content {
+    display: none;
+    height: 100%;
+    flex-grow: 1; /* Allow the active content to take up available space */
+    flex-direction: column; /* Stack content vertically */
+}
+
+/* Visible content when selected */
+.sidebar-content.active {
+    display: flex;
+    flex-direction: column; /* Stack content vertically */
+    flex-grow: 1; /* Allow the active content to take up available space */
+}
+
+#mainConfig, #brushConfig, #gearConfig {
+    /*display: flex;*/
+    flex-direction: column; /* Stack content vertically */
+    /*flex-grow: 1; /* Allow it to grow to take available space */
+    /*overflow-y: auto; /* Add a scroll if the content exceeds available space */
+    /*padding-bottom: 10px; /* Ensure space below the last element */
+    /*box-sizing: border-box; /* Include padding in size calculations */
+}
+
+
+

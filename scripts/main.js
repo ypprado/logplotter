@@ -59,13 +59,20 @@ async function loadDatabaseButton() {
         database = buildUnifiedDatabase(parsedData);
         console.log("Database loaded:", database);
 
-        if(isDatabaseLoaded){
+        if(isDatabaseLoaded()){
+            
             extractDropdownContent(database); 
 
             populateSignals();
 
-            // Enable the "Load Log" button TODO place on main every interface related feature
-            //document.getElementById("loadLogButton").disabled = false;
+            updateButtonColor('loadDatabaseButton',true);
+
+            if(isLogLoaded()){
+                // Enable the "Generate Plot" button
+                document.getElementById("PlotButton").disabled = false;
+            }
+        } else {
+            updateButtonColor('loadDatabaseButton',false);
         }
 
         // Step 4: Take further steps after the database is loaded
@@ -92,14 +99,18 @@ async function loadLogButton() {
         // Step 3: Load the global log in unified JSON format
         buildUnifiedLog(parsedData);
         console.log("Log loaded:", log);
-        
+
         if(isLogLoaded()){
-            // something
+
+            updateButtonColor('loadLogButton',true);
+
+            if(isDatabaseLoaded()){
+                // Enable the "Generate Plot" button
+                document.getElementById("PlotButton").disabled = false;
+            }
+        } else {
+            updateButtonColor('loadLogButton',false);
         }
-
-        // Enable the "Generate Plot" button
-         document.getElementById("PlotButton").disabled = false;
-
     } catch (error) {
         console.error("Error during log loading process:", error);
     }
@@ -194,8 +205,12 @@ function populateCheckboxGroup(filter) {
         populateSignals();
     } else if (filter === 'filterById') {
         // Combine IDs and message names into "ID Name" format
-        const idLabels = dropdownContent.ID.map((id, index) => `${id} ${dropdownContent.MsgName[index]}`);
+        const idLabels = dropdownContent.ID.map((id, index) => `${id} (${dropdownContent.MsgName[index]})`);
         populateCheckboxList(idLabels, checkboxGroup, 'No IDs available.');
+    } else if (filter === 'filterByName') {
+        // Combine IDs and message names into "ID Name" format
+        const NamedLabels = dropdownContent.MsgName.map((name, index) => `${name} (${dropdownContent.ID[index]})`);
+        populateCheckboxList(NamedLabels, checkboxGroup, 'No Names available.');
     } else if (filter === 'filterBySender') {
         populateCheckboxList(dropdownContent.Sender, checkboxGroup, 'No senders available.');
     }
@@ -210,6 +225,9 @@ function populateCheckboxGroup(filter) {
  */
 function populateCheckboxList(list, container, emptyMessage) {
     if (list.length > 0) {
+        // Sort the list alphabetically
+        list.sort((a, b) => a.localeCompare(b));
+
         list.forEach(item => {
             container.innerHTML += `
                 <label><input type="checkbox" value="${item}"> ${item}</label>`;
@@ -262,7 +280,7 @@ function populateSignals() {
         selectedSources.forEach((source) => {
             if (filterType === 'filterById') {
                 // Extract only the ID (remove the concatenated message name)
-                const idOnly = source.split(' ')[0];
+                const idOnly = source.split(' (')[0];
 
                 // Filter by ID using the extracted ID
                 const message = database.messages.find((msg) => msg.id === idOnly);
@@ -271,6 +289,18 @@ function populateSignals() {
                         allSignals.add(`${signal.name} (${message.name})`);
                     });
                 }
+            } else if (filterType === 'filterByName') {
+                // Extract only the Name (remove the concatenated id)
+                const NameOnly = source.split(' (')[0];
+
+                // Filter by ID using the extracted ID
+                const message = database.messages.find((msg) => msg.name === NameOnly);
+                if (message) {
+                    message.signals.forEach((signal) => {
+                        allSignals.add(`${signal.name} (${message.name})`);
+                    });
+                }
+
             } else if (filterType === 'filterBySender') {
                 // Filter by Sender
                 database.messages

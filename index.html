@@ -7,6 +7,9 @@
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/permanent-sidebar.css">
     <link rel="stylesheet" href="styles/plot.css">
+    <link rel="stylesheet" href="styles/sidebar.css">
+    <link rel="stylesheet" href="styles/sidebar-config-main.css">
+    <link rel="stylesheet" href="styles/sidebar-config-brush.css">
 </head>
 <body>
 
@@ -33,12 +36,16 @@
             <div id="sidebarContainer">
                 <!-- Main Configuration Content -->
                 <div class="sidebar-content active" id="mainConfig">
-                    <p>Load a Database</p>
-                    <button onclick="loadDatabaseButton()">Load Database</button>
-                    <p>Source selection</p>
+                    <p>Load your files to start</p>
+                    <div class="button-container">
+                        <button id="loadDatabaseButton" onclick="loadDatabaseButton()">Load Database</button>
+                        <button id="loadLogButton" onclick="loadLogButton()">Load Log</button>         
+                    </div>
+                        <p>Source selection</p>
                     <select id="filterOptions" size="1">
                         <option value="noFilter">No Filter</option>
                         <option value="filterById">Filter by ID</option>
+                        <option value="filterByName">Filter by Name</option>
                         <option value="filterBySender">Filter by Sender</option>
                     </select>
                     <div class="checkbox-container" id="checkbox-sources">
@@ -54,9 +61,7 @@
                             <p>Select a source to see the signals.</p>
                         </div>
                     </div>
-                    <p>Load a Log</p>
-                    <button id="loadLogButton" onclick="loadLogButton()">Load Log</button>         
-                    <button id="PlotButton" onclick="handleGenerateTraces()">Generate Plot!</button>         
+                    <button id="PlotButton" onclick="handleGenerateTraces()" disabled>Generate Plot!</button>         
                 </div>
                 <!-- Brush Configuration Content -->
                 <div class="sidebar-content" id="brushConfig">

@@ -24,7 +24,7 @@ function isDatabaseLoaded() {
         console.error("Database is not loaded or is invalid.");
         return false;
     } else {
-        console.log("Database loaded.");
+        //console.log("Database loaded.");
         return true;
     }
 }

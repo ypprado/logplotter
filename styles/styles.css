@@ -6,131 +6,13 @@ body {
 }
 
 p {
-    /*line-height: 1.5; /* Adjust to provide enough vertical space */
-    height: 20px;
-    padding: 0px 0; /* Add vertical padding for better spacing */
+    /*line-height: 10px; /* Match height for vertical centering */
+    height: 10px;
+    margin-block-start: 10px;
+    padding: 00px 0; /* Add vertical padding for better spacing */
     /*white-space: no-wrap; /* Prevent text from wrapping to the next line */
     overflow: visible; /* show overflowing text if the container is too small */
     text-overflow: ellipsis; /* Add "..." to indicate truncated text */
-}
-
-
-/***************************** main container *****************************/
-/* Main Container shifted right to accommodate permanent-sidebar */
-.container {
-    display: flex;
-    height: 100vh;
-    width: calc(100% - 60px); /* Subtract permanent-sidebar width */
-    margin-left: 60px; /* Offset by permanent-sidebar width */
-    overflow: hidden; /* Prevent horizontal scroll */
-}
-
-/***************************** sidebar *****************************/
-.sidebar {
-    width: 20%; /* Initial width */
-    min-width: 250px;
-    max-width: 800px;
-    background-color: #f4f4f4;
-    color: black;
-    padding: 10px;
-    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    overflow-y: auto; /* Enable vertical scrolling for the sidebar itself */
-    overflow-x: hidden; /* Prevent horizontal scrolling */
-    height: 100vh; /* Match the height of the viewport */
-    box-sizing: border-box; /* Include padding in height calculation */
-    /*transition: width 0.5s ease, transform 0.5s ease;*/
-    position: relative;
-    resize: horizontal;
-}
-
-#resizeHandle {
-    width: 3px;
-    background-color: #ccc;
-    cursor: ew-resize;
-    height: 100%;
-    position: absolute;
-    right: 0;
-    top: 0;
-    z-index: 2;
-}
-
-.sidebar.collapsed {
-    /*width: 0; /* Collapse to hidden */
-    display: none;/**/
-    overflow: hidden; /* Hide content */
-    /*transform: translateX(-100%); /* Slide off-screen */
-}
-
-/* Invisible container holding all sidebar configurations */
-#sidebarContainer {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    flex-grow: 1; /* Allow the active content to take up available space */
-}
-
-/* Initially hide all sidebar contents */
-.sidebar-content {
-    display: none;
-    height: 100%;
-    flex-grow: 1; /* Allow the active content to take up available space */
-    flex-direction: column; /* Stack content vertically */
-}
-
-/* Visible content when selected */
-.sidebar-content.active {
-    display: flex;
-    flex-direction: column; /* Stack content vertically */
-    flex-grow: 1; /* Allow the active content to take up available space */
-}
-
-#mainConfig, #brushConfig, #gearConfig {
-    /*display: flex;*/
-    flex-direction: column; /* Stack content vertically */
-    /*flex-grow: 1; /* Allow it to grow to take available space */
-    /*overflow-y: auto; /* Add a scroll if the content exceeds available space */
-    /*padding-bottom: 10px; /* Ensure space below the last element */
-    /*box-sizing: border-box; /* Include padding in size calculations */
-}
-
-/* Brush sidebar */
-/* Style for each line configuration block */
-.line-config {
-    margin: 10px 0;
-    padding: 10px;
-    gap: 5px;
-    border: 1px solid #ddd;
-    background-color: #f9f9f9;
-    display: flex;
-    flex-direction: column; /* Ensure vertical stacking */
-}
-
-/* Style for the select dropdown */
-.line-mode {
-    margin: 5px 0;
-    padding: 5px;
-}
-
-/* Style for the range input and associated span */
-.line-width {
-    margin: 5px 0;
-}
-
-.line-width-value {
-    margin-left: 10px;
-}
-
-
-/***************************** sidebar:mainConfig *****************************/
-
-button:disabled {
-    background-color: #ccc; /* Gray background */
-    color: #888; /* Lighter text color */
-    cursor: not-allowed; /* Indicate it's disabled */
-    opacity: 0.6; /* Reduce opacity */
 }
 
 button {
@@ -140,96 +22,13 @@ button {
     display: block; /* Ensure buttons are displayed as block elements */
 }
 
-/* dropdown */
-select {
-    margin-bottom: 10px;
-    padding: 10px;
-}
-
-#filterOptions {
-    width: 200px; /* Adjust as needed */
-    cursor: pointer; /* Indicate interactivity */
-}
-
-#filterOptions:hover {
-    background-color: #e6e6e6; /* Highlight dropdown on hover */
-}
-
-/* checkboxes */
-.checkbox-container {
-    min-height: 100px;
-    margin-bottom: 10px;
-    display: flex; /* Enable flexbox for contained .checkbox-group */
-    flex-direction: column; /* Align children vertically */
-    overflow: auto; /* Add scroll if the content overflows */
-}
-
-.checkbox-group {
-    flex-grow: 1; /* Make the border container grow with the parent */
-    overflow-y: scroll; /* Add scrolling if content exceeds height */
-    overflow-x: hidden;
-    border: 1px solid #ddd;
-    padding: 10px;
-}
-
-.checkbox-group label {
-    display: block;
-}
-
-/* Styling the resize handle for checkbox-sources */
-#resizeHandleSources {
-    height: 3px; /* Increase the height for easier interaction */
-    background-color: #ccc; /* Light gray color for visibility */
-    cursor: ns-resize; /* North-South resize cursor */
-    width: 100%;
-    position: relative;
-    z-index: 1;
-    margin-top: 10px; /* Add a gap between the sources container and the handle */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add subtle shadow for separation */
-    border-radius: 5px; /* Rounded corners for a smoother look */
-}
-
-/* Update #checkbox-sources to ensure proper spacing */
-#checkbox-sources {
-    height: 150px; /* Initial height */
-    min-height: 100px; /* Minimum height */
-    max-height: 400px; /* Maximum height */
-    overflow: hidden; /* Prevent overflow of the container */
-    resize: none; /* Disable default resize, handled programmatically */
-    padding-bottom: 5px; /* Optional: Add padding for visual separation */
-}
-#checkbox-signals {
-    flex-grow: 1; /* Allow this container to grow dynamically */
-    display: flex; /* Flexbox for inner alignment */
-    flex-direction: column; /* Ensure vertical alignment */
-    max-height: calc(100vh - 200px); /* Dynamically adjust for remaining space */
-    overflow: auto; /* Add scrolling for content overflow */
-    overflow-x: hidden;
-}
-
-
-
-/* Style for the Show Configuration button */
-#PlotButton {
-    padding: 10px;
-    background-color: #1faf24f3;
-    color: white;
-    border: none;
-    cursor: pointer;
-    width: 100%;
-    font-size: 16px;
-    margin-bottom: 10px;
-    box-sizing: border-box; /* Ensure padding is included in the button height */
-}
-
-#PlotButton:hover {
-    background-color: #17791c;
-}
-
-#PlotButton:disabled {
-    background-color: #ccc; /* Gray background */
-    color: #888; /* Lighter text color */
-    cursor: not-allowed; /* Indicate it's disabled */
-    opacity: 0.6; /* Reduce opacity */
+/***************************** main container *****************************/
+/* Main Container shifted right to accommodate permanent-sidebar */
+.container {
+    display: flex;
+    height: 100vh;
+    width: calc(100% - 60px); /* Subtract permanent-sidebar width */
+    margin-left: 60px; /* Offset by permanent-sidebar width */
+    overflow: hidden; /* Prevent horizontal scroll */
 }
 
