@@ -1,0 +1,100 @@
+VERSION ""
+
+
+NS_ : 
+	NS_DESC_
+	CM_
+	BA_DEF_
+	BA_
+	VAL_
+	CAT_DEF_
+	CAT_
+	FILTER
+	BA_DEF_DEF_
+	EV_DATA_
+	ENVVAR_DATA_
+	SGTYPE_
+	SGTYPE_VAL_
+	BA_DEF_SGTYPE_
+	BA_SGTYPE_
+	SIG_TYPE_REF_
+	VAL_TABLE_
+	SIG_GROUP_
+	SIG_VALTYPE_
+	SIGTYPE_VALTYPE_
+	BO_TX_BU_
+	BA_DEF_REL_
+	BA_REL_
+	BA_DEF_DEF_REL_
+	BU_SG_REL_
+	BU_EV_REL_
+	BU_BO_REL_
+	SG_MUL_VAL_
+
+BS_:
+
+BU_: Vehicle PC
+
+
+BO_ 512 Frame1: 8 Vehicle
+ SG_ F1_Signal1 : 0|4@1+ (1,0) [0|7] "-"  PC
+ SG_ F1_Signal2 : 8|4@1+ (1,0) [15|15] "-"  PC
+ SG_ F1_Signal3 : 16|8@1+ (1,0) [0|255] "States"  PC
+
+BO_ 513 Frame2: 4 PC
+ SG_ F2_Signal1 : 7|16@0+ (0.1,-40) [-40|150] "°C"  Vehicle
+ SG_ F2_Signal2 : 23|8@0+ (1,-40) [-40|150] "°C"  Vehicle
+ SG_ F2_Signal3 : 31|8@0+ (0.1,0) [0|25.5] "A"  Vehicle
+
+BO_ 385854139 Frame3: 8 PC
+ SG_ Mutiplexer M : 0|8@1+ (1,0) [0|255] "-"  Vehicle
+ SG_ Mutiplexer1 m1 : 56|8@1+ (1,0) [0|255] "-"  Vehicle
+ SG_ Mutiplexer2 m2 : 56|8@1+ (1,0) [0|255] "-"  Vehicle
+ SG_ Mutiplexer3 m3 : 56|8@1+ (1,0) [0|255] "-"  Vehicle
+
+
+
+CM_ BO_ 512 "The first frame of the file";
+CM_ SG_ 512 F1_Signal1 "This signal is important";
+CM_ SG_ 512 F1_Signal2 "Not so important";
+CM_ SG_ 512 F1_Signal3 "For sure useful";
+CM_ BO_ 513 "The second frame of the file";
+CM_ SG_ 513 F2_Signal1 "Classic Signal";
+CM_ SG_ 513 F2_Signal2 "Classic Signal but simpler";
+CM_ SG_ 513 F2_Signal3 "Also a classic";
+CM_ BO_ 385854139 "Another frame";
+CM_ SG_ 385854139 Mutiplexer "One Signal to rule them all";
+CM_ SG_ 385854139 Mutiplexer1 "One Signal to find them";
+CM_ SG_ 385854139 Mutiplexer2 "One signal to bring them all";
+CM_ SG_ 385854139 Mutiplexer3 "And in the CAN Software bind them";
+BA_DEF_  "BusType" STRING ;
+BA_DEF_ BO_  "GenMsgCycleTime" INT 0 65535;
+BA_DEF_ BO_  "GenMsgSendType" ENUM  "Cyclic","NotUsed","NotUsed","NotUsed","NotUsed","NotUsed","NotUsed","IfActive","noMsgSendType";
+BA_DEF_ SG_  "GenSigStartValue" FLOAT -3.4E+038 3.4E+038;
+BA_DEF_ SG_  "SigProvideRawValue" ENUM  "No","Yes";
+BA_DEF_ BO_  "MsgSendTimeout" INT -1 3600000;
+BA_DEF_DEF_  "BusType" "CAN";
+BA_DEF_DEF_  "GenMsgCycleTime" 0;
+BA_DEF_DEF_  "GenMsgSendType" "Cyclic";
+BA_DEF_DEF_  "GenSigStartValue" 0;
+BA_DEF_DEF_  "SigProvideRawValue" "No";
+BA_DEF_DEF_  "MsgSendTimeout" -1;
+BA_ "GenMsgCycleTime" BO_ 512 100;
+BA_ "GenMsgCycleTime" BO_ 513 50;
+BA_ "GenMsgCycleTime" BO_ 385854139 1000;
+BA_ "GenSigStartValue" SG_ 512 F1_Signal1 0;
+BA_ "GenSigStartValue" SG_ 512 F1_Signal2 15;
+BA_ "GenSigStartValue" SG_ 512 F1_Signal3 0;
+BA_ "GenSigStartValue" SG_ 513 F2_Signal1 0;
+BA_ "GenSigStartValue" SG_ 513 F2_Signal2 0;
+BA_ "GenSigStartValue" SG_ 513 F2_Signal3 0;
+BA_ "GenSigStartValue" SG_ 385854139 Mutiplexer 0;
+BA_ "GenSigStartValue" SG_ 385854139 Mutiplexer1 0;
+BA_ "GenSigStartValue" SG_ 385854139 Mutiplexer2 0;
+BA_ "GenSigStartValue" SG_ 385854139 Mutiplexer3 0;
+BA_ "GenMsgSendType" BO_ 512 0;
+BA_ "GenMsgSendType" BO_ 513 7;
+BA_ "GenMsgSendType" BO_ 385854139 0;
+BA_ "MsgSendTimeout" BO_ 385854139 10000;
+VAL_ 512 F1_Signal3 1 "State 1" 2 "State 2" 4 "State 4" 5 "Not used" ;
+

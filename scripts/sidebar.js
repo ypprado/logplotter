@@ -1,0 +1,180 @@
+// Define the sidebar configurations
+const sidebarConfigurations = {
+    main: 'mainConfig',
+    brush: 'brushConfig',
+    gear: 'gearConfig'
+};
+
+// Function to toggle between different sidebar configurations
+function toggleSidebarContent(configType) {
+    // Hide all sidebar contents first
+    const allConfigContents = document.querySelectorAll('.sidebar-content');
+    allConfigContents.forEach(content => {
+        content.classList.remove('active');
+    });
+
+    // Show the requested configuration
+    const configToShow = sidebarConfigurations[configType];
+    const contentToShow = document.getElementById(configToShow);
+    if (contentToShow) {
+        contentToShow.classList.add('active');
+    }
+}
+
+// Example function to handle specific display of configuration (e.g., for Brush)
+function displayConfigurationControls(data) {
+    const configContainer = document.getElementById('lineConfigurations');
+    configContainer.innerHTML = '';
+
+    data.forEach((trace, index) => {
+        const lineConfig = document.createElement('div');
+        lineConfig.classList.add('line-config');
+        const lineWidth = trace.line && trace.line.width ? trace.line.width : 2;
+        lineConfig.innerHTML = `
+            <label>Signal ${trace.name}</label>
+
+            <label>Mode</label>
+            <select class="line-mode" data-index="${index}">
+                <option value="lines" ${trace.mode === 'lines' ? 'selected' : ''}>Lines</option>
+                <option value="markers" ${trace.mode === 'markers' ? 'selected' : ''}>Markers</option>
+                <option value="lines+markers" ${trace.mode === 'lines+markers' ? 'selected' : ''}>Lines + Markers</option>
+            </select>
+
+            <div class="line-width-row">
+                <label>Line Width:</label>
+                <span class="line-width-value">${lineWidth}</span>
+            </div>
+            <input type="range" class="line-width" data-index="${index}" min="1" max="10" value="${lineWidth}" />
+
+        `;
+        configContainer.appendChild(lineConfig);
+    });
+    addConfigListeners();
+}
+
+
+/******************** Resize Sidebar  ********************/
+const sidebar = document.querySelector('.sidebar');
+const content = document.querySelector('.content'); // Select the content area
+const container = document.querySelector('.container'); // Select the container
+
+let isResizing = false;
+let throttleTimeout = null;
+
+// Listen for the window resize event
+window.addEventListener('resize', adjustSidebarOnResize);
+
+function adjustSidebarOnResize() {
+    // Ensure the sidebar stays proportional to the container
+    const containerWidth = container.offsetWidth;
+    const sidebarWidth = sidebar.offsetWidth;
+    const sidebarRatio = sidebarWidth / containerWidth;
+
+    const newSidebarWidth = containerWidth * sidebarRatio;
+    const minWidth = 200; // Minimum sidebar width
+    const maxWidth = 600; // Maximum sidebar width
+
+    if (newSidebarWidth >= minWidth && newSidebarWidth <= maxWidth) {
+        sidebar.style.width = `${newSidebarWidth}px`; // Adjust sidebar width
+        content.style.width = `calc(100% - ${newSidebarWidth}px)`; // Adjust content width
+    }
+}
+
+// Existing resizing logic for manual adjustment
+const resizeHandle = document.getElementById('resizeHandle');
+resizeHandle.addEventListener('mousedown', (e) => {
+    isResizing = true;
+    document.body.style.cursor = 'ew-resize';
+    document.body.style.userSelect = 'none'; // Disable text selection
+    document.addEventListener('mousemove', throttledResizeSidebar);
+    document.addEventListener('mouseup', stopResize);
+});
+
+function throttledResizeSidebar(e) {
+    if (!throttleTimeout) {
+        throttleTimeout = setTimeout(() => {
+            resizeSidebar(e);
+            throttleTimeout = null; // Reset the timeout
+        }, 16); // ~60fps (16ms interval)
+    }
+}
+
+function resizeSidebar(e) {
+    if (!isResizing) return;
+
+    const containerOffset = container.getBoundingClientRect().left;
+    const newWidth = e.clientX - containerOffset;
+
+    const minWidth = 200;
+    const maxWidth = 600;
+
+    if (newWidth >= minWidth && newWidth <= maxWidth) {
+        sidebar.style.width = `${newWidth}px`;
+        content.style.width = `calc(100% - ${newWidth}px)`;
+    }
+}
+
+function stopResize() {
+    isResizing = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = ''; // Re-enable text selection
+    document.removeEventListener('mousemove', throttledResizeSidebar);
+    document.removeEventListener('mouseup', stopResize);
+}
+
+/******************** Resize Sources checkbox  ********************/
+
+const sourcesContainer = document.getElementById('checkbox-sources');
+const signalsContainer = document.getElementById('checkbox-signals');
+const resizeHandleSources = document.getElementById('resizeHandleSources');
+
+let isResizingSources = false;
+
+resizeHandleSources.addEventListener('mousedown', (e) => {
+    isResizingSources = true;
+    document.body.style.cursor = 'ns-resize';
+    document.body.style.userSelect = 'none'; // Prevent text selection during drag
+    document.addEventListener('mousemove', resizeSources);
+    document.addEventListener('mouseup', stopResizingSources);
+});
+
+function resizeSources(e) {
+    if (!isResizingSources) return;
+
+    // Calculate the new height for checkbox-sources
+    const containerRect = sourcesContainer.getBoundingClientRect();
+    const newHeight = e.clientY - containerRect.top;
+
+    const minHeight = 100; // Minimum height for sources
+    const maxHeight = 400; // Maximum height for sources
+
+    if (newHeight >= minHeight && newHeight <= maxHeight) {
+        sourcesContainer.style.height = `${newHeight}px`; // Resize sources container
+        //signalsContainer.style.maxHeight = `calc(100vh - ${newHeight + 50}px)`; // Adjust signals container
+    }
+}
+
+function stopResizingSources() {
+    isResizingSources = false;
+    document.body.style.cursor = '';
+    document.body.style.userSelect = ''; // Re-enable text selection
+    document.removeEventListener('mousemove', resizeSources);
+    document.removeEventListener('mouseup', stopResizingSources);
+}
+
+
+function updateButtonColor(buttonId, condition) {
+    let button = document.getElementById(buttonId);
+
+    if (button) {
+        if (condition) {
+            button.style.backgroundColor = "#9bf59ef3"; // Green (Hex)
+            //button.style.color = "#FFFFFF"; // White text (Hex)
+        } else {
+            button.style.backgroundColor = "#fffffff3"; // white (Hex)
+            //button.style.color = "#FFFFFF"; // White text (Hex)
+        }
+    } else {
+        console.error(`Button with ID '${buttonId}' not found.`);
+    }
+}

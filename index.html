@@ -4,59 +4,102 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload and Plot Data</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="styles/styles.css">
+    <link rel="stylesheet" href="styles/permanent-sidebar.css">
+    <link rel="stylesheet" href="styles/plot.css">
+    <link rel="stylesheet" href="styles/sidebar.css">
+    <link rel="stylesheet" href="styles/sidebar-config-main.css">
+    <link rel="stylesheet" href="styles/sidebar-config-brush.css">
 </head>
 <body>
+
+    <!-- Small static sidebar on the left side. Not affected by interface events -->
+    <div class="permanent-sidebar">
+        <button id="arrowButton" class="icon-btn" title="Toggle Sidebar">←</button>
+        <button id="fileButton" class="icon-btn" title="File" onclick="toggleSidebarContent('main')">
+            <i class="icon icon-file"></i>
+        </button>
+        <button id="brushButton" class="icon-btn" title="Brush" onclick="toggleSidebarContent('brush')">
+            <i class="icon icon-brush"></i>
+        </button>
+        <button id="gearButton" class="icon-btn" title="Settings" onclick="toggleSidebarContent('gear')">
+            <i class="icon icon-gear"></i>
+        </button>
+    </div>
+
+    <!-- Main container made of a "sidebar" and the log region "content" -->
     <div class="container">
+        <!-- Dynamic sidebar that changes according to interface events -->
         <div class="sidebar">
-            <p>Load a Database and a Log to start!</p>
-            <button onclick="loadDatabase()">Load Database</button>
-            <button onclick="loadLog()">Load Log</button>
-        
-            <p>Source selection</p>
-            <select id="filterOptions">
-                <option value="noFilter">No Filter</option>
-                <option value="filterById">Filter By ID</option>
-                <option value="filterByNode">Filter by Node</option>
-            </select>
-
-            <div class="checkbox-container" id="checkbox-sources">
-                <label>Filter Sources</label>
-                <div class="checkbox-group">
-                <p>Apply a filter to see the sources.</p>
-                   <!-- Checkboxes go here -->
+            <div id="resizeHandle"></div>
+            <!-- Invisible container that holds all sidebar configurations -->
+            <div id="sidebarContainer">
+                <!-- Main Configuration Content -->
+                <div class="sidebar-content active" id="mainConfig">
+                    <p>Load your files to start</p>
+                    <div class="button-container">
+                        <button id="loadDatabaseButton" onclick="loadDatabaseButton()">Load Database</button>
+                        <button id="loadLogButton" onclick="loadLogButton()">Load Log</button>         
+                    </div>
+                        <p>Source selection</p>
+                    <select id="filterOptions" size="1">
+                        <option value="noFilter">No Filter</option>
+                        <option value="filterById">Filter by ID</option>
+                        <option value="filterByName">Filter by Name</option>
+                        <option value="filterBySender">Filter by Sender</option>
+                    </select>
+                    <div class="checkbox-container" id="checkbox-sources">
+                        <label>Filter Sources</label>
+                        <div class="checkbox-group">
+                            <p>Apply a filter to see the sources.</p>
+                        </div>
+                    <div id="resizeHandleSources"></div>
+                    </div>
+                    <div class="checkbox-container" id="checkbox-signals">
+                        <label>Filter Signals</label>
+                        <div class="checkbox-group">
+                            <p>Select a source to see the signals.</p>
+                        </div>
+                    </div>
+                    <button id="PlotButton" onclick="handleGenerateTraces()" disabled>Generate Plot!</button>         
+                </div>
+                <!-- Brush Configuration Content -->
+                <div class="sidebar-content" id="brushConfig">
+                    <div id="lineConfigurations">
+                        <p>Customization options will be shown
+                        once a plot has been generated.</p>
+                    </div>
+                </div>
+                <!-- Gear Configuration Content -->
+                <div class="sidebar-content" id="gearConfig">
+                    <p>Gear Settings will be shown here.</p>
+                    <button>Place Holder</button>
+                    <button>Place Holder</button>
+                    <button>Place Holder</button>
                 </div>
             </div>
-
-            <div class="checkbox-container" id="checkbox-signals">
-                <label>Filter Signals</label>
-                <div class="checkbox-group">
-                <p>Select a source to see the signals.</p>
-                   <!-- Checkboxes go here -->
-                </div>
-            </div>
-
-            <button id="showConfigBtn">Show Configuration</button>
         </div>
-
-
+        <!-- Plot area -->
         <div class="content">
             <div id="plot"></div>
         </div>
-
-        <!-- Right sidebar, initially hidden -->
-        <div id="rightSidebar" class="right-sidebar">
-            <h3>Configuration Settings</h3>
-            <div id="lineConfigurations">
-                <!-- Configuration options for lines will appear here dynamically -->
-            </div>
-        </div>
-
     </div>
 
+    <!-- Scripts: User Interface -->
+    <script src="scripts/main.js"></script>
+    <script src="scripts/sidebar.js"></script>
+    <script src="scripts/app-state.js"></script>
+    <!-- Scripts: Database -->
+    <script src="scripts/main-db-loader.js"></script>    
+    <script src="scripts/parser-json.js"></script>
+    <script src="scripts/parser-dbc.js"></script>
+    <script src="scripts/parser-sym.js"></script>
+    <!-- Scripts: Log -->
+    <script src="scripts/main-log-loader.js"></script>
+    <script src="scripts/parser-blf.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pako/dist/pako.min.js"></script>
+    <!-- Scripts: Plot -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="main.js"></script>
-    <script src="file.js"></script>
-    <script src="plot.js"></script>
+    <script src="scripts/plot.js"></script>
 </body>
 </html>
