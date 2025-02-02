@@ -457,7 +457,8 @@ function processSelectedSignals(selectedSignals) {
         const messageId = databaseSignal.messageId;
 
         // Filter log entries by message ID
-        const filteredMessages = log.filter((msg) => msg.id === messageId);
+        const filteredMessages = log.filter((msg) => parseInt(msg.id, 16) === parseInt(messageId, 16));
+
 
         // Process the log entries for this signal
         const signalLog = filteredMessages.map((msg) => {
