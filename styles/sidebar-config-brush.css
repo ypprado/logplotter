@@ -24,3 +24,12 @@
 .line-width-value {
     margin-left: 10px;
 }
+
+.color-swatch {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    margin: 3px;
+    cursor: pointer;
+    border: 1px solid #ccc;
+}

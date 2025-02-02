@@ -71,10 +71,27 @@ function updatePlot() {
     traces.forEach((trace, index) => {
         const mode = document.querySelector(`.line-mode[data-index="${index}"]`).value;
         const width = document.querySelector(`.line-width[data-index="${index}"]`).value;
+        const markerSize = document.querySelector(`.marker-size[data-index="${index}"]`).value;
+
+        let color;
+        // Check if the trace is a line or scatter (or another type) and retrieve its color accordingly
+        if (trace.line) {
+            color = trace.line.color;  // Color for line traces
+        } else if (trace.marker) {
+            color = trace.marker.color;  // Color for scatter traces
+        }
+        //console.log(`Trace ${index} color: ${color}`);
 
         trace.type = "scatter";
         trace.mode = mode;
-        trace.line = { width: parseInt(width) };
+        trace.line = { width: parseInt(width), color: color };
+        trace.marker = { size: parseInt(markerSize), color: color };
+
+        // Update signal name color to match trace color
+        const signalNameElement = document.querySelector(`.signal-name[data-index="${index}"]`);
+        if (signalNameElement) {
+            signalNameElement.style.color = color;
+        }
 
         data.push(trace);
     });
@@ -82,6 +99,7 @@ function updatePlot() {
     // Replot the graph with updated configuration
     Plotly.react('plot', data);
 }
+
 
 function createLayoutSettings() {
 

@@ -121,24 +121,65 @@ async function loadLogButton() {
 // Update plot according to changes in configuration sidebar
 function addConfigListeners() {
     // Add listener for mode selection
-    const modeSelectors = document.querySelectorAll('.line-mode');
-    modeSelectors.forEach(selector => {
+    document.querySelectorAll('.line-mode').forEach(selector => {
         selector.addEventListener('change', updatePlot);
     });
 
     // Add listener for line width change
-    const widthSliders = document.querySelectorAll('.line-width');
-    widthSliders.forEach(slider => {
+    document.querySelectorAll('.line-width').forEach(slider => {
         slider.addEventListener('input', function (event) {
             const lineWidthValue = event.target.value;
-            // Find the .line-width-value within the same container
-            const lineWidthSpan = event.target.previousElementSibling.querySelector('.line-width-value');
-            lineWidthSpan.textContent = lineWidthValue;
+            event.target.previousElementSibling.querySelector('.line-width-value').textContent = lineWidthValue;
             updatePlot();
         });
     });
-    
+
+    // Add listener for marker size change
+    document.querySelectorAll('.marker-size').forEach(slider => {
+        slider.addEventListener('input', function (event) {
+            const markerSizeValue = event.target.value;
+            const markerSizeSpan = event.target.parentNode.querySelector('.marker-size-value');
+            if (markerSizeSpan) {
+                markerSizeSpan.textContent = markerSizeValue;
+            }
+            updatePlot();
+        });
+    });
+
+    // Add listener for color swatch click
+    document.querySelectorAll('.color-swatch').forEach(swatch => {
+        swatch.addEventListener('click', function (event) {
+            const selectedColor = event.target.getAttribute('data-color');
+            const index = event.target.closest('.color-palette').getAttribute('data-index');
+
+            // Update the trace color directly in Plotly
+            const traces = Plotly.d3.select('#plot').node().data;
+            const trace = traces[index];
+
+            // Ensure trace.line exists before setting color
+            if (!trace.line) {
+                trace.line = {}; // Initialize line object if it doesn't exist
+            }
+            trace.line.color = selectedColor;
+            
+            // Update marker color as well if it's used
+            if (!trace.marker) {
+                trace.marker = {}; // Initialize marker object if it doesn't exist
+            }
+            trace.marker.color = selectedColor;
+
+            // Update the label text color
+            const label = document.querySelector(`.signal-name[data-index="${index}"]`);
+            if (label) {
+                label.style.color = selectedColor;  // Change text color of the signal name
+            }
+
+            updatePlot();
+        });
+    });
 }
+
+
 
 /******************** Droplist Filter Options ********************/
 const filterOptions = document.getElementById("filterOptions");
