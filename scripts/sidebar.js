@@ -70,36 +70,56 @@ function displayConfigurationControls(data) {
             <!-- Black -->
             <div class="color-swatch" style="background-color:rgb(0, 0, 0);" data-color="rgb(0, 0, 0)"></div> <!-- Black -->
         </div>
-            
-        <!-- Mode Selector -->
-        <label>Mode</label>
-        <select class="line-mode" data-index="${index}">
-            <option value="lines" ${trace.mode === 'lines' ? 'selected' : ''}>Lines</option>
-            <option value="markers" ${trace.mode === 'markers' ? 'selected' : ''}>Markers</option>
-            <option value="lines+markers" ${trace.mode === 'lines+markers' ? 'selected' : ''}>Lines + Markers</option>
-        </select>
-    
-        <!-- Y-Axis Selector -->
-        <label>Y-Axis</label>
-        <select class="y-axis-selector" data-index="${index}">
-            <option value="y1" ${assignedYAxis === "y1" ? "selected" : ""}>Y1 (Primary)</option>
-            <option value="y2" ${assignedYAxis === "y2" ? "selected" : ""}>Y2 (Secondary)</option>
-            <option value="y3" ${assignedYAxis === "y3" ? "selected" : ""}>Y3 (Right side)</option>
-        </select>
+        
+        <hr class="separator">
 
-        <!-- Line Width -->
-        <div class="line-width-row">
-            <label>Line Width:</label>
-            <span class="line-width-value">${lineWidth}</span>
+        <!-- Mode Selector -->
+        <div class="mode-selector-container">
+            <label>Mode</label>
+            <select class="line-mode" data-index="${index}">
+                <option value="lines" ${trace.mode === 'lines' ? 'selected' : ''}>Lines</option>
+                <option value="markers" ${trace.mode === 'markers' ? 'selected' : ''}>Markers</option>
+                <option value="lines+markers" ${trace.mode === 'lines+markers' ? 'selected' : ''}>Lines + Markers</option>
+            </select>
         </div>
-        <input type="range" class="line-width" data-index="${index}" min="1" max="10" value="${lineWidth}" />
     
-        <!-- Marker Size -->
-        <div class="Marker-size-row">
-            <label>Marker Size:</label>
-            <span class="marker-size-value">${markerSize}</span>
+        <!-- Main container for the two groups -->
+        <div class="main-container">
+            <!-- First group (Line Width) -->
+            <div class="group-container">
+                <!-- Label and Span container -->
+                <div class="label-span-container">
+                    <label for="lineWidth">Line Width:</label>
+                    <span class="line-width-value">${lineWidth}</span>
+                </div>
+                <!-- Range container -->
+                <input type="range" id="lineWidth" class="line-width" data-index="${index}" min="1" max="10" value="${lineWidth}" />
+            </div>
+        
+            <!-- Second group (Marker Size) -->
+            <div class="group-container">
+                <!-- Label and Span container -->
+                <div class="label-span-container">
+                    <label for="markerSize">Marker Size:</label>
+                    <span class="marker-size-value">${markerSize}</span>
+                </div>
+                <!-- Range container -->
+                <input type="range" id="markerSize" class="marker-size" data-index="${index}" min="1" max="10" value="${markerSize}" />
+            </div>
         </div>
-        <input type="range" class="marker-size" data-index="${index}" min="1" max="10" value="${markerSize}" />
+
+        <hr class="separator">
+
+        <!-- Y-Axis Selector -->
+        <div class="y-axis-selector-container">
+            <label>Y-Axis</label>
+            <select class="y-axis-selector" data-index="${index}">
+                <option value="y1" ${assignedYAxis === "y1" ? "selected" : ""}>Y1 (Primary)</option>
+                <option value="y2" ${assignedYAxis === "y2" ? "selected" : ""}>Y2 (Secondary)</option>
+                <option value="y3" ${assignedYAxis === "y3" ? "selected" : ""}>Y3 (Right side)</option>
+            </select>
+        </div>
+
         `;
         configContainer.appendChild(lineConfig);
     });

@@ -10,10 +10,19 @@
     flex-direction: column; /* Ensure vertical stacking */
 }
 
+/* Container for the label and select dropdown */
+.mode-selector-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adjust the space between the label and dropdown */
+    margin: 3px 0;         /* Adjust spacing around the line */
+}
+
 /* Style for the select dropdown */
 .line-mode {
-    margin: 5px 0;
+    margin: 0; /* Remove margin for better control */
     padding: 5px;
+    font-size: 14px; /* Adjust font size if needed */
 }
 
 /* Style for the range input and associated span */
@@ -32,4 +41,65 @@
     margin: 3px;
     cursor: pointer;
     border: 1px solid #ccc;
+}
+
+
+/* Main container that holds both groups side by side */
+.main-container {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px; /* Space between the two groups */
+}
+
+/* Each group (line width, marker size) will have its own container */
+.group-container {
+    display: flex;
+    flex-direction: column;
+    width: 48%; /* Ensure the groups take up 48% of the width each */
+}
+
+/* Label and span container (side by side) */
+.label-span-container {
+    display: flex;
+    justify-content: space-between; /* Align label and span to the left and right */
+    margin-bottom: 5px; /* Space between label-span and the range */
+}
+
+/* Label styles (optional) */
+label {
+    font-size: 14px;
+}
+
+/* Range slider styling */
+input[type="range"] {
+    margin-top: 5px; /* Add some space between the label-span and range */
+}
+
+/* Span styles for values */
+span {
+    font-size: 14px;
+    font-weight: bold;
+    margin-left: 10px; /* Space between label and span */
+}
+
+/* Style for the horizontal line */
+.separator {
+    border: none;           /* Remove default border */
+    border-top: 2px solid #ccc; /* Add a thin line */
+    margin: 3px 0;         /* Adjust spacing around the line */
+}
+
+/* Container for the label and select dropdown */
+.y-axis-selector-container {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Adjust the space between the label and dropdown */
+    margin: 3px 0;         /* Adjust spacing around the line */
+}
+
+/* Style for the select dropdown */
+.y-axis-selector {
+    margin: 0;
+    padding: 5px;
+    font-size: 14px;
 }
