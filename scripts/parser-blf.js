@@ -605,7 +605,7 @@ function* parseData(data) {
             [flags, , , timestamp] = unpackObjHeaderV2(data, pos);
             pos += objHeaderV2Size;
         } else {
-            console.warn(`Unknown object header version (${headerVersion})`);
+            //console.warn(`Unknown object header version (${headerVersion})`);
             pos = nextPos;
             continue;
         }
@@ -699,7 +699,7 @@ function* parseData(data) {
                 break;
             }
             default:
-                console.warn(`Unknown object type (${objType})`);
+                //console.warn(`Unknown object type (${objType})`);
         }
 
         pos = nextPos;

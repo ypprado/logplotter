@@ -27,7 +27,6 @@ document.addEventListener('DOMContentLoaded', function () {
             arrowButton.title = 'Collapse Sidebar';
             const sidebarWidth = sidebar.getBoundingClientRect().width; // Get current sidebar width
             content.style.width = `calc(100% - ${sidebarWidth}px)`; // Adjust content width dynamically
-            //console.log("sidebarWidth:", sidebarWidth);
         }
 
         Plotly.Plots.resize('plot');
@@ -43,11 +42,7 @@ document.addEventListener('DOMContentLoaded', function () {
 /******************** Button Database ********************/
 // On button click: Load Database
 async function loadDatabaseButton() {
-    console.log("Button Load Database clicked");
-
     try {
-        console.log("Starting database load process...");
-
         // Step 1: Let the user select a file
         const file = await selectFileDB();
 
@@ -57,7 +52,6 @@ async function loadDatabaseButton() {
         // Step 3: Load the global database in unified JSON format
         resetDatabase();
         database = buildUnifiedDatabase(parsedData);
-        console.log("Database loaded:", database);
 
         if(isDatabaseLoaded()){
             
@@ -86,10 +80,7 @@ async function loadDatabaseButton() {
 /******************** Button Log ********************/
 // On button click: Load Log
 async function loadLogButton() {
-    console.log("Button Load Log clicked");
     try {
-        console.log("Starting Log load process...");
-
         // Step 1: Let the user select a file
         const file = await selectFileLOG();
 
@@ -98,7 +89,6 @@ async function loadLogButton() {
 
         // Step 3: Load the global log in unified JSON format
         buildUnifiedLog(parsedData);
-        console.log("Log loaded:", log);
 
         if(isLogLoaded()){
 
@@ -177,6 +167,38 @@ function addConfigListeners() {
             updatePlot();
         });
     });
+
+    document.querySelectorAll(".y-axis-selector").forEach(select => {
+        select.addEventListener("change", event => {
+            const index = event.target.dataset.index;
+            const selIndex = event.target.selectedIndex;
+            const newYAxis = selIndex === 0 ? "y" : `y${selIndex + 1}`; //y, y2, y3 are used in the trace
+            const axisKey = selIndex === 0 ? "yaxis" : `yaxis${selIndex + 1}`; //yaxis, yaxis2, yaxis3 are used in the layout
+
+            // Update the trace's yaxis property
+            plotData.traces[index].yaxis = newYAxis;
+            
+            // If axis is in use by a trace, make it visible in the layout
+            const yInUse =  plotData.isAxisInUse("y")
+            const y2InUse =  plotData.isAxisInUse("y2")
+            plotLayout["yaxis"].visible = yInUse;
+            plotLayout["yaxis2"].visible = y2InUse;
+            plotLayout["yaxis3"].visible = plotData.isAxisInUse("y3");
+
+            // If y and y2 are active, y shall make room for y2
+            if (yInUse && y2InUse){
+                plotLayout.xaxis.domain = [0.05, 1];
+            } else {
+                plotLayout.xaxis.domain = [0, 1];
+            }
+
+            console.log("Updated plotLayout:", plotLayout);
+
+            updatePlot();
+        });
+    });
+    
+    
 }
 
 
@@ -458,8 +480,16 @@ function handleGenerateTraces() {
     // Add the trace to the global plotData
     plotData.addData(traces); 
     
+    /*const dummytrace = {
+        mode: "lines+markers",
+        name: "Dummy-Signal",
+        type: "scatter",
+        yaxis: 'y2',
+        x: ["2025-01-28T15:07:54.275Z", "2025-01-28T15:07:54.375Z"],
+        y: [20,20]
+    };*/
 
-    console.log(`Generated and added traces for ${selectedCheckboxes.length} signal(s).`);
+    //plotData.addData(dummytrace); 
 
     generatePlot();
 }
@@ -522,7 +552,6 @@ function processSelectedSignals(selectedSignals) {
         processedLogs[signalName] = signalLog;
     });
 
-    console.log("Processed Logs:", processedLogs);
     return processedLogs; // Return the processed logs for further use
 }
 

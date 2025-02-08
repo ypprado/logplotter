@@ -31,6 +31,7 @@ function displayConfigurationControls(data) {
         lineConfig.classList.add('line-config');
         const lineWidth = trace.line && trace.line.width ? trace.line.width : 2;
         const markerSize = trace.marker && trace.marker.size ? trace.marker.size : 6;
+        const assignedYAxis = trace.yaxis || "y"; // Default to Y-axis 1
         //const traceColor = trace.line && trace.line.color ? trace.line.color : 'rgb(0, 0, 0)'; // Default black
 
         lineConfig.innerHTML = `
@@ -78,6 +79,14 @@ function displayConfigurationControls(data) {
             <option value="lines+markers" ${trace.mode === 'lines+markers' ? 'selected' : ''}>Lines + Markers</option>
         </select>
     
+        <!-- Y-Axis Selector -->
+        <label>Y-Axis</label>
+        <select class="y-axis-selector" data-index="${index}">
+            <option value="y1" ${assignedYAxis === "y1" ? "selected" : ""}>Y1 (Primary)</option>
+            <option value="y2" ${assignedYAxis === "y2" ? "selected" : ""}>Y2 (Secondary)</option>
+            <option value="y3" ${assignedYAxis === "y3" ? "selected" : ""}>Y3 (Right side)</option>
+        </select>
+
         <!-- Line Width -->
         <div class="line-width-row">
             <label>Line Width:</label>

@@ -3,6 +3,7 @@ const plotData = {
     // Trace is commonly used in Plotly's terminology for a single plotted dataset
     // Multiple data sets are called traces
     traces: [], // Traces is a group of Trace.
+    //yAxes: ["y"], // List of available Y-axes (initially only "y")
 
     // Clear all traces from the group
     clearTraces() {
@@ -15,9 +16,8 @@ const plotData = {
         const tracesToAdd = Array.isArray(trace) ? trace : [trace]; // Make sure it's always an array
     
         tracesToAdd.forEach(t => {
-            if (t && t.name) { // Ensure each trace has a name
+            if (t && t.name) {
                 this.traces.push(t);
-                console.log(`Trace for signal '${t.name}' added to global traces.`);
             } else {
                 console.error("Invalid trace object. A 'name' property is required.", t);
             }
@@ -35,8 +35,46 @@ const plotData = {
         } else {
             console.warn(`No traces found for signal '${signalName}' to remove.`);
         }
+    },
+
+    addYAxis() {
+        if (this.yAxes.length < 3) {
+            const newYAxis = `y${this.yAxes.length + 1}`;
+            this.yAxes.push(newYAxis);
+            console.log(`Added new Y-axis: ${newYAxis}`);
+        } else {
+            console.warn("Maximum of 3 Y-axes reached.");
+        }
+    },
+
+    isAxisInUse(axis) {
+        // Check if any trace has the specified yaxis
+        return plotData.traces.some(trace => trace.yaxis === axis);
     }
 };
+
+
+const plotLayout = {
+    responsive: true,
+    grid: { rows: 1, columns: 1 },
+    xaxis: { domain: [0.0, 1] },
+    yaxis: {  title: { text: '' }, domain: [0, 1], side: 'left', visible: true},
+    yaxis2: { title: { text: '' }, domain: [0, 1], overlaying: 'y', side: 'left', visible: false, position: 0},
+    yaxis3: { title: { text: '' }, domain: [0, 1], overlaying: 'y', side: 'right', visible: false},
+};
+
+function updateYAxisProperty(axisNumber, property, value) {
+    const axisKey = `yaxis${axisNumber}`;
+    if (plotLayout.layout[axisKey]) {
+        plotLayout.layout[axisKey][property] = value;
+    } else {
+        console.warn(`Y-axis ${axisNumber} does not exist.`);
+    }
+}
+
+function updateXAxisProperty(property, value) {
+    plotLayout.layout.xaxis[property] = value;
+}
 
 
 /**
@@ -44,18 +82,16 @@ const plotData = {
  * @param {Object[]} data - An array of Plotly trace objects ready for plotting.
  */
 function generatePlot() {
-    // Layout settings
-    const layout = createLayoutSettings();
-
     // Check if there is an existing plot and clear it
     const plotElement = document.getElementById('plot');
     if (plotElement) {
         Plotly.purge(plotElement); // Clear any existing plot
     }
+    console.log("plotLayout:", plotLayout);
 
     // Plot the data using Plotly
     if (plotData.traces.length > 0) {
-        Plotly.newPlot('plot', plotData.traces, layout);  
+        Plotly.newPlot('plot', plotData.traces, plotLayout);  
         // Show the configuration panel and populate it with the controls
         displayConfigurationControls(plotData.traces); 
     } else {
@@ -80,8 +116,6 @@ function updatePlot() {
         } else if (trace.marker) {
             color = trace.marker.color;  // Color for scatter traces
         }
-        //console.log(`Trace ${index} color: ${color}`);
-
         trace.type = "scatter";
         trace.mode = mode;
         trace.line = { width: parseInt(width), color: color };
@@ -97,48 +131,7 @@ function updatePlot() {
     });
 
     // Replot the graph with updated configuration
-    Plotly.react('plot', data);
-}
-
-
-function createLayoutSettings() {
-
-    const layout = {
-        //title: 'Multiple Lines Plot',
-        //xaxis: { title: 'X Axis' },
-        responsive: true, // Enables automatic resizing
-        yaxis: {
-            title: {
-                text: '', // Y-axis title text
-                standoff: 0,   // No extra spacing from the axis
-                font: {
-                    size: 14,  // Customize font size if needed
-                    color: 'black' // Customize font color if needed
-                },
-                x: -0.1,       // Horizontal positioning (adjust as needed)
-                xanchor: 'center',
-                yanchor: 'bottom'
-            }
-        },
-        annotations: [
-            {
-                x: 0, // Align with the vertical Y-axis line
-                y: 1, // Place it at the top of the Y-axis range
-                xref: 'paper', // Reference the graph's x-axis in percentage (0 to 1)
-                yref: 'paper', // Reference the graph's y-axis in percentage (0 to 1)
-                text: 'Unit', // Y-axis title text
-                showarrow: false, // No arrow needed
-                font: {
-                    size: 14, // Font size
-                    color: 'black' // Font color
-                },
-                xanchor: 'center', // Center the text horizontally
-                yanchor: 'bottom'  // Align text at its bottom edge
-            }
-        ]
-    };
-
-    return layout;
+    Plotly.react('plot', data, plotLayout);
 }
 
 /**
@@ -168,6 +161,7 @@ function generatePlotlyDatasets(processedLogs) {
                 y: y,
                 mode: "lines+markers",
                 type: "scatter",
+                yaxis: 'y',
                 name: signalName, // Directly use the signalName here
             };
 
@@ -182,8 +176,31 @@ function generatePlotlyDatasets(processedLogs) {
 
 
 
+/*function moveTraceToYAxis(traceName, newYAxis) {
+    const trace = plotData.traces.find(t => t.name === traceName);
+    if (trace && plotData.yAxes.includes(newYAxis)) {
+        trace.yaxis = newYAxis;
+        console.log(`Moved '${traceName}' to Y-axis '${newYAxis}'.`);
+        updatePlot();
+    } else {
+        console.warn(`Invalid trace or Y-axis '${newYAxis}' does not exist.`);
+    }
+}*/
 
-/* example for two subplots
+
+
+/* 
+
+const trace = {
+    mode: "lines+markers",
+    name: "Dummy-Signal",
+    type: "scatter",
+    yaxis: 'y2',
+    x: ["2025-01-28T15:07:54.275Z", "2025-01-28T15:07:54.375Z"],
+    x: [20,20]
+};
+
+example for two subplots
 var trace1 = {
   x: [1, 2, 3, 4, 5],
   y: [10, 15, 13, 17, 12],
