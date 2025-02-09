@@ -37,7 +37,7 @@ function displayConfigurationControls(data) {
         lineConfig.innerHTML = `
         <!-- Signal Name with Dynamic Color -->
         <label>
-            <span class="signal-name" data-index="${index}" style="color:#000; font-weight: bold; text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);">${trace.name}</span>
+            <span class="signal-name" data-index="${index}" style="color:#000; font-weight: bold;">${trace.name}</span>
         </label>
     
         <!-- Trace Color Picker (Color Swatches) -->
@@ -120,6 +120,13 @@ function displayConfigurationControls(data) {
             </select>
         </div>
 
+        <!-- Min and Max Input Fields -->
+        <div class="min-max-container">
+            <label for="min-value">Min:</label>
+            <input type="number" id="min-value" class="min-input" data-index="${index}" />
+            <label for="max-value">Max:</label>
+            <input type="number" id="max-value" class="max-input" data-index="${index}" />
+        </div>
         `;
         configContainer.appendChild(lineConfig);
     });
@@ -252,4 +259,13 @@ function updateButtonColor(buttonId, condition) {
     } else {
         console.error(`Button with ID '${buttonId}' not found.`);
     }
+}
+
+// Function to update all fields (Min or Max) for the same Y-axis
+function updateAllFields(axis, fieldType, value) {
+    document.querySelectorAll(`.${fieldType}-input`).forEach(input => {
+        if (getSelectedYAxis(input) === axis) {
+            input.value = value; // Ensure all fields for the same axis have the same value
+        }
+    });
 }

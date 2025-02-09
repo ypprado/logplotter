@@ -64,16 +64,35 @@ const plotLayout = {
 };
 
 function updateYAxisProperty(axisNumber, property, value) {
+    // Normalize axisNumber to "", "2", or "3"
+    if (typeof axisNumber === "number") {
+        axisNumber = axisNumber === 1 ? "" : axisNumber.toString();
+    } else if (typeof axisNumber === "string") {
+        axisNumber = axisNumber.replace("yaxis", "").replace("y", "");
+    }
+
     const axisKey = `yaxis${axisNumber}`;
-    if (plotLayout.layout[axisKey]) {
-        plotLayout.layout[axisKey][property] = value;
+
+    if (!plotLayout[axisKey]) {
+        console.warn(`Y-axis ${axisKey} does not exist.`);
+        return;
+    }
+
+    // Handle "range" property as an array instead of creating "range[0]" or "range[1]"
+    if (property === "range") {
+        if (!Array.isArray(plotLayout[axisKey].range)) {
+            plotLayout[axisKey].range = [null, null]; // Initialize if not present
+        }
+
+        const minOrMaxIndex = value.index; // 0 for min, 1 for max
+        plotLayout[axisKey].range[minOrMaxIndex] = value.value;
     } else {
-        console.warn(`Y-axis ${axisNumber} does not exist.`);
+        plotLayout[axisKey][property] = value;
     }
 }
 
 function updateXAxisProperty(property, value) {
-    plotLayout.layout.xaxis[property] = value;
+    plotLayout.xaxis[property] = value;
 }
 
 
@@ -120,12 +139,6 @@ function updatePlot() {
         trace.mode = mode;
         trace.line = { width: parseInt(width), color: color };
         trace.marker = { size: parseInt(markerSize), color: color };
-
-        // Update signal name color to match trace color
-        const signalNameElement = document.querySelector(`.signal-name[data-index="${index}"]`);
-        if (signalNameElement) {
-            signalNameElement.style.color = color;
-        }
 
         data.push(trace);
     });

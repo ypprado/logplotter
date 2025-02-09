@@ -137,34 +137,44 @@ function addConfigListeners() {
     });
 
     // Add listener for color swatch click
-    document.querySelectorAll('.color-swatch').forEach(swatch => {
-        swatch.addEventListener('click', function (event) {
-            const selectedColor = event.target.getAttribute('data-color');
-            const index = event.target.closest('.color-palette').getAttribute('data-index');
+    document.querySelectorAll('.color-palette').forEach(palette => {
+        palette.querySelectorAll('.color-swatch').forEach(swatch => {
+            swatch.addEventListener('click', function (event) {
+                // Remove the 'selected' class from all swatches within the current palette
+                palette.querySelectorAll('.color-swatch').forEach(s => {
+                    s.classList.remove('selected');
+                });
 
-            // Update the trace color directly in Plotly
-            const traces = Plotly.d3.select('#plot').node().data;
-            const trace = traces[index];
+                // Add the 'selected' class to the clicked swatch
+                swatch.classList.add('selected');
 
-            // Ensure trace.line exists before setting color
-            if (!trace.line) {
-                trace.line = {}; // Initialize line object if it doesn't exist
-            }
-            trace.line.color = selectedColor;
-            
-            // Update marker color as well if it's used
-            if (!trace.marker) {
-                trace.marker = {}; // Initialize marker object if it doesn't exist
-            }
-            trace.marker.color = selectedColor;
+                const selectedColor = event.target.getAttribute('data-color');
+                const index = event.target.closest('.color-palette').getAttribute('data-index');
 
-            // Update the label text color
-            const label = document.querySelector(`.signal-name[data-index="${index}"]`);
-            if (label) {
-                label.style.color = selectedColor;  // Change text color of the signal name
-            }
+                // Update the trace color directly in Plotly
+                const traces = Plotly.d3.select('#plot').node().data;
+                const trace = traces[index];
 
-            updatePlot();
+                // Ensure trace.line exists before setting color
+                if (!trace.line) {
+                    trace.line = {}; // Initialize line object if it doesn't exist
+                }
+                trace.line.color = selectedColor;
+                
+                // Update marker color as well if it's used
+                if (!trace.marker) {
+                    trace.marker = {}; // Initialize marker object if it doesn't exist
+                }
+                trace.marker.color = selectedColor;
+
+                // Update signal name color to match trace color
+                /*const signalNameElement = document.querySelector(`.signal-name[data-index="${index}"]`);
+                if (signalNameElement) {
+                    signalNameElement.style.color = color;
+                }*/
+
+                updatePlot();
+            });
         });
     });
 
@@ -197,8 +207,41 @@ function addConfigListeners() {
             updatePlot();
         });
     });
-    
-    
+
+
+    // Add listener for Min and Max input fields
+    document.querySelectorAll('.min-input, .max-input').forEach(input => {
+        function handleInputChange(event) {
+            let value = parseFloat(event.target.value); // Convert to number
+            if (isNaN(value)) return; // Ignore invalid values
+
+            // Get correct dataset (instance) and then correct y axis of that instance
+            const index = event.target.dataset.index;
+            const axis = plotData.traces[index].yaxis;
+
+            let fieldType = event.target.classList.contains('min-input') ? 'min' : 'max'; // Determine field type
+            let MinOrMax = fieldType === 'min' ? 0 : 1; // Min corresponds to range[0], Max to range[1]
+
+            // Update the respective Y-axis property in plotLayout
+            updateYAxisProperty(axis, "autorange",  false);
+            updateYAxisProperty(axis, "range", { index: MinOrMax, value });
+
+            // Update all fields referring to the same axis
+            //updateAllFields(axis, fieldType, value);
+             console.log("plotLayout:", plotLayout);
+
+            updatePlot(); // Redraw the plot
+        }
+
+        // Trigger on losing focus (blur) or pressing Enter (keydown)
+        input.addEventListener('blur', handleInputChange);
+        input.addEventListener('keydown', function (event) {
+            if (event.key === 'Enter') {
+                handleInputChange(event);
+            }
+        });
+    });
+
 }
 
 
