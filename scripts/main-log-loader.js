@@ -22,7 +22,7 @@ function selectFileLOG() {
     return new Promise((resolve, reject) => {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
-        fileInput.accept = '.blf, .trc, .json';
+        fileInput.accept = '.blf, .trc, .asc, .json';
 
         // Wait a little before triggering the click
         setTimeout(() => {
@@ -56,6 +56,9 @@ async function parseFileLOG(file) {
                 break;
             case 'trc':
                 parsedData = await parseTRC(file); // Handle TRC files
+                break;
+            case 'asc':
+                parsedData = await parseASC(file); // Handle ASC files
                 break;
             default:
                 alert('Unsupported file format!');

@@ -42,12 +42,13 @@
                         <button id="loadLogButton" onclick="loadLogButton()">Load Log</button>         
                     </div>
                         <p>Source Sorting</p>
+                    <label for="filterOptions">Choose a filter:</label>
                     <select id="filterOptions" size="1">
-                        <option value="noFilter">No Filter</option>
-                        <option value="filterById">Sort by ID</option>
-                        <option value="filterByName">Sort by Name</option>
-                        <option value="filterBySender">Sort by Sender</option>
-                    </select>
+                            <option value="noFilter">No Filter</option>
+                            <option value="filterById">Sort by ID</option>
+                            <option value="filterByName">Sort by Name</option>
+                            <option value="filterBySender">Sort by Sender</option>
+                     </select>                        
                     <div class="checkbox-container" id="checkbox-sources">
                         <label>Filter Sources</label>
                         <div class="checkbox-group">
@@ -98,6 +99,7 @@
     <script src="scripts/main-log-loader.js"></script>
     <script src="scripts/parser-blf.js"></script>
     <script src="scripts/parser-trc.js"></script>
+    <script src="scripts/parser-asc.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pako/dist/pako.min.js"></script>
     <!-- Scripts: Plot -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
