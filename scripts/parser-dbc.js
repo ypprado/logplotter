@@ -72,7 +72,9 @@ function parseDBC(content) {
         // Match value descriptions (e.g., "VAL_ 512 F1_Signal3 1 \"State 1\" 2 \"State 2\" ... ;")
         const valueMatch = line.match(/^VAL_\s+(\d+)\s+(\w+)\s+((?:\d+\s+"[^"]*"\s*)+);$/);
         if (valueMatch) {
-            const messageId = `0x${parseInt(valueMatch[1], 10).toString(16).toUpperCase()}`;
+            const messageId = (parseInt(valueMatch[1], 10) & 0x80000000) !== 0 ? // the leading bit indicates EXT 
+            `0x${(parseInt(valueMatch[1], 10) & 0x7FFFFFFF).toString(16).padStart(8, '0').toUpperCase()}` : 
+            `0x${parseInt(valueMatch[1], 10).toString(16).padStart(3, '0').toUpperCase()}`;
             const signalName = valueMatch[2];
             const valuePairs = valueMatch[3].match(/(\d+)\s+"([^"]*)"/g);
 
