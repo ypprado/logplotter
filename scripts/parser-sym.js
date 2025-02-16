@@ -1,5 +1,5 @@
 /** 
- * Parses the SYM file content into structured data.
+ * Parses the SYM file content into structured data, including enumerations.
  * @param {string} content - The raw SYM file content.
  * @returns {Object} - Parsed messages and nodes.
  */
@@ -8,9 +8,24 @@ function parseSYM(content) {
     const messages = [];
     const nodes = new Set();
     const signals = {}; // Store signals separately before assigning to frames
+    const enumerations = {}; // Store enumerator mappings
     let currentMessage = null;
-    
-    // First Pass: Extract all signals
+
+    // First Pass: Extract enumerations
+    lines.forEach((line) => {
+        const enumMatch = line.match(/^Enum=([^()]+)\(([^)]+)\)/);
+        if (enumMatch) {
+            const enumName = enumMatch[1].trim();
+            const enumValues = enumMatch[2].split(",").map(pair => {
+                const [key, value] = pair.split("=").map(item => item.trim().replace(/"/g, ""));
+                return [key, value];
+            });
+
+            enumerations[enumName] = Object.fromEntries(enumValues);
+        }
+    });
+
+    // Second Pass: Extract all signals
     lines.forEach((line) => {
         const signalDefMatch = line.match(/^Sig="([^"]+)"\s+(\w+)\s+(\d+)(\s+-m)?/);
         if (signalDefMatch) {
@@ -18,7 +33,7 @@ function parseSYM(content) {
             const type = signalDefMatch[2];
             const length = parseInt(signalDefMatch[3], 10);
             const isBigEndian = !!signalDefMatch[4];
-            
+
             signals[name] = {
                 name,
                 length,
@@ -30,7 +45,7 @@ function parseSYM(content) {
                 units: "",
                 valueDescriptions: {}
             };
-            
+
             // Extract additional attributes
             const attributesMatch = line.match(/\/f:(\d+(?:\.\d+)?)|\/o:(-?\d+(?:\.\d+)?)|\/min:(-?\d+(?:\.\d+)?)|\/max:(-?\d+(?:\.\d+)?)|\/u:"([^"]+)"|\/e:([^\s]+)/g);
             if (attributesMatch) {
@@ -40,16 +55,21 @@ function parseSYM(content) {
                     if (attr.startsWith("/min:")) signals[name].valueRange[0] = parseFloat(attr.split(":")[1]);
                     if (attr.startsWith("/max:")) signals[name].valueRange[1] = parseFloat(attr.split(":")[1]);
                     if (attr.startsWith("/u:")) signals[name].units = attr.split(":")[1].replace(/"/g, '');
-                    if (attr.startsWith("/e:")) signals[name].valueDescriptions = attr.split(":")[1];
+                    if (attr.startsWith("/e:")) {
+                        const enumName = attr.split(":")[1];
+                        if (enumerations[enumName]) {
+                            signals[name].valueDescriptions = enumerations[enumName];
+                        }
+                    }
                 });
             }
         }
     });
-    
-    // Second Pass: Parse Messages and Assign Signals
+
+    // Third Pass: Parse Messages and Assign Signals
     lines.forEach((line) => {
         line = line.trim();
-        
+
         // Detect new message
         const messageMatch = line.match(/^\[(.+)\]$/);
         if (messageMatch) {
@@ -92,7 +112,7 @@ function parseSYM(content) {
         if (signalRefMatch && currentMessage) {
             const signalName = signalRefMatch[1];
             const startBit = parseInt(signalRefMatch[2], 10);
-            
+
             if (signals[signalName]) {
                 const signalCopy = { ...signals[signalName], startBit };
                 currentMessage.signals.push(signalCopy);

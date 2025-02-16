@@ -1,4 +1,19 @@
 /**
+ * Converts a numeric message ID to a formatted hexadecimal string.
+ * If the highest bit is set, ID is exntended and will be formated as 
+ * 29 bits, otherwise it will be formated as 11 bits.
+ * 
+ * @param {number} messageId - The message ID to convert.
+ * @returns {string} - The formatted hexadecimal string: "0x______" */
+function formatMessageId(messageId) {
+    if ((messageId & 0x80000000) !== 0) { // Check if EXT flag is set
+        return `0x${(messageId & 0x7FFFFFFF).toString(16).padStart(8, '0').toUpperCase()}`;
+    } else {
+        return `0x${messageId.toString(16).padStart(3, '0').toUpperCase()}`;
+    }
+}
+
+/**
  * Parses the DBC file content into structured data.
  * 
  * @param {string} content - The raw DBC file content.
@@ -23,9 +38,7 @@ function parseDBC(content) {
             }
 
             currentMessage = {
-                id: (parseInt(messageMatch[1], 10) & 0x80000000) !== 0 ? // the leading bit indicates EXT 
-                `0x${(parseInt(messageMatch[1], 10) & 0x7FFFFFFF).toString(16).padStart(8, '0').toUpperCase()}` : 
-                `0x${parseInt(messageMatch[1], 10).toString(16).padStart(3, '0').toUpperCase()}`,
+                id: formatMessageId(messageMatch[1]),
                 name: messageMatch[2],
                 dlc: parseInt(messageMatch[3], 10),
                 sender: messageMatch[4],
@@ -72,9 +85,7 @@ function parseDBC(content) {
         // Match value descriptions (e.g., "VAL_ 512 F1_Signal3 1 \"State 1\" 2 \"State 2\" ... ;")
         const valueMatch = line.match(/^VAL_\s+(\d+)\s+(\w+)\s+((?:\d+\s+"[^"]*"\s*)+);$/);
         if (valueMatch) {
-            const messageId = (parseInt(valueMatch[1], 10) & 0x80000000) !== 0 ? // the leading bit indicates EXT 
-            `0x${(parseInt(valueMatch[1], 10) & 0x7FFFFFFF).toString(16).padStart(8, '0').toUpperCase()}` : 
-            `0x${parseInt(valueMatch[1], 10).toString(16).padStart(3, '0').toUpperCase()}`;
+            const messageId = formatMessageId(valueMatch[1]);
             const signalName = valueMatch[2];
             const valuePairs = valueMatch[3].match(/(\d+)\s+"([^"]*)"/g);
 
