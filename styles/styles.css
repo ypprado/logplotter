@@ -3,32 +3,42 @@ body {
     margin: 0;
     display: flex;
     height: 100vh;
+    background-color: #e0e0e0;
 }
 
 p {
-    /*line-height: 10px; /* Match height for vertical centering */
-    height: 10px;
-    margin-block-start: 10px;
-    padding: 00px 0; /* Add vertical padding for better spacing */
-    /*white-space: no-wrap; /* Prevent text from wrapping to the next line */
-    overflow: visible; /* show overflowing text if the container is too small */
-    text-overflow: ellipsis; /* Add "..." to indicate truncated text */
+    height: auto;
+    margin: 0;
+    padding: 5px 0;
+    overflow: visible;
+    text-overflow: ellipsis;
+    font-size: 16px;
+    color: #333;
 }
 
 button {
-    width: 100%; /* Ensure buttons take the full width of the sidebar */
+width: 100%;
     padding: 10px;
-    margin-bottom: 10px; /* Space between buttons */
-    display: block; /* Ensure buttons are displayed as block elements */
+    margin-bottom: 10px;
+    display: block;
+    border: none;
+    background-color: #7aa4fff3; /* Adjust button color */
+    color: white;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #005f99;
 }
 
 /***************************** main container *****************************/
-/* Main Container shifted right to accommodate permanent-sidebar */
 .container {
     display: flex;
     height: 100vh;
-    width: calc(100% - 60px); /* Subtract permanent-sidebar width */
-    margin-left: 60px; /* Offset by permanent-sidebar width */
-    overflow: hidden; /* Prevent horizontal scroll */
+    width: calc(100% - 65px); /* Adjust width to match new sidebar size */
+    margin-left: 70px; /* Adjust margin for sidebar */
+    border-radius: 20px; /* Adjust the value as needed */
+    overflow: hidden;
 }
-
