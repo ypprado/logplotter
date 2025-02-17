@@ -104,7 +104,8 @@ function generatePlot() {
     // Check if there is an existing plot and clear it
     const plotElement = document.getElementById('plot');
     if (plotElement) {
-        Plotly.purge(plotElement); // Clear any existing plot
+        //Plotly.purge(plotElement); // Clear any existing plot
+        Plotly.react(plotElement, [], {}, plotElement.layout);
     }
     console.log("plotLayout:", plotLayout);
 

@@ -33,6 +33,11 @@ select {
     display: flex; /* Enable flexbox for contained .checkbox-group */
     flex-direction: column; /* Align children vertically */
     overflow: auto; /* Add scroll if the content overflows */
+    border: 1px solid #ddd; /* Add a border for separation */
+    border-radius: 5px; /* Rounded corners for a modern look */
+    padding: 10px; /* Add padding for inner spacing */
+    background-color: #f9f9f9; /* Light background color */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
 }
 
 .checkbox-group {
@@ -56,7 +61,7 @@ select {
     margin: 10px auto; /* Center it */
     position: relative;
     z-index: 1;
-    margin-top: 10px; /* Add a gap between the sources container and the handle */
+    margin-top: 0px; /* Add a gap between the sources container and the handle */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Add subtle shadow for separation */
     border-radius: 5px; /* Rounded corners for a smoother look */
 }
