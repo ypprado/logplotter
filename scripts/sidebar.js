@@ -214,7 +214,7 @@ let isResizingSources = false;
 
 resizeHandleSources.addEventListener('mousedown', (e) => {
     isResizingSources = true;
-    document.body.style.cursor = 'ns-resize';
+    document.body.style.cursor = 'ns-resize'; // cursor style indicating a north-south resize
     document.body.style.userSelect = 'none'; // Prevent text selection during drag
     document.addEventListener('mousemove', resizeSources);
     document.addEventListener('mouseup', stopResizingSources);
@@ -227,12 +227,16 @@ function resizeSources(e) {
     const containerRect = sourcesContainer.getBoundingClientRect();
     const newHeight = e.clientY - containerRect.top;
 
-    const minHeight = 100; // Minimum height for sources
-    const maxHeight = 400; // Maximum height for sources
+    const minHeight = 150; // Minimum height for sources
+    const maxHeight = 1400; // Maximum height for sources
 
     if (newHeight >= minHeight && newHeight <= maxHeight) {
         sourcesContainer.style.height = `${newHeight}px`; // Resize sources container
         //signalsContainer.style.maxHeight = `calc(100vh - ${newHeight + 50}px)`; // Adjust signals container
+        // Calculate and set the height for checkbox-signals to fill remaining space
+        const remainingHeight = window.innerHeight - newHeight - resizeHandleSources.offsetHeight - 20; // Adjust for handle and margins
+        signalsContainer.style.height = `${remainingHeight}px`; // Resize signals container
+       
     }
 }
 
@@ -244,6 +248,8 @@ function stopResizingSources() {
     document.removeEventListener('mouseup', stopResizingSources);
 }
 
+
+/******************** Plot Button  ********************/
 
 function updateButtonColor(buttonId, condition) {
     let button = document.getElementById(buttonId);
@@ -260,6 +266,9 @@ function updateButtonColor(buttonId, condition) {
         console.error(`Button with ID '${buttonId}' not found.`);
     }
 }
+
+
+/******************** Y Axis  ********************/
 
 // Function to update all fields (Min or Max) for the same Y-axis
 function updateAllFields(axis, fieldType, value) {

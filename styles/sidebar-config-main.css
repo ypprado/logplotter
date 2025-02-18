@@ -28,10 +28,11 @@ select {
 
 /* checkboxes */
 .checkbox-container {
-    min-height: 150px;
+    /*min-height: 150px;/**/
+    height: clamp(150px, 50vh, 100vh); /* Limit height to 50vh */
     margin-bottom: 10px;
-    display: flex; /* Enable flexbox for contained .checkbox-group */
-    flex-direction: column; /* Align children vertically */
+    /*display: flex; /* Enable flexbox for contained .checkbox-group */
+    /*flex-direction: column; /* Align children vertically */
     overflow: auto; /* Add scroll if the content overflows */
     border: 1px solid #ddd; /* Add a border for separation */
     border-radius: 5px; /* Rounded corners for a modern look */
@@ -42,9 +43,9 @@ select {
 
 .checkbox-group {
     flex-grow: 1; /* Make the border container grow with the parent */
-    overflow-y: scroll; /* Add scrolling if content exceeds height */
-    overflow-x: hidden;
-    border: 1px solid #ddd;
+    overflow-y: auto; /* Add scrolling if content exceeds height */
+    /*overflow-x: hidden;/**/
+    /*border: 1px solid #ddd;/**/
     padding: 10px;
 }
 
@@ -66,15 +67,15 @@ select {
     border-radius: 5px; /* Rounded corners for a smoother look */
 }
 
-#checkbox-signals {
-    flex-grow: 1; /* Allow this container to grow dynamically */
+/*#checkbox-signals {
+    /*flex-grow: 1; /* Allow this container to grow dynamically */
     /*min-height: 150; /* Prevent it from forcing #checkbox-sources to resize */
     /*display: flex; /* Flexbox for inner alignment */
     /*flex-direction: column; /* Ensure vertical alignment */
-    max-height: calc(100vh - 200px); /* Dynamically adjust for remaining space */
+    /*max-height: calc(100vh - 200px); /* Dynamically adjust for remaining space */
     /*overflow: auto; /* Add scrolling for content overflow */
     /*overflow-x: hidden;*/
-}
+/*}*/
 
 /* Style for the Show Configuration button */
 #PlotButton {

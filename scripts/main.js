@@ -353,9 +353,6 @@ document.querySelector('#checkbox-sources .checkbox-group').addEventListener('ch
 });
 
 /**
- * Populates the checkbox-signals container based on all selected sources.
- */
-/**
  * Populates the checkbox-signals container based on selected sources (or displays all signals if no source is selected).
  */
 function populateSignals() {
