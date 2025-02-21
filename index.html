@@ -1,108 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Upload and Plot Data</title>
-    <link rel="stylesheet" href="styles/styles.css">
-    <link rel="stylesheet" href="styles/permanent-sidebar.css">
-    <link rel="stylesheet" href="styles/plot.css">
-    <link rel="stylesheet" href="styles/sidebar.css">
-    <link rel="stylesheet" href="styles/sidebar-config-main.css">
-    <link rel="stylesheet" href="styles/sidebar-config-brush.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Landing Page</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <a href="index.html">Home</a>
+    <a href="blog.html">Blog</a>
+    <a href="app/index.html">CAN Log Plotter</a>
+    <a href="#">Database Editor (coming soon)</a>
+  </nav>
 
-    <!-- Small static sidebar on the left side. Not affected by interface events -->
-    <div class="permanent-sidebar">
-        <button id="arrowButton" class="icon-btn" title="Toggle Sidebar">←</button>
-        <button id="fileButton" class="icon-btn" title="File" onclick="toggleSidebarContent('main')">
-            <i class="icon icon-file"></i>
-        </button>
-        <button id="brushButton" class="icon-btn" title="Brush" onclick="toggleSidebarContent('brush')">
-            <i class="icon icon-brush"></i>
-        </button>
-        <button id="gearButton" class="icon-btn" title="Settings" onclick="toggleSidebarContent('gear')">
-            <i class="icon icon-gear"></i>
-        </button>
+  <!-- Hero / Welcome Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Welcome to the CAN Hub</h1>
+      <p>This hub for information and applications targeted to the automotive industry and communication standards.</p>
+      <a href="app/index.html" class="cta-button">Explore the Log Plotter</a>
     </div>
+  </section>
 
-    <!-- Main container made of a "sidebar" and the log region "content" -->
-    <div class="container">
-        <!-- Dynamic sidebar that changes according to interface events -->
-        <div class="sidebar">
-            <div id="resizeHandle"></div>
-            <!-- Invisible container that holds all sidebar configurations -->
-            <div id="sidebarContainer">
-                <!-- Main Configuration Content -->
-                <div class="sidebar-content active" id="mainConfig">
-                    <p>Load your files to start</p>
-                    <div class="button-container">
-                        <button id="loadDatabaseButton" onclick="loadDatabaseButton()">Load Database</button>
-                        <button id="loadLogButton" onclick="loadLogButton()">Load Log</button>         
-                    </div>
-                        <p>Source Sorting</p>
-                    <label for="filterOptions">Choose a filter:</label>
-                    <select id="filterOptions" size="1">
-                            <option value="noFilter">No Filter</option>
-                            <option value="filterById">Sort by ID</option>
-                            <option value="filterByName">Sort by Name</option>
-                            <option value="filterBySender">Sort by Sender</option>
-                     </select>                        
-                    <div class="checkbox-container" id="checkbox-sources">
-                        <label>Filter Sources</label>
-                        <div class="checkbox-group">
-                            <p>Apply a filter to see the sources.</p>
-                        </div>
-                    </div>
-                    <div id="resizeHandleSources"></div>
-                    <div class="checkbox-container" id="checkbox-signals">
-                        <label>Filter Signals</label>
-                        <div class="checkbox-group">
-                            <p>Select a source to see the signals.</p>
-                        </div>
-                    </div>
-                    <button id="PlotButton" onclick="handleGenerateTraces()" disabled>Generate Plot!</button>         
-                </div>
-                <!-- Brush Configuration Content -->
-                <div class="sidebar-content" id="brushConfig">
-                    <div id="lineConfigurations">
-                        <p>Customization options will be shown
-                        once a plot has been generated.</p>
-                    </div>
-                </div>
-                <!-- Gear Configuration Content -->
-                <div class="sidebar-content" id="gearConfig">
-                    <p>Gear Settings will be shown here.</p>
-                    <button>Place Holder</button>
-                    <button>Place Holder</button>
-                    <button>Place Holder</button>
-                </div>
-            </div>
-        </div>
-        <!-- Plot area -->
-        <div class="content">
-            <div id="plot"></div>
-        </div>
-    </div>
+  <!-- Latest Blog Posts Preview -->
+  <section id="blog-previews">
+    <h2>Latest Blog Posts</h2>
+    
+    <article class="blog-post">
+      <img src="placeholder1.jpg" alt="Thumbnail for Blog Post 1">
+      <div class="post-content">
+        <h3>Blog Post Title 1</h3>
+        <p>This is a brief preview of blog post 1. It provides a summary to entice you to read more.</p>
+        <a href="blog-post1.html">Read More</a>
+      </div>
+    </article>
+    
+    <article class="blog-post">
+      <img src="placeholder2.jpg" alt="Thumbnail for Blog Post 2">
+      <div class="post-content">
+        <h3>Blog Post Title 2</h3>
+        <p>This is a brief preview of blog post 2. It provides a summary to entice you to read more.</p>
+        <a href="blog-post2.html">Read More</a>
+      </div>
+    </article>
+    
+    <article class="blog-post">
+      <img src="placeholder3.jpg" alt="Thumbnail for Blog Post 3">
+      <div class="post-content">
+        <h3>Blog Post Title 3</h3>
+        <p>This is a brief preview of blog post 3. It provides a summary to entice you to read more.</p>
+        <a href="blog-post3.html">Read More</a>
+      </div>
+    </article>
+    
+    <article class="blog-post">
+      <img src="placeholder4.jpg" alt="Thumbnail for Blog Post 4">
+      <div class="post-content">
+        <h3>Blog Post Title 4</h3>
+        <p>This is a brief preview of blog post 4. It provides a summary to entice you to read more.</p>
+        <a href="blog-post4.html">Read More</a>
+      </div>
+    </article>
+  </section>
 
-    <!-- Scripts: User Interface -->
-    <script src="scripts/main.js"></script>
-    <script src="scripts/sidebar.js"></script>
-    <script src="scripts/app-state.js"></script>
-    <!-- Scripts: Database -->
-    <script src="scripts/main-db-loader.js"></script>    
-    <script src="scripts/parser-json.js"></script>
-    <script src="scripts/parser-dbc.js"></script>
-    <script src="scripts/parser-sym.js"></script>
-    <!-- Scripts: Log -->
-    <script src="scripts/main-log-loader.js"></script>
-    <script src="scripts/parser-blf.js"></script>
-    <script src="scripts/parser-trc.js"></script>
-    <script src="scripts/parser-asc.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pako/dist/pako.min.js"></script>
-    <!-- Scripts: Plot -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <script src="scripts/plot.js"></script>
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 My Website</p>
+  </footer>
 </body>
 </html>
