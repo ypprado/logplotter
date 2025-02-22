@@ -1,20 +1,21 @@
 /* **************************** permanent sidebar **************************** */
 .permanent-sidebar {
     width: 60px; /* Increased width for better usability */
-    height: calc(100vh - 30px); /* Subtracting top and bottom margin */
-    background-color: hsl(0 0% 98%);
-    margin: 5px;
-    border-radius: 20px; /* Adjust the value as needed */
+    /*height: calc(100vh - 30px); /* Subtracting top and bottom margin */
+    height: calc(100% - var(--navbar-height) - 20px); /* Windows - navbar - 2xmargin */
+    top: var(--navbar-height); /* Offset by navbar height */
+    position: fixed;
+    left: 0;
+    z-index: 2;
+    padding: 10px 0;
+    margin: 10px;
+    background-color:  white;
+    border-radius: 20px;
     color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 10px 0;/**/
     /*border: 2px solid hsla(0, 0%, 100%, 0.993); /**/
-    position: fixed;
-    left: 0;
-    top: 0;
-    z-index: 2;
 }
 
 /* Permanent Sidebar Buttons */
@@ -47,6 +48,10 @@
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+}
+
+#gearButton {
+    visibility: hidden;
 }
 
 .icon-file {

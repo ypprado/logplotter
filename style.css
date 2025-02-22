@@ -18,8 +18,9 @@
     position: fixed;
     top: 0;
     width: 100%;
+    height: 50px;
     background: #1e3a8a;
-    padding: 15px 0;
+    padding: 5px 0;
     display: flex;
     justify-content: center;
     gap: 20px;
@@ -39,6 +40,10 @@
     background: #3b82f6;
     border-radius: 5px;
   }
+
+  a[href="blog.html"] {
+    display: none;
+}
   
   /* Hero / Welcome Section */
   .hero {

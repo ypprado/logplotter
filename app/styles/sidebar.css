@@ -1,15 +1,13 @@
 /***************************** sidebar *****************************/
 .sidebar {
     width: 25%; /* Initial width */
-    /*height: 100vh; /* Match the height of the viewport */
-    height: calc(100vh - 10px); /* Subtracting top and bottom margin */
+    height: calc(100% - 20px); /* parent height - 2xmargin */
     min-width: 200px;
     max-width: 1500px;
-    background-color: hsl(0 0% 98%);
+    background-color:  white;
     color: rgb(94, 94, 94);
     padding: 10px;
-    margin: 5px;
-    /*box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1); /**/
+    margin: 10px;
     border-radius: 20px; /* Adjust the value as needed */
     display: flex;
     flex-direction: column;
@@ -17,7 +15,6 @@
     overflow-y: auto; /* Enable vertical scrolling for the sidebar itself */
     overflow-x: hidden; /* Prevent horizontal scrolling */
     box-sizing: border-box; /* Include padding in height calculation */
-    /*transition: width 0.5s ease, transform 0.5s ease;*/
     position: relative;
     resize: horizontal;
 }

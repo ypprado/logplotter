@@ -6,13 +6,20 @@
     <title>Upload and Plot Data</title>
     <link rel="stylesheet" href="styles/styles.css">
     <link rel="stylesheet" href="styles/permanent-sidebar.css">
-    <link rel="stylesheet" href="styles/plot.css">
     <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/sidebar-config-main.css">
     <link rel="stylesheet" href="styles/sidebar-config-brush.css">
+    <link rel="stylesheet" href="styles/plot.css">
 </head>
 <body>
-
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <a href="../index.html">Home</a>
+        <a href="blog.html">Blog</a>
+        <a href="index.html">CAN Log Plotter</a>
+        <a href="#">Database Editor (coming soon)</a>
+    </nav>
+    
     <!-- Small static sidebar on the left side. Not affected by interface events -->
     <div class="permanent-sidebar">
         <button id="arrowButton" class="icon-btn" title="Toggle Sidebar">←</button>
@@ -103,6 +110,7 @@
     <script src="https://cdn.jsdelivr.net/npm/pako/dist/pako.min.js"></script>
     <!-- Scripts: Plot -->
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!--<script src="scripts/plotly-3.0.0.min.js"></script>-->
     <script src="scripts/plot.js"></script>
 </body>
 </html>
