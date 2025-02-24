@@ -637,7 +637,7 @@ function extractRawValue(data, startBit, length, byteOrder) {
     let valueBytes = data.slice(startByte, endByte);
 
     // Handle byte order
-    if (byteOrder === "BigEndian") {
+    if (byteOrder === "LittleEndian") {
         valueBytes = valueBytes.reverse();
     }
 
