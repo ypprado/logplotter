@@ -621,34 +621,44 @@ function findSignalInDatabase(signalName) {
 }
 
 /**
- * Extracts a raw value from a CAN message payload.
- * @param {Array} data - CAN message data as an array of bytes.
- * @param {number} startBit - The start bit of the signal.
- * @param {number} length - The length of the signal in bits.
- * @param {string} byteOrder - "LittleEndian" or "BigEndian".
- * @returns {number} - Extracted raw value.
+ * Extracts a raw value from a byte array based on the given bit position, length, and byte order.
+ * Supports both Big Endian (Motorola) and Little Endian formats.
+ *
+ * @param {Array} data - The byte array containing the data.
+ * @param {number} startBit - The starting bit position.
+ * @param {number} length - The length of the data in bits.
+ * @param {string} byteOrder - The byte order, either "BigEndian" (Motorola) or "LittleEndian".
+ * @returns {number} - The extracted raw value.
  */
 function extractRawValue(data, startBit, length, byteOrder) {
-    const startByte = Math.floor(startBit / 8);
-    const endByte = Math.ceil((startBit + length) / 8);
-    const bitOffset = startBit % 8;
-
-    // Extract relevant bytes
-    let valueBytes = data.slice(startByte, endByte);
-
-    // Handle byte order
+    // Calculate start and end bytes
+    let byteStart = Math.floor(startBit / 8);
+    let byteEnd = byteStart + Math.ceil(length / 8);
+    let bitOffset = startBit % 8;
+    
+    // Extract relevant bytes based on byte order
+    let extractedBytes;
     if (byteOrder === "LittleEndian") {
-        valueBytes = valueBytes.reverse();
+        extractedBytes = data.slice(byteStart, byteEnd).reverse(); // Reverse for Little Endian
+    } else {
+        extractedBytes = data.slice(byteStart, byteEnd + 1); // Include additional byte for Big Endian
     }
 
-    // Convert to binary and extract bits
-    const binaryString = valueBytes.map((byte) => byte.toString(2).padStart(8, '0')).join('');
-    const rawBinary = binaryString.substring(bitOffset, bitOffset + length);
+    // Convert bytes to a full bit sequence
+    let bitString = extractedBytes.map(byte => byte.toString(2).padStart(8, '0')).join('');
 
-    // Convert binary to integer
-    return parseInt(rawBinary, 2);
+    // Extract the correct bit sequence based on endian format
+    let selectedBits;
+    if (byteOrder === "BigEndian") {
+        let start = bitString.length - (bitOffset + length);
+        selectedBits = bitString.slice(start, start + length);
+    } else {
+        selectedBits = bitString.slice(bitOffset, bitOffset + length);
+    }
+
+    // Convert the bit string to an integer
+    return parseInt(selectedBits, 2);
 }
-
 
 /******************** Plot Container ********************/
 window.addEventListener('resize', () => {
