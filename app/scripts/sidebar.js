@@ -130,7 +130,6 @@ function displayConfigurationControls(data) {
         `;
         configContainer.appendChild(lineConfig);
     });
-    addConfigListeners();
 }
 
 
