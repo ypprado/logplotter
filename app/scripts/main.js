@@ -621,43 +621,53 @@ function findSignalInDatabase(signalName) {
 }
 
 /**
- * Extracts a raw value from a byte array based on the given bit position, length, and byte order.
+ * Calculates the end bit position in a CAN message given the start bit and bit size.
+ * Ensures correct alignment within byte boundaries.
+ * 
+ * @param {number} inputStartBit - The starting bit position.
+ * @param {number} inputBitSize - The size of the signal in bits.
+ * @returns {number} - The calculated end bit position.
+ */
+function calculateEndBit(inputStartBit, inputBitSize) {
+    const rowStart = Math.floor(inputStartBit / 8);
+    const relStart = inputStartBit % 8;
+    const invStart = 7 - relStart;
+    const invStartOffset = invStart + (rowStart * 8);
+    const endBit = (invStartOffset + inputBitSize) - 1;
+    const modEnd = endBit % 8;
+    const norEnd = 8 - modEnd - 1;
+    return (Math.floor(endBit / 8) * 8) + norEnd;
+}
+
+/**
+ * Extracts a raw value from a CAN message payload.
  * Supports both Big Endian (Motorola) and Little Endian formats.
- *
- * @param {Array} data - The byte array containing the data.
- * @param {number} startBit - The starting bit position.
- * @param {number} length - The length of the data in bits.
- * @param {string} byteOrder - The byte order, either "BigEndian" (Motorola) or "LittleEndian".
- * @returns {number} - The extracted raw value.
+ * 
+ * @param {Array<number>} data - CAN message data as an array of bytes.
+ * @param {number} startBit - The start bit of the signal.
+ * @param {number} length - The length of the signal in bits.
+ * @param {string} byteOrder - "LittleEndian" or "BigEndian".
+ * @returns {number} - Extracted raw value.
  */
 function extractRawValue(data, startBit, length, byteOrder) {
-    // Calculate start and end bytes
-    let byteStart = Math.floor(startBit / 8);
-    let byteEnd = byteStart + Math.ceil(length / 8);
-    let bitOffset = startBit % 8;
-    
-    // Extract relevant bytes based on byte order
-    let extractedBytes;
+    let newStartBit = byteOrder === "BigEndian" ? calculateEndBit(startBit, length) : startBit;
+    const startByte = Math.floor(startBit / 8);
+    const endByte = Math.ceil((newStartBit + length) / 8);
+    const bitOffset = startBit % 8;
+
+    // Extract relevant bytes
+    let valueBytes = data.slice(startByte, endByte);
     if (byteOrder === "LittleEndian") {
-        extractedBytes = data.slice(byteStart, byteEnd).reverse(); // Reverse for Little Endian
-    } else {
-        extractedBytes = data.slice(byteStart, byteEnd + 1); // Include additional byte for Big Endian
+        valueBytes.reverse();
     }
 
-    // Convert bytes to a full bit sequence
-    let bitString = extractedBytes.map(byte => byte.toString(2).padStart(8, '0')).join('');
+    // Convert to binary and extract bits
+    const binaryString = valueBytes.map(byte => byte.toString(2).padStart(8, '0')).join('');
+    const rawBinary = byteOrder === "BigEndian"
+        ? binaryString.substring(8 - bitOffset, 8 - bitOffset + length)
+        : binaryString.substring(bitOffset, bitOffset + length);
 
-    // Extract the correct bit sequence based on endian format
-    let selectedBits;
-    if (byteOrder === "BigEndian") {
-        let start = bitString.length - (bitOffset + length);
-        selectedBits = bitString.slice(start, start + length);
-    } else {
-        selectedBits = bitString.slice(bitOffset, bitOffset + length);
-    }
-
-    // Convert the bit string to an integer
-    return parseInt(selectedBits, 2);
+    return parseInt(rawBinary, 2);
 }
 
 /******************** Plot Container ********************/
