@@ -188,7 +188,9 @@ function addConfigListeners() {
                 const index = event.target.closest('.color-palette').getAttribute('data-index');
 
                 // Update the trace color directly in Plotly
-                const traces = Plotly.d3.select('#plot').node().data;
+                //const traces = Plotly.d3.select('#plot').node().data;
+                const traces = document.querySelector('#plot').data;
+
                 const trace = traces[index];
 
                 // Ensure trace.line exists before setting color
@@ -578,7 +580,7 @@ document.addEventListener("DOMContentLoaded", () => {
                     //plotData.addData(dummytrace); 
 
                     generatePlot();
-                    
+
                     addConfigListeners();
 
                 } catch (error) {

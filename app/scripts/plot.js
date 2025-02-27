@@ -121,7 +121,8 @@ function generatePlot() {
 
 function updatePlot() {
     const data = [];
-    const traces = Plotly.d3.select('#plot').node().data;
+    //const traces = Plotly.d3.select('#plot').node().data;
+    const traces = document.querySelector('#plot').data;
 
     // Update each trace based on configuration
     traces.forEach((trace, index) => {
