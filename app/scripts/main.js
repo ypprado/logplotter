@@ -548,6 +548,11 @@ function getSelectedSignals() {
     return selectedSignals;
 }
 
+function toSigned(value, bitLength) {
+    let signBit = 1 << (bitLength - 1);
+    return (value & (signBit - 1)) - (value & signBit);
+}
+
 /**
  * Processes the log to extract values for selected signals.
  * @param {Array<string>} selectedSignals - List of selected signal names.
@@ -580,8 +585,16 @@ function processSelectedSignals(selectedSignals) {
                 databaseSignal.byteOrder
             );
 
+            // Ensure rawValue is interpreted correctly before applying scaling
+            let correctedValue = rawValue;
+
+            if (databaseSignal.valueType === "Signed") {
+                // Convert rawValue to signed based on its bit length
+                correctedValue = toSigned(rawValue, databaseSignal.length);
+            }
+
             // Apply scaling and offset
-            const scaledValue = rawValue * databaseSignal.scaling + databaseSignal.offset;
+            const scaledValue = correctedValue * databaseSignal.scaling + databaseSignal.offset;
 
             return {
                 timestamp: msg.timestamp, // Timestamp in seconds
