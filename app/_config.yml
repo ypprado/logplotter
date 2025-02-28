@@ -1,0 +1,8 @@
+# _config.yml
+
+exclude:
+  - node_modules
+  - app/node_modules
+  - vendor
+  - Gemfile
+  - Gemfile.lock
