@@ -58,9 +58,71 @@ const plotLayout = {
     responsive: true,
     grid: { rows: 1, columns: 1 },
     xaxis: { domain: [0.0, 1] },
-    yaxis: {  title: { text: '' }, domain: [0, 1], side: 'left', visible: true},
-    yaxis2: { title: { text: '' }, domain: [0, 1], overlaying: 'y', side: 'left', visible: false, position: 0},
-    yaxis3: { title: { text: '' }, domain: [0, 1], overlaying: 'y', side: 'right', visible: false},
+    yaxis: 
+    {  
+        title: { text: '' }, 
+        domain: [0, 1], 
+        side: 'left', 
+        visible: true, 
+        showline: true
+    },
+    yaxis2: 
+    { 
+        title: { text: '' }, 
+        domain: [0, 1], 
+        overlaying: 'y', 
+        side: 'left', 
+        visible: false,
+        showline: false, 
+        position: 0
+    },
+    yaxis3: 
+    { 
+        title: { text: '' }, 
+        domain: [0, 1], 
+        overlaying: 'y', 
+        side: 'right', 
+        visible: false
+    },
+    annotations: [
+        {
+            text: 'Y1',
+            x: 0,
+            y: 1.02,  
+            xref: 'paper',
+            yref: 'paper',
+            xanchor: 'right',
+            yanchor: 'bottom',
+            showarrow: false,
+            visible: true,
+            font: { size: 12, color: 'black' },
+        },
+        {
+            text: 'Y2',
+            x: 0.05,
+            y: 1.02, 
+            xref: 'paper',
+            yref: 'paper',
+            xanchor: 'right',
+            yanchor: 'bottom',
+            showarrow: false,
+            visible: false,
+            font: { size: 12, color: 'black' },
+        },
+        {
+            text: 'Y3',
+            x: 1,  // Align with y-axis3 tick labels on the right
+            y: 1.02,  
+            xref: 'paper',
+            yref: 'paper',
+            xanchor: 'left',
+            yanchor: 'bottom',
+            showarrow: false,
+            visible: false,
+            font: { size: 12, color: 'black' },
+            align: 'center'
+        }
+    ] 
 };
 
 function updateYAxisProperty(axisNumber, property, value) {
@@ -95,6 +157,47 @@ function updateXAxisProperty(property, value) {
     plotLayout.xaxis[property] = value;
 }
 
+// Example usage:
+//updatePlotLayout('yaxis2:visible', true);   // Makes yaxis2 visible
+//updatePlotLayout('annotations:2:visible', true);  // Makes annotation 2 visible
+//updatePlotLayout('yaxis3:showline', true);   // Ensures yaxis3 line is shown
+function updatePlotLayout(propertyPath, newValue) {
+    const keys = propertyPath.split(':');
+    let obj = plotLayout;
+
+    // Traverse the object to find the correct property
+    for (let i = 0; i < keys.length - 1; i++) {
+        let key = keys[i];
+
+        // Convert index keys (e.g., annotations:2) into integers for array access
+        if (!isNaN(key)) {
+            key = parseInt(key);
+        }
+
+        // Ensure the key exists
+        if (!(key in obj)) {
+            console.warn(`Invalid property path: ${propertyPath}`);
+            return;
+        }
+
+        obj = obj[key]; // Move deeper in the structure
+    }
+
+    let finalKey = keys[keys.length - 1];
+
+    // Convert to integer if targeting an array index
+    if (!isNaN(finalKey)) {
+        finalKey = parseInt(finalKey);
+    }
+
+    // Set the new value without overwriting the object
+    if (obj.hasOwnProperty(finalKey)) {
+        obj[finalKey] = newValue;
+    } else {
+        console.warn(`Invalid final property: ${finalKey} in ${propertyPath}`);
+        return;
+    }
+}
 
 /**
  * Generate a brand new plot on the given HTML container id "plot" 
@@ -118,6 +221,7 @@ function generatePlot() {
         console.error("No valid data for plotting.");
     }
 }
+
 
 function updatePlot() {
     const data = [];
@@ -188,59 +292,3 @@ function generatePlotlyDatasets(processedLogs) {
     // Return the array of traces
     return traces;
 }
-
-
-
-/*function moveTraceToYAxis(traceName, newYAxis) {
-    const trace = plotData.traces.find(t => t.name === traceName);
-    if (trace && plotData.yAxes.includes(newYAxis)) {
-        trace.yaxis = newYAxis;
-        console.log(`Moved '${traceName}' to Y-axis '${newYAxis}'.`);
-        updatePlot();
-    } else {
-        console.warn(`Invalid trace or Y-axis '${newYAxis}' does not exist.`);
-    }
-}*/
-
-
-
-/* 
-
-const trace = {
-    mode: "lines+markers",
-    name: "Dummy-Signal",
-    type: "scatter",
-    yaxis: 'y2',
-    x: ["2025-01-28T15:07:54.275Z", "2025-01-28T15:07:54.375Z"],
-    x: [20,20]
-};
-
-example for two subplots
-var trace1 = {
-  x: [1, 2, 3, 4, 5],
-  y: [10, 15, 13, 17, 12],
-  type: 'scatter',
-  xaxis: 'x1',
-  yaxis: 'y1'
-};
-
-var trace2 = {
-  x: [1, 2, 3, 4, 5],
-  y: [16, 5, 11, 9, 20],
-  type: 'scatter',
-  xaxis: 'x2',
-  yaxis: 'y2'
-};
-
-var data = [trace1, trace2];
-
-var layout = {
-  grid: {rows: 1, columns: 2, pattern: 'independent'},
-  xaxis: {title: 'X Axis 1', domain: [0, 0.5]},
-  yaxis: {title: 'Y Axis 1'},
-  xaxis2: {title: 'X Axis 2', domain: [0.5, 1]},
-  yaxis2: {title: 'Y Axis 2'}
-};
-
-Plotly.newPlot('myDiv', data, layout);
-*/

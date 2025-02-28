@@ -227,18 +227,31 @@ function addConfigListeners() {
             plotData.traces[index].yaxis = newYAxis;
             
             // If axis is in use by a trace, make it visible in the layout
-            const yInUse =  plotData.isAxisInUse("y")
-            const y2InUse =  plotData.isAxisInUse("y2")
+            const yInUse  = plotData.isAxisInUse("y");
+            const y2InUse = plotData.isAxisInUse("y2");
+            const y3InUse = plotData.isAxisInUse("y3");
             plotLayout["yaxis"].visible = yInUse;
+            plotLayout.annotations[0].visible = yInUse;
             plotLayout["yaxis2"].visible = y2InUse;
-            plotLayout["yaxis3"].visible = plotData.isAxisInUse("y3");
+            plotLayout.annotations[1].visible = y2InUse;
+            plotLayout["yaxis3"].visible = y3InUse;
+            plotLayout.annotations[2].visible = y3InUse;
 
             // If y and y2 are active, y shall make room for y2
+            // adjust label placement accordingly
+            if (yInUse && !y2InUse) {
+                plotLayout.annotations[0].x = 0; //Y1 label
+            } else if (!yInUse && y2InUse) {
+                plotLayout.annotations[1].x = 0; //Y2 label
+            }
             if (yInUse && y2InUse){
                 plotLayout.xaxis.domain = [0.05, 1];
+                plotLayout.annotations[0].x = 0.05;
+                plotLayout.annotations[1].x = 0;
             } else {
                 plotLayout.xaxis.domain = [0, 1];
             }
+
 
             console.log("Updated plotLayout:", plotLayout);
 
