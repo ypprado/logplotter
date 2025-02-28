@@ -45,8 +45,8 @@
                 <div class="sidebar-content active" id="mainConfig">
                     <p>Load your files to start</p>
                     <div class="button-container">
-                        <button id="loadDatabaseButton" onclick="loadDatabaseButton()">Load Database</button>
-                        <button id="loadLogButton" onclick="loadLogButton()">Load Log</button>         
+                        <button id="loadDatabaseButton">Load Database</button>
+                        <button id="loadLogButton">Load Log</button>         
                     </div>
                         <p>Source Sorting</p>
                     <label for="filterOptions">Choose a filter:</label>
@@ -69,7 +69,7 @@
                             <p>Select a source to see the signals.</p>
                         </div>
                     </div>
-                    <button id="PlotButton" onclick="handleGenerateTraces()" disabled>Generate Plot!</button>         
+                    <button id="PlotButton" disabled>Generate Plot!</button>         
                 </div>
                 <!-- Brush Configuration Content -->
                 <div class="sidebar-content" id="brushConfig">
@@ -94,12 +94,10 @@
     </div>
 
     <!-- Scripts: User Interface -->
-    <script src="scripts/main.js"></script>
+    <script type="module" src="scripts/main.js"></script>
     <script src="scripts/sidebar.js"></script>
-    <script src="scripts/app-state.js"></script>
     <!-- Scripts: Database -->
-    <script src="scripts/main-db-loader.js"></script>    
-    <script src="scripts/parser-json.js"></script>
+    <script type="module" src="scripts/main-db-loader.js"></script>    
     <script src="scripts/parser-dbc.js"></script>
     <script src="scripts/parser-sym.js"></script>
     <!-- Scripts: Log -->
@@ -109,7 +107,8 @@
     <script src="scripts/parser-asc.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/pako/dist/pako.min.js"></script>
     <!-- Scripts: Plot -->
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <!--<<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>-->
+    <script src="https://cdn.plot.ly/plotly-3.0.0.min.js"></script> 
     <!--<script src="scripts/plotly-3.0.0.min.js"></script>-->
     <script src="scripts/plot.js"></script>
 </body>

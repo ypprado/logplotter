@@ -1,28 +1,23 @@
-
-
-let log = null; // Global variable to store the JSON database
+let log = null; // Global variable to store the log
 
 function resetLog() {
-    // Clear the global database variable
     log = [];
 }
 
+// Check if log is not loaded.
 function isLogLoaded() {
     if (!log) {
-        //console.error("Log is not loaded or is invalid.");
         return false;
     } else {
-        //console.log("Log loaded.");
         return true;
     }
 }
-
 
 function selectFileLOG() {
     return new Promise((resolve, reject) => {
         const fileInput = document.createElement('input');
         fileInput.type = 'file';
-        fileInput.accept = '.blf, .trc, .asc, .json';
+        fileInput.accept = '.blf, .trc, .asc';
 
         // Wait a little before triggering the click
         setTimeout(() => {
@@ -50,9 +45,6 @@ async function parseFileLOG(file) {
         switch (fileExtension) {
             case 'blf':
                 parsedData = await parseBLF(file); // Directly handle BLF files
-                break;
-            case 'json':
-                parsedData = await parseJSONlog(file); // Handle JSON files
                 break;
             case 'trc':
                 parsedData = await parseTRC(file); // Handle TRC files

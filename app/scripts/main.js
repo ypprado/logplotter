@@ -1,8 +1,4 @@
-/**
- * main.js aims to make the integration between user interface and
- * processes in js. 
- */
-
+import databaseHandler from "./main-db-loader.js";
 /******************** Permanent Sidebar ********************/
 /**
  * Monitor "arrowButton" which is responsible for hide/unhide 
@@ -41,70 +37,110 @@ document.addEventListener('DOMContentLoaded', function () {
 
 /******************** Button Database ********************/
 // On button click: Load Database
-async function loadDatabaseButton() {
-    try {
+document.addEventListener("DOMContentLoaded", () => {
+    const loadDatabaseBtn = document.getElementById("loadDatabaseButton");
+
+    if (loadDatabaseBtn) {
+        loadDatabaseBtn.addEventListener("click", async () => {
+            try {
+                // Step 1: Load the database (file selection + parsing + transformation)
+                databaseHandler.resetDatabase(); // Ensure previous data is cleared
+                await databaseHandler.loadDatabase();
+
+                // Step 2: Check if the database is loaded successfully
+                if (databaseHandler.isDatabaseLoaded()) {
+                    console.log("Database loaded:", databaseHandler.getDatabase());
+                    databaseHandler.extractDropdownContent(); // Update dropdowns
+                    populateSignals(); // Update UI elements
+                    updateButtonColor('loadDatabaseButton', true);
+
+                    // Step 3: Enable the "Generate Plot" button if the log is also loaded
+                    if (isLogLoaded()) {
+                        document.getElementById("PlotButton").disabled = false;
+                    }
+                } else {
+                    updateButtonColor('loadDatabaseButton', false);
+                }
+            } catch (error) {
+                console.error("Error during database loading process:", error);
+            }
+        });
+    }
+});
+
+async function loadDatabaseButton1() {
+/*    try {
         // Step 1: Let the user select a file
         const file = await selectFileDB();
-
         // Step 2: Parse the file content
         const parsedData = await parseFileDB(file);
-
         // Step 3: Load the global database in unified JSON format
         resetDatabase();
         database = buildUnifiedDatabase(parsedData);
 
         if(isDatabaseLoaded()){
-            
-            extractDropdownContent(database); 
-
+            extractDropdownContent(); 
             populateSignals();
-
             updateButtonColor('loadDatabaseButton',true);
-
             if(isLogLoaded()){
-                // Enable the "Generate Plot" button
                 document.getElementById("PlotButton").disabled = false;
             }
         } else {
             updateButtonColor('loadDatabaseButton',false);
         }
-
-        // Step 4: Take further steps after the database is loaded
-        //proceedWithNextSteps();
-
     } catch (error) {
         console.error("Error during database loading process:", error);
     }
+*/
+    await databaseHandler.loadDatabase();
+    console.log("Database loaded:", database);
+    if (database) {
+        extractDropdownContent();
+        populateSignals();
+        updateButtonColor('loadDatabaseButton', true);
+        if (isLogLoaded()) {
+            document.getElementById("PlotButton").disabled = false;
+        }
+    } else {
+        updateButtonColor('loadDatabaseButton', false);
+    }
+
 }
 
 /******************** Button Log ********************/
 // On button click: Load Log
-async function loadLogButton() {
-    try {
-        // Step 1: Let the user select a file
-        const file = await selectFileLOG();
+document.addEventListener("DOMContentLoaded", () => {
+    const loadLogBtn = document.getElementById("loadLogButton");
 
-        // Step 2: Parse the file content
-        const parsedData = await parseFileLOG(file);
+        if (loadLogBtn) {
+            loadLogBtn.addEventListener("click", async () => {
+                try {
+                // Step 1: Let the user select a file
+                const file = await selectFileLOG();
 
-        // Step 3: Load the global log in unified JSON format
-        buildUnifiedLog(parsedData);
+                // Step 2: Parse the file content
+                const parsedData = await parseFileLOG(file);
 
-        if(isLogLoaded()){
+                // Step 3: Load the global log in unified JSON format
+                buildUnifiedLog(parsedData);
 
-            updateButtonColor('loadLogButton',true);
+                if(isLogLoaded()){
 
-            if(isDatabaseLoaded()){
-                // Enable the "Generate Plot" button
-                document.getElementById("PlotButton").disabled = false;
+                    updateButtonColor('loadLogButton',true);
+
+                    if(databaseHandler.isDatabaseLoaded()){
+                        // Enable the "Generate Plot" button
+                        document.getElementById("PlotButton").disabled = false;
+                    }
+                } else {
+                    updateButtonColor('loadLogButton',false);
+                }
+            } catch (error) {
+                console.error("Error during log loading process:", error);
             }
-        } else {
-            updateButtonColor('loadLogButton',false);
-        }
-    } catch (error) {
-        console.error("Error during log loading process:", error);
+        });
     }
-}
+});
 
 
 /******************** Plot listener ********************/
@@ -152,7 +188,9 @@ function addConfigListeners() {
                 const index = event.target.closest('.color-palette').getAttribute('data-index');
 
                 // Update the trace color directly in Plotly
-                const traces = Plotly.d3.select('#plot').node().data;
+                //const traces = Plotly.d3.select('#plot').node().data;
+                const traces = document.querySelector('#plot').data;
+
                 const trace = traces[index];
 
                 // Ensure trace.line exists before setting color
@@ -298,6 +336,9 @@ function populateCheckboxGroup(filter) {
     // Clear existing content
     checkboxGroup.innerHTML = '';
 
+    const database = databaseHandler.getDatabase();
+    const dropdownContent = databaseHandler.getDropdownContent();
+    
     // Handle case where the database is not loaded
     if (!database || !dropdownContent) {
         checkboxGroup.innerHTML = `<p>Please load a database to apply filters.</p>`;
@@ -366,6 +407,8 @@ function populateSignals() {
 
     // Use a Set to collect unique signals
     const allSignals = new Set();
+
+    const database = databaseHandler.getDatabase();
 
     // If no sources are selected, display all available signals
     if (selectedSources.length === 0) {
@@ -485,54 +528,67 @@ function getSignalsForSource(source) {
  * generates a Plotly trace for each selected signal, and adds the traces to the global plotData. 
  * This function is triggered when the "PlotButton" is clicked.
  */
-function handleGenerateTraces() {
-    // Get the checkbox container
-    const checkboxContainer = document.getElementById('checkbox-signals');
 
-    // Check if the container exists
-    if (!checkboxContainer) {
-        console.error("Checkbox container with ID 'checkbox-signals' not found.");
-        return;
-    }
+document.addEventListener("DOMContentLoaded", () => {
+    const PlotBtn = document.getElementById("PlotButton");
+        if (PlotBtn) {
+            PlotBtn.addEventListener("click", async () => {
+                try {
+                    // Get the checkbox container
+                    const checkboxContainer = document.getElementById('checkbox-signals');
 
-    // Get all checked checkboxes within the container
-    const selectedCheckboxes = Array.from(
-        checkboxContainer.querySelectorAll('input[type="checkbox"]:checked')
-    );
+                    // Check if the container exists
+                    if (!checkboxContainer) {
+                        console.error("Checkbox container with ID 'checkbox-signals' not found.");
+                        return;
+                    }
 
-    if (selectedCheckboxes.length === 0) {
-        console.warn("No signals selected for trace generation.");
-        return;
-    }
+                    // Get all checked checkboxes within the container
+                    const selectedCheckboxes = Array.from(
+                        checkboxContainer.querySelectorAll('input[type="checkbox"]:checked')
+                    );
 
-    // Get signals selected in the checkbox
-    const selectedSignals = getSelectedSignals();
+                    if (selectedCheckboxes.length === 0) {
+                        console.warn("No signals selected for trace generation.");
+                        return;
+                    }
 
-    // sort and convert log based on signals selected
-    const processedLogs = processSelectedSignals(selectedSignals);
+                    // Get signals selected in the checkbox
+                    const selectedSignals = getSelectedSignals();
 
-    // Clear any previous traces to generate a fresh plot
-    plotData.clearTraces();
+                    // sort and convert log based on signals selected
+                    const processedLogs = processSelectedSignals(selectedSignals);
 
-    // Generate traces based on processed log
-    const traces = generatePlotlyDatasets(processedLogs);
+                    // Clear any previous traces to generate a fresh plot
+                    plotData.clearTraces();
 
-    // Add the trace to the global plotData
-    plotData.addData(traces); 
-    
-    /*const dummytrace = {
-        mode: "lines+markers",
-        name: "Dummy-Signal",
-        type: "scatter",
-        yaxis: 'y2',
-        x: ["2025-01-28T15:07:54.275Z", "2025-01-28T15:07:54.375Z"],
-        y: [20,20]
-    };*/
+                    // Generate traces based on processed log
+                    const traces = generatePlotlyDatasets(processedLogs);
 
-    //plotData.addData(dummytrace); 
+                    // Add the trace to the global plotData
+                    plotData.addData(traces); 
+                    
+                    /*const dummytrace = {
+                        mode: "lines+markers",
+                        name: "Dummy-Signal",
+                        type: "scatter",
+                        yaxis: 'y2',
+                        x: ["2025-01-28T15:07:54.275Z", "2025-01-28T15:07:54.375Z"],
+                        y: [20,20]
+                    };*/
 
-    generatePlot();
-}
+                    //plotData.addData(dummytrace); 
+
+                    generatePlot();
+
+                    addConfigListeners();
+
+                } catch (error) {
+                    console.error("Error during plot process:", error);
+                }
+            });
+        }
+    });
 
 /**
  * Extracts the names of selected signals from the checkbox-signals container.
@@ -602,6 +658,7 @@ function processSelectedSignals(selectedSignals) {
  * @returns {Object|null} - Signal object with messageId and properties, or null if not found.
  */
 function findSignalInDatabase(signalName) {
+    const database = databaseHandler.getDatabase();
     for (const message of database.messages) {
         for (const signal of message.signals) {
             if (signal.name === signalName) {

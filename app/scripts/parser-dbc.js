@@ -6,10 +6,19 @@
  * @param {number} messageId - The message ID to convert.
  * @returns {string} - The formatted hexadecimal string: "0x______" */
 function formatMessageId(messageId) {
-    if ((messageId & 0x80000000) !== 0) { // Check if EXT flag is set
-        return `0x${(messageId & 0x7FFFFFFF).toString(16).padStart(8, '0').toUpperCase()}`;
+    const EXT_FLAG = 0x80000000;
+    const STD_ID_LENGTH = 3;
+    const EXT_ID_LENGTH = 8;
+
+    messageId = Number(messageId);
+    if (isNaN(messageId)) {
+        throw new Error("Invalid messageId: Must be a number.");
+    }
+
+    if ((messageId & EXT_FLAG) !== 0) { 
+        return `0x${(messageId & ~EXT_FLAG).toString(16).padStart(EXT_ID_LENGTH, '0').toUpperCase()}`;
     } else {
-        return `0x${messageId.toString(16).padStart(3, '0').toUpperCase()}`;
+        return `0x${messageId.toString(16).padStart(STD_ID_LENGTH, '0').toUpperCase()}`;
     }
 }
 
