@@ -122,7 +122,12 @@ const plotLayout = {
             font: { size: 12, color: 'black' },
             align: 'center'
         }
-    ] 
+    ]/*,
+    legend: {
+        x: 1,
+        xanchor: 'right',
+        y: 1
+      }*/ 
 };
 
 function updateYAxisProperty(axisNumber, property, value) {
@@ -263,7 +268,9 @@ function generatePlotlyDatasets(processedLogs) {
     // Loop through each signal in the processed logs
     for (const signalName in processedLogs) {
         if (processedLogs.hasOwnProperty(signalName)) {
-            const signalArray = processedLogs[signalName];
+            const signalData = processedLogs[signalName];
+            const signalArray = signalData.data;
+            const unit = signalData.unit ? ` (${signalData.unit})` : ""; 
 
             // Extract data from the signal array
             const x = signalArray.map(entry => entry.timestamp); // Time (x-axis)
@@ -281,7 +288,7 @@ function generatePlotlyDatasets(processedLogs) {
                 mode: "lines+markers",
                 type: "scatter",
                 yaxis: 'y',
-                name: signalName, // Directly use the signalName here
+                name: `${signalName}${unit}`, // Updated name with unit
             };
 
             // Add the trace to the traces array

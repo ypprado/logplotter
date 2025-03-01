@@ -586,7 +586,7 @@ document.addEventListener("DOMContentLoaded", () => {
                         name: "Dummy-Signal",
                         type: "scatter",
                         yaxis: 'y2',
-                        x: ["2025-01-28T15:07:54.275Z", "2025-01-28T15:07:54.375Z"],
+                        x: ["1", "2"],
                         y: [20,20]
                     };*/
 
@@ -639,7 +639,6 @@ function processSelectedSignals(selectedSignals) {
         // Filter log entries by message ID
         const filteredMessages = log.filter((msg) => parseInt(msg.id, 16) === parseInt(messageId, 16));
 
-
         // Process the log entries for this signal
         const signalLog = filteredMessages.map((msg) => {
             const rawValue = extractRawValue(
@@ -658,8 +657,15 @@ function processSelectedSignals(selectedSignals) {
             };
         });
 
-        // Store the processed log for this signal
-        processedLogs[signalName] = signalLog;
+
+        // Sanitize the unit before passing it
+        const cleanUnit = sanitizeUnit(databaseSignal.unit || "");
+
+        // Store the processed log along with the unit
+        processedLogs[signalName] = {
+            data: signalLog,
+            unit: cleanUnit
+        };
     });
 
     return processedLogs; // Return the processed logs for further use
@@ -682,7 +688,9 @@ function findSignalInDatabase(signalName) {
                     byteOrder: signal.byteOrder,
                     scaling: signal.scaling,
                     offset: signal.offset,
-                    valueType: signal.valueType
+                    valueType: signal.valueType,
+                    unit: signal.units,
+                    valueDescription: signal.valueDescription 
                 };
             }
         }
@@ -724,3 +732,11 @@ function extractRawValue(data, startBit, length, byteOrder) {
 window.addEventListener('resize', () => {
     Plotly.Plots.resize('plot'); // Resizes the Plotly chart
 });
+
+
+function sanitizeUnit(unit) {
+    if (!unit) return ""; // Return empty if no unit is provided
+
+    // Remove non-ASCII characters and keep only alphanumeric, common symbols
+    return unit.replace(/[^\x20-\x7E°Ωμ]/g, "").trim();
+}
