@@ -278,6 +278,7 @@ function generatePlotlyDatasets(processedLogs) {
 
             if (x.length === 0 || y.length === 0) {
                 console.warn(`No data found for signal "${signalName}".`);
+                showToast(`Warning: No data found for "${signalName}" in the trace file.`);
                 continue; // Skip to the next signal if no data is found
             }
 
@@ -298,4 +299,27 @@ function generatePlotlyDatasets(processedLogs) {
 
     // Return the array of traces
     return traces;
+}
+
+function showToast(message) {
+    const toastContainer = document.getElementById("toast-container");
+
+    // Create toast element
+    const toast = document.createElement("div");
+    toast.classList.add("toast");
+    toast.textContent = message;
+
+    // Append toast to container
+    toastContainer.appendChild(toast);
+
+    // Show the toast with animation
+    setTimeout(() => {
+        toast.classList.add("show");
+    }, 10);
+
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+    }, 5000);
 }

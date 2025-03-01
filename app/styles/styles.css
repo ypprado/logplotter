@@ -84,6 +84,30 @@ button:hover {
     background-color: #005f99;
 }
 
+#toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.toast {
+    background-color: rgba(255, 69, 0, 0.9); /* Subtle red/orange */
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    font-size: 14px;
+    margin-bottom: 10px;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
 /***************************** main container *****************************/
 .container {
     /*position: relative;/**/

@@ -563,6 +563,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     if (selectedCheckboxes.length === 0) {
                         console.warn("No signals selected for trace generation.");
+                        showToast("No signals selected for trace generation");
                         return;
                     }
 
@@ -739,4 +740,27 @@ function sanitizeUnit(unit) {
 
     // Remove non-ASCII characters and keep only alphanumeric, common symbols
     return unit.replace(/[^\x20-\x7E°Ωμ]/g, "").trim();
+}
+
+function showToast(message) {
+    const toastContainer = document.getElementById("toast-container");
+
+    // Create toast element
+    const toast = document.createElement("div");
+    toast.classList.add("toast");
+    toast.textContent = message;
+
+    // Append toast to container
+    toastContainer.appendChild(toast);
+
+    // Show the toast with animation
+    setTimeout(() => {
+        toast.classList.add("show");
+    }, 10);
+
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove("show");
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
 }
