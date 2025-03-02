@@ -58,7 +58,7 @@ async function parseTRC(file) {
     function parseMsgV1_3(cols) {
         return {
             timestamp: formatTimestamp(parseFloat(cols[1]) / 1000 + startTime),
-            arbitrationId: parseInt(cols[4], 10),
+            arbitrationId: parseInt(cols[4], 16),
             isExtendedId: cols[4].length > 4,
             channel: parseInt(cols[2]),
             dlc: parseInt(cols[6]),

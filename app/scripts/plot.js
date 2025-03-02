@@ -246,7 +246,7 @@ function updatePlot() {
         } else if (trace.marker) {
             color = trace.marker.color;  // Color for scatter traces
         }
-        trace.type = "scatter";
+        trace.type = "scattergl";
         trace.mode = mode;
         trace.line = { width: parseInt(width), color: color };
         trace.marker = { size: parseInt(markerSize), color: color };
@@ -287,7 +287,7 @@ function generatePlotlyDatasets(processedLogs) {
                 x: x,
                 y: y,
                 mode: "lines+markers",
-                type: "scatter",
+                type: "scattergl",
                 yaxis: 'y',
                 name: `${signalName}${unit}`, // Updated name with unit
             };

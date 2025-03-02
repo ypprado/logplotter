@@ -663,6 +663,11 @@ function getSelectedSignals() {
     return selectedSignals;
 }
 
+function toSigned(value, bitLength) {
+    let signBit = 1 << (bitLength - 1);
+    return (value & (signBit - 1)) - (value & signBit);
+}
+
 /**
  * Processes the log to extract values for selected signals.
  * @param {Array<string>} selectedSignals - List of selected signal names.
@@ -694,8 +699,16 @@ function processSelectedSignals(selectedSignals) {
                 databaseSignal.byteOrder
             );
 
+            // Ensure rawValue is interpreted correctly before applying scaling
+            let correctedValue = rawValue;
+
+            if (databaseSignal.valueType === "Signed") {
+                // Convert rawValue to signed based on its bit length
+                correctedValue = toSigned(rawValue, databaseSignal.length);
+            }
+
             // Apply scaling and offset
-            const scaledValue = rawValue * databaseSignal.scaling + databaseSignal.offset;
+            const scaledValue = correctedValue * databaseSignal.scaling + databaseSignal.offset;
 
             return {
                 timestamp: msg.timestamp, // Timestamp in seconds
@@ -745,34 +758,54 @@ function findSignalInDatabase(signalName) {
 }
 
 /**
+ * Calculates the end bit position in a CAN message given the start bit and bit size.
+ * Ensures correct alignment within byte boundaries.
+ * 
+ * @param {number} inputStartBit - The starting bit position.
+ * @param {number} inputBitSize - The size of the signal in bits.
+ * @returns {number} - The calculated end bit position.
+ */
+function calculateEndBit(inputStartBit, inputBitSize) {
+    const rowStart = Math.floor(inputStartBit / 8);
+    const relStart = inputStartBit % 8;
+    const invStart = 7 - relStart;
+    const invStartOffset = invStart + (rowStart * 8);
+    const endBit = (invStartOffset + inputBitSize) - 1;
+    const modEnd = endBit % 8;
+    const norEnd = 8 - modEnd - 1;
+    return (Math.floor(endBit / 8) * 8) + norEnd;
+}
+
+/**
  * Extracts a raw value from a CAN message payload.
- * @param {Array} data - CAN message data as an array of bytes.
+ * Supports both Big Endian (Motorola) and Little Endian formats.
+ * 
+ * @param {Array<number>} data - CAN message data as an array of bytes.
  * @param {number} startBit - The start bit of the signal.
  * @param {number} length - The length of the signal in bits.
  * @param {string} byteOrder - "LittleEndian" or "BigEndian".
  * @returns {number} - Extracted raw value.
  */
 function extractRawValue(data, startBit, length, byteOrder) {
+    let newStartBit = byteOrder === "BigEndian" ? calculateEndBit(startBit, length) : startBit;
     const startByte = Math.floor(startBit / 8);
-    const endByte = Math.ceil((startBit + length) / 8);
+    const endByte = Math.ceil((newStartBit + length) / 8);
     const bitOffset = startBit % 8;
 
     // Extract relevant bytes
     let valueBytes = data.slice(startByte, endByte);
-
-    // Handle byte order
-    if (byteOrder === "BigEndian") {
-        valueBytes = valueBytes.reverse();
+    if (byteOrder === "LittleEndian") {
+        valueBytes.reverse();
     }
 
     // Convert to binary and extract bits
-    const binaryString = valueBytes.map((byte) => byte.toString(2).padStart(8, '0')).join('');
-    const rawBinary = binaryString.substring(bitOffset, bitOffset + length);
+    const binaryString = valueBytes.map(byte => byte.toString(2).padStart(8, '0')).join('');
+    const rawBinary = byteOrder === "BigEndian"
+        ? binaryString.substring(8 - bitOffset, 8 - bitOffset + length)
+        : binaryString.substring(bitOffset, bitOffset + length);
 
-    // Convert binary to integer
     return parseInt(rawBinary, 2);
 }
-
 
 /******************** Plot Container ********************/
 window.addEventListener('resize', () => {
