@@ -23,3 +23,15 @@
     background-color: hsl(0 0% 98%); /* Lighter gray background */
     box-sizing: border-box; /* Prevent overflow from padding or borders */
 }
+
+/* Increase toolbar button size */
+.js-plotly-plot .plotly .modebar-btn {
+    margin: 5px !important;  /* Adds space between buttons */
+}
+
+/* Optional: Make icons larger */
+.js-plotly-plot .plotly .modebar-btn svg {
+    width: 30px !important; 
+    height: 30px !important;
+    fill: black !important; /* Ensures the icon is visible */
+}

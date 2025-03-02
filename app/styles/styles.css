@@ -86,8 +86,9 @@ button:hover {
 
 #toast-container {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
+    top: 20px; /* Position it at the top */
+    left: 50%; /* Move to the center */
+    transform: translateX(-50%); /* Center it correctly */
     z-index: 1000;
 }
 
@@ -96,7 +97,7 @@ button:hover {
     color: white;
     padding: 10px 15px;
     border-radius: 5px;
-    font-size: 14px;
+    font-size: 16px;
     margin-bottom: 10px;
     opacity: 0;
     transform: translateY(10px);

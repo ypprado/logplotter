@@ -16,9 +16,9 @@ const databaseHandler = {
         return this.database?.messages ? true : false;
     },
 
-    async loadDatabase() {
+    async loadDatabase(file) {
         try {
-            const file = await this.selectFileDB();
+            //const file = await this.selectFileDB();
             const parsedData = await this.parseFileDB(file);
             this.database = this.buildUnifiedDatabase(parsedData);
             this.extractDropdownContent();
@@ -93,7 +93,7 @@ const databaseHandler = {
         };
     },
 
-    selectFileDB() {
+    /*selectFileDB() {
         return new Promise((resolve, reject) => {
             const fileInput = document.createElement('input');
             fileInput.type = 'file';
@@ -114,7 +114,7 @@ const databaseHandler = {
                 fileInput.click();
             }, 5);
         });
-    },
+    },*/
 
     async parseFileDB(file) {
         const fileExtension = file.name.split('.').pop();

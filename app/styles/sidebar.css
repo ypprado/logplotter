@@ -1,8 +1,8 @@
 /***************************** sidebar *****************************/
 .sidebar {
-    width: 25%; /* Initial width */
+    width: 30%; /* Initial width */
     height: calc(100% - 20px); /* parent height - 2xmargin */
-    min-width: 200px;
+    min-width: 250px;
     max-width: 1500px;
     background-color:  white;
     color: rgb(94, 94, 94);

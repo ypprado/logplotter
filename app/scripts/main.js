@@ -1,11 +1,5 @@
 import databaseHandler from "./main-db-loader.js";
 /******************** Permanent Sidebar ********************/
-/**
- * Monitor "arrowButton" which is responsible for hide/unhide 
- * the sidepanel.
- * Consequently, the plot are (container) must be resized and
- * the plot updated
- */
 document.addEventListener('DOMContentLoaded', function () {
     const arrowButton = document.getElementById('arrowButton');
     const sidebar = document.querySelector('.sidebar');
@@ -35,113 +29,164 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
-/******************** Button Database ********************/
-// On button click: Load Database
+/******************** Drop area Database ********************/
 document.addEventListener("DOMContentLoaded", () => {
-    const loadDatabaseBtn = document.getElementById("loadDatabaseButton");
+    const databaseDropArea = document.getElementById("drop-area");
+    const databaseInput = document.getElementById("fileInput");
+    const dropText = document.getElementById("drop-text");
 
-    if (loadDatabaseBtn) {
-        loadDatabaseBtn.addEventListener("click", async () => {
-            try {
-                // Step 1: Load the database (file selection + parsing + transformation)
-                databaseHandler.resetDatabase(); // Ensure previous data is cleared
-                await databaseHandler.loadDatabase();
+    function handleFileDrop(event) {
+        event.preventDefault();
+        const files = event.dataTransfer.files;
+        const file = files[0]; // Only process the first file
+        const allowedExtensions = ['.dbc', '.sym'];
+        const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
 
-                // Step 2: Check if the database is loaded successfully
-                if (databaseHandler.isDatabaseLoaded()) {
-                    console.log("Database loaded:", databaseHandler.getDatabase());
-                    databaseHandler.extractDropdownContent(); // Update dropdowns
-                    populateSignals(); // Update UI elements
-                    updateButtonColor('loadDatabaseButton', true);
-
-                    // Step 3: Enable the "Generate Plot" button if the log is also loaded
-                    if (isLogLoaded()) {
-                        document.getElementById("PlotButton").disabled = false;
-                    }
-                } else {
-                    updateButtonColor('loadDatabaseButton', false);
-                }
-            } catch (error) {
-                console.error("Error during database loading process:", error);
-            }
-        });
-    }
-});
-
-async function loadDatabaseButton1() {
-/*    try {
-        // Step 1: Let the user select a file
-        const file = await selectFileDB();
-        // Step 2: Parse the file content
-        const parsedData = await parseFileDB(file);
-        // Step 3: Load the global database in unified JSON format
-        resetDatabase();
-        database = buildUnifiedDatabase(parsedData);
-
-        if(isDatabaseLoaded()){
-            extractDropdownContent(); 
-            populateSignals();
-            updateButtonColor('loadDatabaseButton',true);
-            if(isLogLoaded()){
-                document.getElementById("PlotButton").disabled = false;
-            }
+        if (!allowedExtensions.includes(fileExtension)) {
+            console.error("Invalid file type. Only .dbc and .sym are allowed.");
+            showToast("A database must have the sym or dbc extension!");
+            dropText.textContent = "Load your Database here.";
+            databaseDropArea.classList.remove("active");
+            databaseHandler.resetDatabase();
+            resetUI();
+            return;
         } else {
-            updateButtonColor('loadDatabaseButton',false);
+        processFile(files);
         }
-    } catch (error) {
-        console.error("Error during database loading process:", error);
-    }
-*/
-    await databaseHandler.loadDatabase();
-    console.log("Database loaded:", database);
-    if (database) {
-        extractDropdownContent();
-        populateSignals();
-        updateButtonColor('loadDatabaseButton', true);
-        if (isLogLoaded()) {
-            document.getElementById("PlotButton").disabled = false;
-        }
-    } else {
-        updateButtonColor('loadDatabaseButton', false);
     }
 
-}
+    async function processFile(files) {
+        if (files.length === 0) return;
 
-/******************** Button Log ********************/
-// On button click: Load Log
-document.addEventListener("DOMContentLoaded", () => {
-    const loadLogBtn = document.getElementById("loadLogButton");
+        const file = files[0]; // Only process the first file
+        const allowedExtensions = ['.dbc', '.sym'];
+        const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
 
-        if (loadLogBtn) {
-            loadLogBtn.addEventListener("click", async () => {
-                try {
-                // Step 1: Let the user select a file
-                const file = await selectFileLOG();
+        if (!allowedExtensions.includes(fileExtension)) {
+            console.error("Invalid file type. Only .dbc and .sym are allowed.");
+            showToast("A database must have the sym or dbc extension!");
+            dropText.textContent = "Load your Database here.";
+            databaseDropArea.classList.remove("active");
+            databaseHandler.resetDatabase();
+            resetUI();
+            return;
+        } else {
+            // Update the drop zone text with the selected file name and change layout
+            dropText.textContent = file.name;
+            databaseDropArea.classList.add("active");
 
-                // Step 2: Parse the file content
-                const parsedData = await parseFileLOG(file);
+            // Step 1: Load the database (file selection + parsing + transformation)
+            databaseHandler.resetDatabase(); // Ensure previous data is cleared
+            await databaseHandler.loadDatabase(file);
 
-                // Step 3: Load the global log in unified JSON format
-                buildUnifiedLog(parsedData);
+            // Step 2: Check if the database is loaded successfully
+            if (databaseHandler.isDatabaseLoaded()) {
+                console.log("Database loaded:", databaseHandler.getDatabase());
+                databaseHandler.extractDropdownContent(); // Update dropdowns
 
-                if(isLogLoaded()){
+                document.getElementById("filterOptions").value = "filterByName";
+                populateCheckboxGroup("filterByName"); // Populate the checkbox group
+                populateSignals(); // Update UI elements
 
-                    updateButtonColor('loadLogButton',true);
-
-                    if(databaseHandler.isDatabaseLoaded()){
-                        // Enable the "Generate Plot" button
-                        document.getElementById("PlotButton").disabled = false;
-                    }
-                } else {
-                    updateButtonColor('loadLogButton',false);
+                // Step 3: Enable the "Generate Plot" button if the log is also loaded
+                if (isLogLoaded()) {
+                    document.getElementById("PlotButton").disabled = false;
                 }
-            } catch (error) {
-                console.error("Error during log loading process:", error);
             }
-        });
+        }
     }
+
+    function handleClickInput(inputElement) {
+        inputElement.click();
+    }
+
+    function handleFileSelect(event) {
+        processFile(event.target.files);
+    }
+
+    // Event listeners for Database Drop Area
+    databaseDropArea.addEventListener("dragover", (e) => e.preventDefault());
+    databaseDropArea.addEventListener("drop", (e) => handleFileDrop(e));
+    databaseDropArea.addEventListener("click", () => handleClickInput(databaseInput));
+    databaseInput.addEventListener("change", (e) => handleFileSelect(e));
 });
 
+/******************** Drop area Log ********************/
+document.addEventListener("DOMContentLoaded", () => {
+    const logDropArea = document.getElementById("drop-area-log");
+    const logInput = document.getElementById("fileInputLog");
+    const dropText = document.getElementById("drop-text-log");
+
+    function handleFileDrop(event) {
+        event.preventDefault();
+        const files = event.dataTransfer.files;
+        const file = files[0]; // Only process the first file 
+        const allowedExtensions = ['.blf', '.trc', '.asc']; 
+        const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+
+        if (!allowedExtensions.includes(fileExtension)) {
+            console.error("Invalid file type. Only blf, trc and asc files are allowed.");
+            showToast("A database must have the blf, trc or asc extension!");
+            dropText.textContent = "Load your Log here.";
+            logDropArea.classList.remove("active");
+            document.getElementById("PlotButton").disabled = true;
+            resetLog();
+            return;
+        } else {
+        processFile(files);
+        }
+    }
+
+    async function processFile(files) {
+        if (files.length === 0) return;
+
+        const file = files[0]; // Only process the first file
+        const allowedExtensions = ['.blf', '.trc', '.asc']; 
+        const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+
+        if (!allowedExtensions.includes(fileExtension)) {
+            console.error("Invalid file type. Only blf, trc and asc files are allowed.");
+            showToast("A database must have the blf, trc or asc extension!");
+            dropText.textContent = "Load your Log here.";
+            logDropArea.classList.remove("active");
+            document.getElementById("PlotButton").disabled = true;
+            resetLog();
+            return;
+        } else {
+            // Update the drop zone text with the selected file name and change layout
+            dropText.textContent = file.name;
+            logDropArea.classList.add("active");
+
+            // Step 2: Parse the file content
+            const parsedData = await parseFileLOG(file);
+
+            // Step 3: Load the global log in unified JSON format
+            buildUnifiedLog(parsedData);
+
+            if(isLogLoaded()){
+
+                if(databaseHandler.isDatabaseLoaded()){
+                    // Enable the "Generate Plot" button
+                    document.getElementById("PlotButton").disabled = false;
+                }
+            }
+        }
+    }
+
+    function handleClickInput(inputElement) {
+        inputElement.click();
+    }
+
+    function handleFileSelect(event) {
+        processFile(event.target.files);
+    }
+
+    // Event listeners for Database Drop Area
+    logDropArea.addEventListener("dragover", (e) => e.preventDefault());
+    logDropArea.addEventListener("drop", (e) => handleFileDrop(e));
+    logDropArea.addEventListener("click", () => handleClickInput(logInput));
+    logInput.addEventListener("change", (e) => handleFileSelect(e));
+});
 
 /******************** Plot listener ********************/
 // Update plot according to changes in configuration sidebar
@@ -763,4 +808,21 @@ function showToast(message) {
         toast.classList.remove("show");
         setTimeout(() => toast.remove(), 300);
     }, 3000);
+}
+
+function resetUI() {
+    // Reset the dropdown to "No Filter"
+    document.getElementById("filterOptions").value = "noFilter";
+
+    // Clear checkboxes inside "checkbox-sources" and "checkbox-signals"
+    document.querySelector("#checkbox-sources .checkbox-group").innerHTML = "<p>Apply a filter to see the sources.</p>";
+    document.querySelector("#checkbox-signals .checkbox-group").innerHTML = "<p>Select a source to see the signals.</p>";
+
+    // Disable the "Generate Plot" button
+    document.getElementById("PlotButton").disabled = true;
+
+    // Reset the "lineConfigurations" text
+    document.getElementById("lineConfigurations").innerHTML = `
+        <p>Customization options will be shown once a plot has been generated.</p>
+    `;
 }

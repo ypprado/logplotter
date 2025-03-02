@@ -50,10 +50,6 @@
     background-repeat: no-repeat;
 }
 
-#gearButton {
-    visibility: hidden;
-}
-
 .icon-file {
     background-image: url('../images/file-icon.png');
 }

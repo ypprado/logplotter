@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="styles/sidebar.css">
     <link rel="stylesheet" href="styles/sidebar-config-main.css">
     <link rel="stylesheet" href="styles/sidebar-config-brush.css">
+    <link rel="stylesheet" href="styles/sidebar-config-gear.css">
     <link rel="stylesheet" href="styles/plot.css">
 </head>
 <body>
@@ -44,10 +45,14 @@
                 <!-- Main Configuration Content -->
                 <div class="sidebar-content active" id="mainConfig">
                     <p>Load your files to start</p>
-                    <div class="button-container">
-                        <button id="loadDatabaseButton">Load Database</button>
-                        <button id="loadLogButton">Load Log</button>         
+                    <div id="drop-area" class="drop-container" data-type="database">
+                        <p id="drop-text">Load your Database here.</p>
+                        <input type="file" id="fileInput" hidden accept=".dbc,.sym">
                     </div>
+                    <div id="drop-area-log" class="drop-container" data-type="log">
+                        <p id="drop-text-log">Load your Log here.</p>
+                        <input type="file" id="fileInputLog" hidden accept=".blf, .trc, .asc">
+                    </div>    
                         <p>Source Sorting</p>
                     <label for="filterOptions">Choose a filter:</label>
                     <select id="filterOptions" size="1">
@@ -81,9 +86,10 @@
                 <!-- Gear Configuration Content -->
                 <div class="sidebar-content" id="gearConfig">
                     <p>Gear Settings will be shown here.</p>
-                    <button>Place Holder</button>
-                    <button>Place Holder</button>
-                    <button>Place Holder</button>
+                    <div id="drop-area" class="drop-container" onclick="triggerFileInput()">
+                        <p id="drop-text">Drop your database here.</p>
+                        <input type="file" id="fileInput" onchange="handleFileSelect(event)" hidden>
+                    </div>
                 </div>
             </div>
         </div>
@@ -98,6 +104,7 @@
     <!-- Scripts: User Interface -->
     <script type="module" src="scripts/main.js"></script>
     <script src="scripts/sidebar.js"></script>
+    <script src="scripts/sidebar-gear.js"></script>
     <!-- Scripts: Database -->
     <script type="module" src="scripts/main-db-loader.js"></script>    
     <script src="scripts/parser-dbc.js"></script>
