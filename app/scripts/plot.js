@@ -56,6 +56,8 @@ const plotData = {
 
 const plotLayout = {
     responsive: true,
+    hovermode: 'x',
+    dragmode: 'pan',
     grid: { rows: 1, columns: 1 },
     xaxis: { domain: [0.0, 1] },
     yaxis: 
@@ -70,6 +72,7 @@ const plotLayout = {
     { 
         title: { text: '' }, 
         domain: [0, 1], 
+        range: [0, 100],
         overlaying: 'y', 
         side: 'left', 
         visible: false,
@@ -80,6 +83,7 @@ const plotLayout = {
     { 
         title: { text: '' }, 
         domain: [0, 1], 
+        range: [0, 100],
         overlaying: 'y', 
         side: 'right', 
         visible: false
@@ -129,6 +133,12 @@ const plotLayout = {
         y: 1
       }*/ 
 };
+
+const plotConfiguration = {
+    displaylogo: false,
+    modeBarButtonsToRemove: ['select2d','lasso2d','resetScale2d'],
+    displayModeBar: true,
+}
 
 function updateYAxisProperty(axisNumber, property, value) {
     // Normalize axisNumber to "", "2", or "3"
@@ -219,7 +229,7 @@ function generatePlot() {
 
     // Plot the data using Plotly
     if (plotData.traces.length > 0) {
-        Plotly.newPlot('plot', plotData.traces, plotLayout);  
+        Plotly.newPlot('plot', plotData.traces, plotLayout, plotConfiguration);  
         // Show the configuration panel and populate it with the controls
         displayConfigurationControls(plotData.traces); 
     } else {

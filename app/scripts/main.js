@@ -859,3 +859,115 @@ function resetUI() {
         <p>Customization options will be shown once a plot has been generated.</p>
     `;
 }
+
+// Helper function to format a timestamp (in ms) into a local date string 
+// matching the "YYYY-MM-DD HH:mm:ss.sss" format.
+function formatDateLocal(ts) {
+    let d = new Date(ts);
+    let year = d.getFullYear();
+    let month = ('0' + (d.getMonth() + 1)).slice(-2);
+    let day = ('0' + d.getDate()).slice(-2);
+    let hours = ('0' + d.getHours()).slice(-2);
+    let minutes = ('0' + d.getMinutes()).slice(-2);
+    let seconds = ('0' + d.getSeconds()).slice(-2);
+    let ms = d.getMilliseconds().toString().padStart(3, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}.${ms}`;
+}
+
+// Attach the wheel event listener to the Plotly chart container
+document.getElementById("plot").addEventListener("wheel", function(event) {
+    event.preventDefault(); // Prevent default page scroll behavior
+
+    const plotDiv = document.getElementById("plot");
+    // Check if plotDiv is initialized with layout and data
+    if (!plotDiv || !plotDiv.layout || !plotDiv.data || !plotDiv.layout.xaxis) {
+        // Exit early if the plot isn't available yet
+        return;
+    }
+
+    const zoomFactor = 0.05; // 5% zoom step
+
+    // ---- X-Axis Zoom (Ctrl + Scroll or General Scroll) ----
+    if (!event.shiftKey) {
+        // Get current x-axis range from Plotly layout, falling back to the first trace's range if needed.
+        let currentXRange = plotDiv.layout.xaxis.range || [
+            plotDiv.data[0].x[0],
+            plotDiv.data[0].x[plotDiv.data[0].x.length - 1]
+        ];
+
+        // Convert date strings to timestamps (milliseconds)
+        let xMin = new Date(currentXRange[0]).getTime();
+        let xMax = new Date(currentXRange[1]).getTime();
+        let rangeWidth = xMax - xMin;
+
+        // Determine zoom step (5% of the current range)
+        let zoomStep = rangeWidth * zoomFactor;
+        let direction = event.deltaY < 0 ? 1 : -1; // Scroll up: zoom in, Scroll down: zoom out
+
+        // Calculate new boundaries by shifting the edges
+        let newXMin = xMin + direction * zoomStep;
+        let newXMax = xMax - direction * zoomStep;
+
+        // Adjust for symmetry: recalc center and use half the new range on each side
+        let center = (xMin + xMax) / 2;
+        let halfNewRange = (newXMax - newXMin) / 2;
+        newXMin = center - halfNewRange;
+        newXMax = center + halfNewRange;
+
+        // Convert timestamps back to local date strings
+        let newXRange = [formatDateLocal(newXMin), formatDateLocal(newXMax)];
+
+        // Update Plotly layout: disable autorange and apply the new x-axis range
+        Plotly.relayout(plotDiv, {
+            "xaxis.autorange": false,
+            "xaxis.range": newXRange
+        });
+    }
+
+// ---- Y-Axis Zoom (Shift + Scroll) ----
+if (!event.ctrlKey) {
+    // Use deltaY if available, otherwise fallback to deltaX
+    let delta = event.deltaY !== 0 ? event.deltaY : event.deltaX;
+    let direction = delta < 0 ? 1 : -1; // negative delta means zoom in, positive means zoom out
+
+    // List of y-axis keys in your layout (adjust as needed)
+    const yAxes = ["yaxis", "yaxis2", "yaxis3"];
+    yAxes.forEach((axisKey) => {
+        let axisObj = plotDiv.layout[axisKey];
+        // Only update if the axis is visible and has a range defined
+        if (axisObj && axisObj.visible && axisObj.range) {
+            let currentYRange = axisObj.range;
+            let yMin = currentYRange[0];
+            let yMax = currentYRange[1];
+            let yRangeWidth = yMax - yMin;
+            let yZoomStep = yRangeWidth * zoomFactor;
+            // Use deltaY (or deltaX fallback if needed)
+            let delta = event.deltaY !== 0 ? event.deltaY : event.deltaX;
+            let direction = delta < 0 ? 1 : -1;
+            
+            // Compute new range boundaries symmetrically
+            let newYMin = yMin + direction * yZoomStep;
+            let newYMax = yMax - direction * yZoomStep;
+            let center = (yMin + yMax) / 2;
+            let halfYRange = (newYMax - newYMin) / 2;
+            newYMin = center - halfYRange;
+            newYMax = center + halfYRange;
+            
+            // Update the axis; disable autorange so manual range is used
+            let updateObj = {};
+            updateObj[axisKey + ".autorange"] = false;
+            updateObj[axisKey + ".range"] = [newYMin, newYMax];
+            Plotly.relayout(plotDiv, updateObj);
+        }
+    });
+}
+});
+/*
+        updateXAxisProperty("autorange", false); // Disable X-axis autorange
+        updateXAxisProperty("range", [
+            adjustDateRange(xRange[0], zoomInSeconds),
+            adjustDateRange(xRange[1], -zoomInSeconds)
+
+                updatePlot(); // Apply updates to the plot
+
+*/
