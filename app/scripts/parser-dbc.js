@@ -28,7 +28,7 @@ function formatMessageId(messageId) {
  * @param {string} content - The raw DBC file content.
  * @returns {Object} - Parsed data including messages and nodes.
  */
-function parseDBC(content) {
+export function parseDBC(content) {
     const lines = content.split("\n");
     const messages = [];
     const nodes = new Set();

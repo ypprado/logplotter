@@ -1,3 +1,6 @@
+import { parseDBC } from './parser-dbc.js';
+import { parseSYM } from './parser-sym.js';
+
 const databaseHandler = {
     database: null,
     dropdownContent: {

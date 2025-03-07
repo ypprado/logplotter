@@ -3,7 +3,7 @@
  * @param {string} content - The raw SYM file content.
  * @returns {Object} - Parsed messages and nodes.
  */
-function parseSYM(content) {
+export function parseSYM(content) {
     const lines = content.split("\n").map(line => line.trim());
     const messages = [];
     const nodes = new Set();
