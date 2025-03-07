@@ -14,8 +14,8 @@ describe('parseDBC', () => {
           BO_ 2561326028 Msg_4: 8 Vector__XXX
         `;
         
-        const parsedData = parseDBC(dbcContent);
-      
+        const parsedData = parseDBC(dbcContent);        
+
         // We expect 4 messages
         expect(parsedData.messages).toHaveLength(4);
       
@@ -31,9 +31,9 @@ describe('parseDBC', () => {
         expect(msg2.name).toBe('Msg_2');
         expect(msg2.isExtendedId).toBe(true);
       
-        // 3) ID=0x18ABCDEF, Standard (custom truncation to 0xDEF if that’s your parser’s behavior)
+        // 3) ID=0x18ABCDEF, Standard (custom truncation to 0x5EF if that’s your parser’s behavior)
         const msg3 = parsedData.messages[2];
-        expect(msg3.id).toBe('0xDEF');
+        expect(msg3.id).toBe('0x5EF');
         expect(msg3.name).toBe('Msg_3');
         expect(msg3.isExtendedId).toBe(false);
       
@@ -66,7 +66,7 @@ describe('parseDBC', () => {
         expect(sig.name).toBe('Speed');
         expect(sig.startBit).toBe(0);
         expect(sig.length).toBe(8);
-        expect(sig.byteOrder).toBe('Motorola'); // or "LittleEndian" if your parser does so
+        expect(sig.byteOrder).toBe('LittleEndian'); 
         expect(sig.valueType).toBe('Unsigned'); // `+` indicates unsigned
         expect(sig.scaling).toBe(1);
         expect(sig.offset).toBe(0);
@@ -81,6 +81,7 @@ describe('parseDBC', () => {
         SG_ GearPos : 16|8@0+ (1,0) [0|5] "" Vector__XXX
         
         VAL_ 512 GearPos 0 "Park" 1 "Reverse" 2 "Neutral" 3 "Drive" 4 "Low" 5 "2";
+        
         `;
 
         const parsedData = parseDBC(dbcContent);
@@ -151,8 +152,7 @@ describe('parseDBC', () => {
         const parsedData = parseDBC(dbcContent);
 
         expect(parsedData.messages).toHaveLength(0);
-        expect(parsedData.nodes).toBeUndefined(); 
-        // Or adjust to empty array if your parser sets `nodes: []`
+        expect(parsedData.nodes).toEqual([]);
     });
 
     test('parses multiple messages and checks node or sender info', () => {

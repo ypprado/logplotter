@@ -37,7 +37,7 @@ describe('parseSYM', () => {
         expect(msg2.isExtendedId).toBe(true);
 
         const msg3 = parsedData.messages[2];
-        expect(msg3.id).toBe('0xDEF');
+        expect(msg3.id).toBe('0x5EF');
         expect(msg3.name).toBe('Msg_3');
         expect(msg3.isExtendedId).toBe(false);
 

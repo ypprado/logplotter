@@ -1,12 +1,17 @@
 /**
  * Converts a numeric message ID to a formatted hexadecimal string.
- * If the highest bit is set, ID is exntended and will be formated as 
- * 29 bits, otherwise it will be formated as 11 bits.
+ * If the highest bit is set, ID is extended and will be formatted as 29 bits,
+ * otherwise, it will be formatted as 11 bits.
  * 
  * @param {number} messageId - The message ID to convert.
- * @returns {string} - The formatted hexadecimal string: "0x______" */
+ * @returns {{ id: string, isExtended: boolean }} - An object containing:
+ *          - `id`: The formatted hexadecimal string ("0x______").
+ *          - `isExtended`: A boolean indicating if it's an extended ID.
+ */
 function formatMessageId(messageId) {
     const EXT_FLAG = 0x80000000;
+    const STD_ID_MASK = 0x7FF;       // 11-bit Standard ID Mask
+    const EXT_ID_MASK = 0x1FFFFFFF;  // 29-bit Extended ID Mask
     const STD_ID_LENGTH = 3;
     const EXT_ID_LENGTH = 8;
 
@@ -15,12 +20,23 @@ function formatMessageId(messageId) {
         throw new Error("Invalid messageId: Must be a number.");
     }
 
-    if ((messageId & EXT_FLAG) !== 0) { 
-        return `0x${(messageId & ~EXT_FLAG).toString(16).padStart(EXT_ID_LENGTH, '0').toUpperCase()}`;
-    } else {
-        return `0x${messageId.toString(16).padStart(STD_ID_LENGTH, '0').toUpperCase()}`;
-    }
+    // Determine if it's an Extended ID
+    const isExtended = (messageId & EXT_FLAG) !== 0;
+
+    // **Truncate ID properly** based on Standard (11-bit) or Extended (29-bit)
+    const truncatedId = isExtended
+        ? (messageId & EXT_ID_MASK)  // Keep only 29 bits
+        : (messageId & STD_ID_MASK); // Keep only 11 bits
+
+    // Format the ID as hex string
+    const formattedId = `0x${truncatedId.toString(16).toUpperCase().padStart(
+        isExtended ? EXT_ID_LENGTH : STD_ID_LENGTH,
+        '0'
+    )}`;
+
+    return { id: formattedId, isExtended };
 }
+
 
 /**
  * Parses the DBC file content into structured data.
@@ -46,13 +62,16 @@ export function parseDBC(content) {
                 messages.push(currentMessage);
             }
 
+            const { id, isExtended } = formatMessageId(messageMatch[1]);
+
             currentMessage = {
-                id: formatMessageId(messageMatch[1]),
+                id: id,  // Formatted message ID
+                isExtendedId: isExtended,  // Boolean indicating if it's an extended ID
                 name: messageMatch[2],
                 dlc: parseInt(messageMatch[3], 10),
                 sender: messageMatch[4],
                 signals: [],
-            };
+            };            
 
             nodes.add(messageMatch[4]); // Add sender node
             return;
@@ -93,12 +112,14 @@ export function parseDBC(content) {
 
         // Match value descriptions (e.g., "VAL_ 512 F1_Signal3 1 \"State 1\" 2 \"State 2\" ... ;")
         const valueMatch = line.match(/^VAL_\s+(\d+)\s+(\w+)\s+((?:\d+\s+"[^"]*"\s*)+);$/);
-        if (valueMatch) {
-            const messageId = formatMessageId(valueMatch[1]);
+        if (valueMatch) 
+        {
+            const { id: messageId, isExtended } = formatMessageId(valueMatch[1]);
             const signalName = valueMatch[2];
             const valuePairs = valueMatch[3].match(/(\d+)\s+"([^"]*)"/g);
 
-            if (!valueDescriptions[messageId]) {
+            if (!valueDescriptions[messageId]) 
+            {
                 valueDescriptions[messageId] = {};
             }
 
@@ -118,11 +139,12 @@ export function parseDBC(content) {
     messages.forEach((msg) => {
         msg.signals.forEach((signal) => {
             const signalDescriptions = valueDescriptions[msg.id]?.[signal.name];
-            if (signalDescriptions) {
-                signal.valueDescriptions = signalDescriptions;
-            }
+
+            // Ensure valueDescriptions is always an object, avoiding 'undefined' issues
+            signal.valueDescriptions = signalDescriptions ?? {};
         });
     });
 
     return { messages, nodes: Array.from(nodes) };
+
 }

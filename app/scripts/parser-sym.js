@@ -93,10 +93,25 @@ export function parseSYM(content) {
             return;
         }
 
-        // Parse CAN Type
+        // Parse CAN Type 
         const typeMatch = line.match(/^Type=(Standard|Extended)$/);
         if (typeMatch && currentMessage) {
             currentMessage.isExtendedId = typeMatch[1] === "Extended";
+
+            // If the ID was already set, adjust its formatting based on the type
+            if (currentMessage.id) {
+                let rawId = parseInt(currentMessage.id, 16);
+
+                // If standard, ensure it's only 11 bits
+                if (!currentMessage.isExtendedId) {
+                    rawId = rawId & 0x7FF;  // Mask to 11-bit for standard ID
+                }
+
+                currentMessage.id = currentMessage.isExtendedId
+                    ? `0x${rawId.toString(16).toUpperCase().padStart(8, '0')}`  // Extended ID (8 hex digits)
+                    : `0x${rawId.toString(16).toUpperCase().padStart(3, '0')}`;  // Standard ID (3 hex digits)
+            }
+
             return;
         }
 
