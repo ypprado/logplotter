@@ -36,6 +36,14 @@
     padding: 10px;
 }
 
+#drop-text-log, #drop-text{
+    display: block;         /* Ensure block for ellipsis */
+    width: 100%;            /* Take the full width of parent */
+    white-space: nowrap;    /* Prevent wrapping */
+    overflow: hidden;       /* Hide overflow */
+    text-overflow: ellipsis;/* Show ellipsis on overflow */
+    text-align: center;     /* Center the text horizontally */
+  }
 /* dropdown */
 select {
     margin-bottom: 10px;
