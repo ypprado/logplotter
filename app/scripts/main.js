@@ -327,21 +327,17 @@ function addConfigListeners() {
 
 }
 
-
 /******************** Droplist Filter Options Scroll ********************/
 document.addEventListener('DOMContentLoaded', function () {
     const filterOptions = document.getElementById("filterOptions");
     filterOptions.addEventListener("wheel", handleFilterOptionsScroll);
 });
 
-
 /******************** Checkbox Sources ********************/
 // Event listener for the dropdown selection change
 document.getElementById('filterOptions').addEventListener('change', function () {
     populateCheckboxGroup(this.value);
 });
-
-
 
 /******************** Checkbox Signals ********************/
 // Event listener for changes in the checkbox-sources
@@ -427,10 +423,10 @@ document.addEventListener("DOMContentLoaded", () => {
                     }
 
                     // Get signals selected in the checkbox
-                    const selectedSignals = getSelectedSignals();
+                    const selectedSignalsA = getSelectedSignals();
 
                     // sort and convert log based on signals selected
-                    const processedLogs = processSelectedSignals(selectedSignals);
+                    const processedLogs = processSelectedSignals(selectedSignalsA);
 
                     // Clear any previous traces to generate a fresh plot
                     plotData.clearTraces();
@@ -440,17 +436,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
                     // Add the trace to the global plotData
                     plotData.addData(traces); 
-                    
-                    /*const dummytrace = {
-                        mode: "lines+markers",
-                        name: "Dummy-Signal",
-                        type: "scatter",
-                        yaxis: 'y2',
-                        x: ["1", "2"],
-                        y: [20,20]
-                    };*/
-
-                    //plotData.addData(dummytrace); 
 
                     generatePlot();
 
@@ -465,16 +450,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /**
  * Extracts the names of selected signals from the checkbox-signals container.
- * @returns {Array<string>} - Array of selected signal names.
+ * @returns {Array<string>} - Array of selected signal names (no parentheses).
  */
 function getSelectedSignals() {
-    const checkboxes = document.querySelectorAll('#checkbox-signals .checkbox-group input[type="checkbox"]:checked');
-    const selectedSignals = Array.from(checkboxes).map((checkbox) => {
-        // Extract signal name from "Signal1 (Message1)" format
-        const fullName = checkbox.value; // Example: "Signal1 (Message1)"
-        return fullName.split(' (')[0]; // Extract "Signal1"
+    const checkboxes = document.querySelectorAll(
+        '#checkbox-signals .checkbox-group input[type="checkbox"]:checked'
+    );
+    return Array.from(checkboxes).map((checkbox) => {
+        // "Speed (Engine)" => ["Speed", "Engine)"]
+        return checkbox.value.split(' (')[0];
     });
-    return selectedSignals;
 }
 
 function toSigned(value, bitLength) {

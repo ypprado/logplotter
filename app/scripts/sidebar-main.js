@@ -58,6 +58,8 @@ function populateCheckboxGroup(filter, dropdownContent) {
     }
 }
 
+// Tracks all checked signals, e.g. "Speed (Engine)" 
+const selectedSignals = new Set();
 
 
 /**
@@ -69,15 +71,13 @@ function populateSignals(database) {
         document.querySelectorAll('#checkbox-sources .checkbox-group input[type="checkbox"]:checked')
     ).map(checkbox => checkbox.value);
 
-    // Clear the existing content
+    // Clear existing
     checkboxGroup.innerHTML = '';
 
     // Use a Set to collect unique signals
     const allSignals = new Set();
 
-    //const database = databaseHandler.getDatabase();
-
-    // If no sources are selected, display all available signals
+    // If no sources are selected, display all
     if (selectedSources.length === 0) {
         database.messages.forEach((message) => {
             message.signals.forEach((signal) => {
@@ -86,16 +86,11 @@ function populateSignals(database) {
         });
     } else {
         // If sources are selected, filter by ID or Sender
-        selectedSources.forEach((source) => {
-        // Determine filter type based on dropdown selection
         const filterType = document.getElementById('filterOptions').value;
 
         selectedSources.forEach((source) => {
             if (filterType === 'filterById') {
-                // Extract only the ID (remove the concatenated message name)
                 const idOnly = source.split(' (')[0];
-
-                // Filter by ID using the extracted ID
                 const message = database.messages.find((msg) => msg.id === idOnly);
                 if (message) {
                     message.signals.forEach((signal) => {
@@ -103,19 +98,14 @@ function populateSignals(database) {
                     });
                 }
             } else if (filterType === 'filterByName') {
-                // Extract only the Name (remove the concatenated id)
-                const NameOnly = source.split(' (')[0];
-
-                // Filter by ID using the extracted ID
-                const message = database.messages.find((msg) => msg.name === NameOnly);
+                const nameOnly = source.split(' (')[0];
+                const message = database.messages.find((msg) => msg.name === nameOnly);
                 if (message) {
                     message.signals.forEach((signal) => {
                         allSignals.add(`${signal.name} (${message.name})`);
                     });
                 }
-
             } else if (filterType === 'filterBySender') {
-                // Filter by Sender
                 database.messages
                     .filter((msg) => msg.sender === source)
                     .forEach((message) => {
@@ -125,23 +115,39 @@ function populateSignals(database) {
                     });
             }
         });
-
-        });
     }
 
-    // Convert the Set to an array, sort it alphabetically, and populate the checkboxes
+    // Convert Set to array, sort it, and build checkboxes
     const sortedSignals = Array.from(allSignals).sort((a, b) => a.localeCompare(b));
 
     if (sortedSignals.length > 0) {
         sortedSignals.forEach((signal) => {
+            // Check if it's already in our global set
+            const isChecked = selectedSignals.has(signal);
+            
+            // Build checkbox+label
             checkboxGroup.innerHTML += `
-                <label><input type="checkbox" value="${signal}"> ${signal}</label>`;
+                <label>
+                  <input type="checkbox" value="${signal}" ${isChecked ? 'checked' : ''} />
+                  ${signal}
+                </label>`;
+        });
+
+        // Attach change listeners to new checkboxes
+        const inputs = checkboxGroup.querySelectorAll('input[type="checkbox"]');
+        inputs.forEach((input) => {
+            input.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    selectedSignals.add(e.target.value);
+                } else {
+                    selectedSignals.delete(e.target.value);
+                }
+            });
         });
     } else {
         checkboxGroup.innerHTML = `<p>No signals available for the selected sources.</p>`;
     }
 }
-
 
 /******************** Resize Sources checkbox  ********************/
 let isResizingSources = false;
