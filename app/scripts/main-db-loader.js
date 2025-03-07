@@ -1,5 +1,5 @@
 const databaseHandler = {
-    database: null, // Store database internally
+    database: null,
     dropdownContent: {
         ID: [],
         MsgName: [],
@@ -18,7 +18,6 @@ const databaseHandler = {
 
     async loadDatabase(file) {
         try {
-            //const file = await this.selectFileDB();
             const parsedData = await this.parseFileDB(file);
             this.database = this.buildUnifiedDatabase(parsedData);
             this.extractDropdownContent();
@@ -58,16 +57,10 @@ const databaseHandler = {
 
     buildUnifiedDatabase(parsedData) {
         return {
-            /*network: {
-                protocol: "CAN",
-                baudRate: 250000,
-                messageCount: parsedData.messages.length,
-            },*/
             messages: parsedData.messages.map((msg) => ({
                 id: msg.id,
                 name: msg.name,
                 dlc: msg.dlc,
-                //cycleTime: 0,
                 sender: msg.sender,
                 signals: msg.signals.map((sig) => ({
                     name: sig.name,
@@ -93,29 +86,6 @@ const databaseHandler = {
         };
     },
 
-    /*selectFileDB() {
-        return new Promise((resolve, reject) => {
-            const fileInput = document.createElement('input');
-            fileInput.type = 'file';
-            fileInput.accept = '.dbc, .sym';
-
-            // Wait a little before triggering the click
-            setTimeout(() => {
-                fileInput.addEventListener('change', function (event) {
-
-                    // Get the selected file
-                    const file = event.target.files[0];
-                    if (file) {
-                        resolve(file); // Resolve with the selected file
-                    } else {
-                        reject("No file selected.");
-                    }
-                });
-                fileInput.click();
-            }, 5);
-        });
-    },*/
-
     async parseFileDB(file) {
         const fileExtension = file.name.split('.').pop();
     
@@ -128,10 +98,10 @@ const databaseHandler = {
                 try {
                     switch (fileExtension) {
                         case 'dbc':
-                            resolve(parseDBC(fileContent)); // Resolve with parsed DBC
+                            resolve(parseDBC(fileContent));
                             break;
                         case 'sym':
-                            resolve(parseSYM(fileContent)); // Resolve with parsed SYM
+                            resolve(parseSYM(fileContent));
                             break;
                         default:
                             reject(new Error('Unsupported file format.'));
@@ -139,23 +109,17 @@ const databaseHandler = {
                             break;
                     }
                 } catch (error) {
-                    reject(error); // Reject if parsing throws an error
+                    reject(error); 
                 }
             };
     
             reader.onerror = function () {
-                reject(new Error("Error reading file.")); // Reject on file read error
+                reject(new Error("Error reading file."));
                 warning('File format not supported!');
             };
     
-            reader.readAsText(file); // Start reading the file as text
+            reader.readAsText(file);
         });
     },
 };
 export default databaseHandler;
-
-function sum(a, b) {
-    return a + b;
-  }
-//  module.exports = sum;
-export { sum };

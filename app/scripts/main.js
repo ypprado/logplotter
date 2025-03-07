@@ -1,29 +1,9 @@
 import databaseHandler from "./main-db-loader.js";
-/******************** Permanent Sidebar ********************/
+
+/************ Permanent Sidebar arrowButton *****************/
 document.addEventListener('DOMContentLoaded', function () {
     const arrowButton = document.getElementById('arrowButton');
-    const sidebar = document.querySelector('.sidebar');
-    const content = document.querySelector('.content');
-
-    function toggleSidebar() {
-
-        sidebar.classList.toggle('collapsed');
-        if (sidebar.classList.contains('collapsed')) {
-            arrowButton.textContent = '→';
-            arrowButton.title = 'Expand Sidebar';
-            content.style.width = `100%`; // Adjust content width dynamically
-        } else {
-            arrowButton.textContent = '←';
-            arrowButton.title = 'Collapse Sidebar';
-            const sidebarWidth = sidebar.getBoundingClientRect().width; // Get current sidebar width
-            content.style.width = `calc(100% - ${sidebarWidth}px)`; // Adjust content width dynamically
-        }
-
-        Plotly.Plots.resize('plot');
-    }
-
     arrowButton.addEventListener('click', toggleSidebar);
-
     window.addEventListener('resize', () => {
         Plotly.Plots.resize('plot');
     });
@@ -38,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
     function handleFileDrop(event) {
         event.preventDefault();
         const files = event.dataTransfer.files;
-        const file = files[0]; // Only process the first file
+        const file = files[0];
         const allowedExtensions = ['.dbc', '.sym'];
         const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
 
@@ -83,10 +63,15 @@ document.addEventListener("DOMContentLoaded", () => {
             if (databaseHandler.isDatabaseLoaded()) {
                 console.log("Database loaded:", databaseHandler.getDatabase());
                 databaseHandler.extractDropdownContent(); // Update dropdowns
-
+                const dropdownContent = databaseHandler.getDropdownContent();
                 document.getElementById("filterOptions").value = "filterByName";
-                populateCheckboxGroup("filterByName"); // Populate the checkbox group
-                populateSignals(); // Update UI elements
+
+
+                populateCheckboxGroup("filterByName", dropdownContent); // Populate the checkbox group
+                
+                const database = databaseHandler.getDatabase();
+
+                populateSignals(database); // Update UI elements
 
                 // Step 3: Enable the "Generate Plot" button if the log is also loaded
                 if (isLogLoaded()) {
@@ -341,205 +326,32 @@ function addConfigListeners() {
 }
 
 
-
-/******************** Droplist Filter Options ********************/
-const filterOptions = document.getElementById("filterOptions");
-
-// Change the selected item when scrolling over the dropdown
-filterOptions.addEventListener("wheel", (event) => {
-    event.preventDefault(); // Prevent the page from scrolling
-
-    // Get the current selected index
-    const currentIndex = filterOptions.selectedIndex;
-
-    // Calculate the new index based on scroll direction
-    let newIndex = currentIndex;
-    if (event.deltaY > 0) {
-        // Scroll down, move to the next item
-        newIndex = Math.min(currentIndex + 1, filterOptions.options.length - 1);
-    } else {
-        // Scroll up, move to the previous item
-        newIndex = Math.max(currentIndex - 1, 0);
-    }
-
-    // Set the new index as the selected option
-    filterOptions.selectedIndex = newIndex;
-
-    // Update the selected index
-    if (newIndex !== currentIndex) {
-        filterOptions.selectedIndex = newIndex;
-
-        // Manually trigger the change event
-        const changeEvent = new Event("change", { bubbles: true });
-        filterOptions.dispatchEvent(changeEvent);
-    }
+/******************** Droplist Filter Options Scroll ********************/
+document.addEventListener('DOMContentLoaded', function () {
+    const filterOptions = document.getElementById("filterOptions");
+    filterOptions.addEventListener("wheel", handleFilterOptionsScroll);
 });
 
-/******************** Checkbox Sources ********************/
 
+/******************** Checkbox Sources ********************/
 // Event listener for the dropdown selection change
 document.getElementById('filterOptions').addEventListener('change', function () {
     populateCheckboxGroup(this.value);
 });
 
-/**
- * Populates the checkbox group based on the selected filter option.
- * 
- * @param {string} filter - The selected filter value from the dropdown.
- */
-function populateCheckboxGroup(filter) {
-    // Get the checkbox group container
-    const checkboxGroup = document.querySelector('#checkbox-sources .checkbox-group');
-
-    // Clear existing content
-    checkboxGroup.innerHTML = '';
-
-    const database = databaseHandler.getDatabase();
-    const dropdownContent = databaseHandler.getDropdownContent();
-    
-    // Handle case where the database is not loaded
-    if (!database || !dropdownContent) {
-        checkboxGroup.innerHTML = `<p>Please load a database to apply filters.</p>`;
-        return;
-    }
-
-    // Populate checkboxes based on the selected filter
-    if (filter === 'noFilter') {
-        checkboxGroup.innerHTML = `<p>No filter applied.</p>`;
-        // Do not populate sources, but call a function to handle signals if needed
-        populateSignals();
-    } else if (filter === 'filterById') {
-        // Combine IDs and message names into "ID Name" format
-        const idLabels = dropdownContent.ID.map((id, index) => `${id} (${dropdownContent.MsgName[index]})`);
-        populateCheckboxList(idLabels, checkboxGroup, 'No IDs available.');
-    } else if (filter === 'filterByName') {
-        // Combine IDs and message names into "ID Name" format
-        const NamedLabels = dropdownContent.MsgName.map((name, index) => `${name} (${dropdownContent.ID[index]})`);
-        populateCheckboxList(NamedLabels, checkboxGroup, 'No Names available.');
-    } else if (filter === 'filterBySender') {
-        populateCheckboxList(dropdownContent.Sender, checkboxGroup, 'No senders available.');
-    }
-}
-
-/**
- * Helper function to populate a list of checkboxes.
- * 
- * @param {string[]} list - The list of items to populate as checkboxes.
- * @param {HTMLElement} container - The container to populate.
- * @param {string} emptyMessage - The message to display if the list is empty.
- */
-function populateCheckboxList(list, container, emptyMessage) {
-    if (list.length > 0) {
-        // Sort the list alphabetically
-        list.sort((a, b) => a.localeCompare(b));
-
-        list.forEach(item => {
-            container.innerHTML += `
-                <label><input type="checkbox" value="${item}"> ${item}</label>`;
-        });
-    } else {
-        container.innerHTML = `<p>${emptyMessage}</p>`;
-    }
-}
 
 
 /******************** Checkbox Signals ********************/
 // Event listener for changes in the checkbox-sources
 document.querySelector('#checkbox-sources .checkbox-group').addEventListener('change', function (event) {
     if (event.target.tagName === 'INPUT' && event.target.type === 'checkbox') {
-        populateSignals();
+        const database = databaseHandler.getDatabase();
+        populateSignals(database);
     }
 });
 
-/**
- * Populates the checkbox-signals container based on selected sources (or displays all signals if no source is selected).
- */
-function populateSignals() {
-    const checkboxGroup = document.querySelector('#checkbox-signals .checkbox-group');
-    const selectedSources = Array.from(
-        document.querySelectorAll('#checkbox-sources .checkbox-group input[type="checkbox"]:checked')
-    ).map(checkbox => checkbox.value);
 
-    // Clear the existing content
-    checkboxGroup.innerHTML = '';
-
-    // Use a Set to collect unique signals
-    const allSignals = new Set();
-
-    const database = databaseHandler.getDatabase();
-
-    // If no sources are selected, display all available signals
-    if (selectedSources.length === 0) {
-        database.messages.forEach((message) => {
-            message.signals.forEach((signal) => {
-                allSignals.add(`${signal.name} (${message.name})`);
-            });
-        });
-    } else {
-        // If sources are selected, filter by ID or Sender
-        selectedSources.forEach((source) => {
-        // Determine filter type based on dropdown selection
-        const filterType = document.getElementById('filterOptions').value;
-
-        selectedSources.forEach((source) => {
-            if (filterType === 'filterById') {
-                // Extract only the ID (remove the concatenated message name)
-                const idOnly = source.split(' (')[0];
-
-                // Filter by ID using the extracted ID
-                const message = database.messages.find((msg) => msg.id === idOnly);
-                if (message) {
-                    message.signals.forEach((signal) => {
-                        allSignals.add(`${signal.name} (${message.name})`);
-                    });
-                }
-            } else if (filterType === 'filterByName') {
-                // Extract only the Name (remove the concatenated id)
-                const NameOnly = source.split(' (')[0];
-
-                // Filter by ID using the extracted ID
-                const message = database.messages.find((msg) => msg.name === NameOnly);
-                if (message) {
-                    message.signals.forEach((signal) => {
-                        allSignals.add(`${signal.name} (${message.name})`);
-                    });
-                }
-
-            } else if (filterType === 'filterBySender') {
-                // Filter by Sender
-                database.messages
-                    .filter((msg) => msg.sender === source)
-                    .forEach((message) => {
-                        message.signals.forEach((signal) => {
-                            allSignals.add(`${signal.name} (${message.name})`);
-                        });
-                    });
-            }
-        });
-
-        });
-    }
-
-    // Convert the Set to an array, sort it alphabetically, and populate the checkboxes
-    const sortedSignals = Array.from(allSignals).sort((a, b) => a.localeCompare(b));
-
-    if (sortedSignals.length > 0) {
-        sortedSignals.forEach((signal) => {
-            checkboxGroup.innerHTML += `
-                <label><input type="checkbox" value="${signal}"> ${signal}</label>`;
-        });
-    } else {
-        checkboxGroup.innerHTML = `<p>No signals available for the selected sources.</p>`;
-    }
-}
-
-
-/**
- * Retrieves a list of signals for a given source.
- *
- * @param {string} source - The selected source (ECU, Node, or ID).
- * @returns {string[]} - A list of signals associated with the source.
- */
+/*
 function getSignalsForSource(source) {
     // Ensure the appState is available
     if (!appState.parsedCSV || appState.parsedCSV.length === 0) {
@@ -578,7 +390,7 @@ function getSignalsForSource(source) {
         .filter(signal => signal); // Exclude undefined or empty values
 
     return [...new Set(matchingSignals)]; // Return unique signals
-}
+}*/
 
 /******************** Button Plot ********************/
 /**

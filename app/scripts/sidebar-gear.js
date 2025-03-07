@@ -1,4 +1,4 @@
-const dropArea = document.getElementById("drop-area");
+/*const dropArea = document.getElementById("drop-area");
 const fileInput = document.getElementById("fileInput");
 const dropText = document.getElementById("drop-text");
 
@@ -28,4 +28,4 @@ dropArea.addEventListener("drop", (e) => {
     e.preventDefault();
     fileInput.files = e.dataTransfer.files;
     handleFileSelect({ target: fileInput });
-});
+});*/
