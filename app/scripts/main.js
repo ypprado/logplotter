@@ -108,12 +108,12 @@ document.addEventListener("DOMContentLoaded", () => {
         const file = files[0]; // Only process the first file 
         const allowedExtensions = ['.blf', '.trc', '.asc']; 
         const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
-
+        
+        logDropArea.classList.remove("active");
         if (!allowedExtensions.includes(fileExtension)) {
             console.error("Invalid file type. Only blf, trc and asc files are allowed.");
             showToast("A database must have the blf, trc or asc extension!");
             dropText.textContent = "Load your Log here.";
-            logDropArea.classList.remove("active");
             document.getElementById("PlotButton").disabled = true;
             resetLog();
             return;
@@ -126,21 +126,20 @@ document.addEventListener("DOMContentLoaded", () => {
         if (files.length === 0) return;
 
         const file = files[0]; // Only process the first file
+
         const allowedExtensions = ['.blf', '.trc', '.asc']; 
         const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
-
+        
+        logDropArea.classList.remove("active");
         if (!allowedExtensions.includes(fileExtension)) {
             console.error("Invalid file type. Only blf, trc and asc files are allowed.");
             showToast("A database must have the blf, trc or asc extension!");
             dropText.textContent = "Load your Log here.";
-            logDropArea.classList.remove("active");
             document.getElementById("PlotButton").disabled = true;
             resetLog();
             return;
         } else {
-            // Update the drop zone text with the selected file name and change layout
-            dropText.textContent = file.name;
-            logDropArea.classList.add("active");
+            dropText.textContent = "Loading File...";
 
             // Step 2: Parse the file content
             const parsedData = await parseFileLOG(file);
@@ -149,6 +148,9 @@ document.addEventListener("DOMContentLoaded", () => {
             buildUnifiedLog(parsedData);
 
             if(isLogLoaded()){
+                // Update the drop zone text with the selected file name and change layout
+                dropText.textContent = file.name;
+                logDropArea.classList.add("active");
 
                 if(databaseHandler.isDatabaseLoaded()){
                     // Enable the "Generate Plot" button
@@ -783,3 +785,4 @@ if (!event.ctrlKey) {
                 updatePlot(); // Apply updates to the plot
 
 */
+

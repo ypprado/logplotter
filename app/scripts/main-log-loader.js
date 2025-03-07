@@ -36,11 +36,13 @@ function selectFileLOG() {
     });
 }
 
+
 async function parseFileLOG(file) {
     try {
         const fileExtension = file.name.split('.').pop().toLowerCase();
 
         let parsedData;
+        document.body.style.cursor = 'wait'; // Switch cursor to wait
 
         switch (fileExtension) {
             case 'blf':
@@ -60,6 +62,8 @@ async function parseFileLOG(file) {
 
     } catch (error) {
         console.error("Error processing the log file:", error);
+    } finally {
+        document.body.style.cursor = 'default'; // Revert cursor to default
     }
 }
 

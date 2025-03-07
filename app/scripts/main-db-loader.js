@@ -96,6 +96,8 @@ const databaseHandler = {
                 const fileContent = event.target.result;
     
                 try {
+                    document.body.style.cursor = 'wait'; // Switch cursor to wait
+
                     switch (fileExtension) {
                         case 'dbc':
                             resolve(parseDBC(fileContent));
@@ -110,6 +112,8 @@ const databaseHandler = {
                     }
                 } catch (error) {
                     reject(error); 
+                } finally {
+                    document.body.style.cursor = 'default'; // Revert cursor to default
                 }
             };
     
