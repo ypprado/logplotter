@@ -613,7 +613,7 @@ function extractRawValue(data, startBit, length, byteOrder) {
     // Convert to binary and extract bits
     const binaryString = valueBytes.map(byte => byte.toString(2).padStart(8, '0')).join('');
     const rawBinary = byteOrder === "BigEndian"
-        ? binaryString.substring(8 - bitOffset, 8 - bitOffset + length)
+        ? binaryString.substring(7 - bitOffset, 7 - bitOffset + length)
         : binaryString.substring(bitOffset, bitOffset + length);
 
     return parseInt(rawBinary, 2);
