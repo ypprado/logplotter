@@ -336,7 +336,7 @@ document.addEventListener('DOMContentLoaded', function () {
 /******************** Checkbox Sources ********************/
 // Event listener for the dropdown selection change
 document.getElementById('filterOptions').addEventListener('change', function () {
-    populateCheckboxGroup(this.value);
+    populateCheckboxGroup(this.value,databaseHandler.getDropdownContent());
 });
 
 /******************** Checkbox Signals ********************/
