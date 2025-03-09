@@ -176,4 +176,48 @@ describe('parseDBC', () => {
         expect(brakeMsg.signals[0].name).toBe('Pressure');
     });
 
+    test('handles missing or malformed fields gracefully', () => {
+        const dbcContent = `
+        BO_ 300 IncompleteMsg:
+        SG_ Signal : 0|
+        `;
+        expect(() => parseDBC(dbcContent)).not.toThrow();
+    });
+
+    test('rejects invalid ID formats', () => {
+        const dbcContent = `
+        BO_ XYZ InvalidMsg: 8 ECU
+        `;
+        expect(() => parseDBC(dbcContent)).toThrow("Invalid ID format");
+    });
+
+    test('handles no messages gracefully', () => {
+        const dbcContent = `NS_ : BS_:`;  
+        const parsedData = parseDBC(dbcContent);
+
+        expect(parsedData.messages).toHaveLength(0);
+        expect(parsedData.nodes).toEqual([]);
+    });
+
+    test('parses multiple messages and checks node or sender info', () => {
+        const dbcContent = `
+        BO_ 100 EngineMsg: 8 PCM
+        SG_ Speed : 0|8@1+ (1,0) [0|255] "km/h" Vector__XXX
+
+        BO_ 101 BrakeMsg: 8 ABS
+        SG_ Pressure : 8|8@1+ (0.5,0) [0|127.5] "bar" Vector__XXX
+        `;
+
+        const parsedData = parseDBC(dbcContent);
+        expect(parsedData.messages).toHaveLength(2);
+
+        const engineMsg = parsedData.messages[0];
+        expect(engineMsg.sender).toBe('PCM');
+        expect(engineMsg.signals[0].name).toBe('Speed');
+
+        const brakeMsg = parsedData.messages[1];
+        expect(brakeMsg.sender).toBe('ABS');
+        expect(brakeMsg.signals[0].name).toBe('Pressure');
+    });
+
 });

@@ -177,4 +177,134 @@ describe('databaseHandler', () => {
         }));
     });
 
+    test('resetDatabase() should not throw an error if called multiple times', () => {
+        expect(() => {
+            databaseHandler.resetDatabase();
+            databaseHandler.resetDatabase();
+        }).not.toThrow();
+    });
+
+    test('isDatabaseLoaded() should return false after resetDatabase is called', () => {
+        databaseHandler.database = { messages: [{ id: 123 }] };
+        expect(databaseHandler.isDatabaseLoaded()).toBe(true);
+
+        databaseHandler.resetDatabase();
+        expect(databaseHandler.isDatabaseLoaded()).toBe(false);
+    });
+
+    test('extractDropdownContent() should handle empty database gracefully', () => {
+        databaseHandler.database = { messages: [] };
+
+        expect(() => databaseHandler.extractDropdownContent()).not.toThrow();
+        expect(databaseHandler.dropdownContent).toEqual({ ID: [], MsgName: [], Sender: [], Signal: [] });
+    });
+
+    test('extractDropdownContent() should not add duplicates to dropdown lists', () => {
+        databaseHandler.database = {
+            messages: [
+                { id: 10, name: 'TestMsg', sender: 'NodeA', signals: [{ name: 'Speed' }, { name: 'Speed' }] },
+                { id: 20, name: 'TestMsg', sender: 'NodeA', signals: [{ name: 'RPM' }] }
+            ]
+        };
+
+        databaseHandler.extractDropdownContent();
+        expect(databaseHandler.dropdownContent.ID).toEqual([10, 20]);
+        expect(databaseHandler.dropdownContent.MsgName).toEqual(['TestMsg']);
+        expect(databaseHandler.dropdownContent.Sender).toEqual(['NodeA']);
+        expect(databaseHandler.dropdownContent.Signal).toEqual(['Speed', 'RPM']); // No duplicates
+    });
+
+    test('buildUnifiedDatabase() should handle empty input data', () => {
+        const unifiedDatabase = databaseHandler.buildUnifiedDatabase({ messages: [], nodes: [] });
+
+        expect(unifiedDatabase).toEqual({
+            messages: [],
+            nodes: []
+        });
+    });
+
+    test('buildUnifiedDatabase() should handle messages without signals', () => {
+        const parsedData = {
+            messages: [{ id: 555, name: 'NoSignalsMsg', dlc: 8, sender: 'ECU', signals: [] }],
+            nodes: ['ECU']
+        };
+
+        const unifiedDatabase = databaseHandler.buildUnifiedDatabase(parsedData);
+
+        expect(unifiedDatabase.messages).toHaveLength(1);
+        expect(unifiedDatabase.messages[0].signals).toEqual([]); // Should handle no signals
+    });
+
+    test('addUnique() should handle empty arrays correctly', () => {
+        const array = [];
+        databaseHandler.addUnique(array, 1);
+        expect(array).toEqual([1]);
+    });
+
+    test('addUnique() should handle non-array inputs gracefully', () => {
+        expect(() => databaseHandler.addUnique(null, 5)).toThrow();
+        expect(() => databaseHandler.addUnique(undefined, 5)).toThrow();
+    });
+
+    test('parseFileDB() should reject unsupported file formats', async () => {
+        const mockFile = new File(["dummy content"], "test.txt", { type: "text/plain" });
+
+        await expect(databaseHandler.parseFileDB(mockFile)).rejects.toThrow("Unsupported file format");
+    });
+
+    test('parseFileDB() should return null if file content is empty', async () => {
+        const mockFile = new File([""], "test.dbc", { type: "text/plain" });
+
+        await expect(databaseHandler.parseFileDB(mockFile)).resolves.toBeNull();
+    });
+
+    test('loadDatabase() should return null if user cancels file selection', async () => {
+        databaseHandler.selectFileDB = jest.fn().mockResolvedValue(null);
+
+        const database = await databaseHandler.loadDatabase();
+        expect(database).toBeNull();
+    });
+
+    test('loadDatabase() should throw an error if parsing fails', async () => {
+        const mockFile = new File(["invalid content"], "test.dbc", { type: "text/plain" });
+
+        databaseHandler.selectFileDB = jest.fn().mockResolvedValue(mockFile);
+        databaseHandler.parseFileDB = jest.fn().mockRejectedValue(new Error("Parsing error"));
+
+        await expect(databaseHandler.loadDatabase()).rejects.toThrow("Parsing error");
+    });
+
+    test('loadDatabase() should still function correctly if no nodes are present', async () => {
+        const mockDBCContent = `
+            BO_ 200 ExampleMsg: 8 Node1
+            SG_ TestSignal : 0|8@1+ (1,0) [0|255] "units" Node1
+        `;
+        const mockFile = new File([mockDBCContent], "test.dbc", { type: "text/plain" });
+
+        const mockParsedData = {
+            messages: [
+                { id: 200, name: "ExampleMsg", dlc: 8, sender: "Node1", signals: [{ name: "TestSignal" }] }
+            ],
+            nodes: [] // No nodes
+        };
+
+        databaseHandler.selectFileDB = jest.fn().mockResolvedValue(mockFile);
+        databaseHandler.parseFileDB = jest.fn().mockResolvedValue(mockParsedData);
+
+        const database = await databaseHandler.loadDatabase();
+        expect(database.messages).toHaveLength(1);
+        expect(database.nodes).toEqual([]); // Should not fail if nodes are missing
+    });
+
+    test('resetDatabase() should clear all properties including dropdownContent', () => {
+        databaseHandler.database = { messages: [{ id: 100 }] };
+        databaseHandler.dropdownContent = { ID: [100], MsgName: ['TestMsg'], Sender: ['TestSender'], Signal: ['TestSignal'] };
+
+        databaseHandler.resetDatabase();
+
+        expect(databaseHandler.database).toBeNull();
+        expect(databaseHandler.dropdownContent).toEqual({ ID: [], MsgName: [], Sender: [], Signal: [] });
+    });
+
+
 });

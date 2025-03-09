@@ -194,4 +194,93 @@ test('parses multiple messages and checks node creation if applicable', () => {
     // parseSYM doesn’t populate them by default
   });
 
+  test('handles missing fields gracefully', () => {
+      const content = `
+        [IncompleteMsg]
+        ID=
+        Type=
+      `;
+      const parsedData = parseSYM(content);
+      expect(parsedData.messages).toHaveLength(0);
+  });
+
+  test('rejects invalid ID formats', () => {
+      const content = `
+        [InvalidMsg]
+        ID=XYZh
+        Type=Standard
+      `;
+      expect(() => parseSYM(content)).toThrow("Invalid ID format");
+  });
+
+  test('parses case-insensitive Type and ID keys', () => {
+      const content = `
+        [CaseInsensitiveMsg]
+        id=123h
+        type=extended
+      `;
+      const parsedData = parseSYM(content);
+      expect(parsedData.messages).toHaveLength(1);
+      expect(parsedData.messages[0].id).toBe('0x123');
+      expect(parsedData.messages[0].isExtendedId).toBe(true);
+  });
+
+  test('handles duplicate message names correctly', () => {
+      const content = `
+        [DuplicateMsg]
+        ID=200h
+        Type=Standard
+
+        [DuplicateMsg]
+        ID=200h
+        Type=Standard
+      `;
+      const parsedData = parseSYM(content);
+      expect(parsedData.messages).toHaveLength(1);
+  });
+
+  test('rejects signals with excessive bit length', () => {
+      const content = `
+        [TestMsg]
+        ID=300h
+        Type=Standard
+        Sig="BigSignal" unsigned 80
+      `;
+      expect(() => parseSYM(content)).toThrow("Bit length exceeds valid range");
+  });
+
+  test('handles empty or comment-only files gracefully', () => {
+      const content = `
+        // This is a comment
+        # Another comment
+      `;
+      const parsedData = parseSYM(content);
+      expect(parsedData.messages).toHaveLength(0);
+  });
+
+  test('parses message names with special characters', () => {
+      const content = `
+        [Msg_with-Special_Chars]
+        ID=101h
+        Type=Standard
+      `;
+      const parsedData = parseSYM(content);
+      expect(parsedData.messages[0].name).toBe('Msg_with-Special_Chars');
+  });
+
+  test('applies default values to missing signal properties', () => {
+      const content = `
+        [TestMsg]
+        ID=101h
+        Type=Standard
+        Sig="IncompleteSignal"
+      `;
+      const parsedData = parseSYM(content);
+      const sig = parsedData.messages[0].signals[0];
+
+      expect(sig.length).toBeDefined();
+      expect(sig.scaling).toBe(1.0);
+      expect(sig.units).toBe('');
+  });
+
 });
