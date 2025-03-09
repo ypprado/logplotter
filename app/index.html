@@ -16,24 +16,23 @@
     <!-- Navigation Bar -->
     <nav class="navbar">
         <a href="../index.html">Home</a>
-        <a href="blog.html">Blog</a>
         <a href="index.html">CAN Log Plotter</a>
-        <a href="#">Database Editor (coming soon)</a>
+        <a href="../about.html">About</a>
     </nav>
     
     <!-- Small static sidebar on the left side. Not affected by interface events -->
     <div class="permanent-sidebar">
-        <button id="arrowButton" class="icon-btn" title="Toggle Sidebar">←</button>
-        <button id="fileButton" class="icon-btn" title="File" onclick="toggleSidebarContent('main')">
+        <button id="arrowButton" class="icon-btn" title="Hide/Show Sidebar">←</button>
+        <button id="fileButton" class="icon-btn" title="Start" onclick="toggleSidebarContent('main')">
             <i class="icon icon-file"></i>
         </button>
-        <button id="brushButton" class="icon-btn" title="Brush" onclick="toggleSidebarContent('brush')">
+        <button id="brushButton" class="icon-btn" title="Customize Signals" onclick="toggleSidebarContent('brush')">
             <i class="icon icon-brush"></i>
         </button>
-        <button id="gearButton" class="icon-btn" title="Settings" onclick="toggleSidebarContent('gear')">
+        <button id="gearButton" class="icon-btn" title="Chart Settings" onclick="toggleSidebarContent('gear')">
             <i class="icon icon-gear"></i>
         </button>
-        <button id="ExportButton" class="icon-btn" title="Settings">
+        <button id="ExportButton" class="icon-btn" title="Export as CSV">
             <i class="icon icon-export"></i>
         </button>
     </div>
