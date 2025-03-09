@@ -71,8 +71,11 @@ Contributions are welcome! To contribute:
 Support Us
 
 We are a small team at PAS Solutions, dedicated to developing innovative software solutions. If you find LogPlotter useful and would like to support our work, consider supporting us on Ko-Fi:
+
 https://ko-fi.com/passolutions
-![PAS](https://github.com/user-attachments/assets/4e1afa3b-93b4-4328-88d4-367c7f965f2e)
+
+![2025-03-09_rest-b416dc90e81ed9cbe4bff91101c6df6d-sg1l77sl](https://github.com/user-attachments/assets/2868c83a-c95a-4e74-b45a-28cb7b97d066)
+
 
 Your support helps us continue improving and expanding our projects!
 
