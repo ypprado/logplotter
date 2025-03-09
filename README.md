@@ -1,12 +1,12 @@
 # LogPlotter
 
-LogPlotter is a web-based application designed to provide a visual representation of logged CAN bus communications. It enables users to upload log files and visualize the data in a user-friendly graphical format, facilitating easier analysis and interpretation of CAN bus activities.
+LogPlotter is a web-based application designed to provide a visual representation of logged CAN bus communications. It enables users to upload log files and visualize the data in a user-friendly graphical format, facilitating easier analysis and interpretation of CAN bus activities.
 
 ## Features
 
-- **Log File Upload**: Easily upload your CAN bus log files through the web interface.
-- **Data Visualization**: Generate interactive plots and charts to represent the CAN bus data effectively.
-- **User-Friendly Interface**: Navigate through the application with an intuitive and responsive design.
+- **Log File Upload**: Easily upload your CAN bus log files through the web interface.
+- **Data Visualization**: Generate interactive plots and charts to represent the CAN bus data effectively.
+- **User-Friendly Interface**: Navigate through the application with an intuitive and responsive design.
 
 ## Installation
 
