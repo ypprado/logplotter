@@ -771,3 +771,78 @@ if (!event.ctrlKey) {
 
 */
 
+
+/**
+ * Generates and downloads a CSV from the provided Plotly traces.
+ * Each row is "Time, trace1, trace2, ...", with missing values left blank.
+ * @param {Array} traces - Array of Plotly traces, each containing x, y, and name.
+ */
+function downloadTracesAsCSV(traces) {
+    
+    if (!traces || traces.length === 0) {
+      console.warn("No traces found. CSV generation skipped.");
+      showToast("No traces available. Please plot a graph before exporting.");
+      return;
+    }
+  
+    // 1) Collect all unique time points from every trace
+    const allTimes = new Set();
+    traces.forEach(trace => {
+      trace.x.forEach(time => allTimes.add(time));
+    });
+    // Sort times (assumes numeric or date-like; adjust if needed)
+    const sortedTimes = Array.from(allTimes).sort((a, b) => a - b);
+  
+    // 2) Build a map of time -> { traceIndex -> value }
+    //    This way we can assemble rows easily
+    const dataMap = new Map(); // key: time, value: object with traceIndex -> data
+    traces.forEach((trace, traceIndex) => {
+      trace.x.forEach((timeVal, i) => {
+        const val = trace.y[i];
+        if (!dataMap.has(timeVal)) {
+          dataMap.set(timeVal, {});
+        }
+        dataMap.get(timeVal)[traceIndex] = val;
+      });
+    });
+  
+    // 3) Build CSV header: "Time, traceName1, traceName2, ... "
+    const header = ["Time", ...traces.map(t => t.name)];
+    let csvString = header.join(",") + "\n";
+  
+    // 4) Fill CSV rows, using sorted time points
+    for (const t of sortedTimes) {
+      const rowObj = dataMap.get(t) || {};
+      // First column is time; then each trace’s value or blank
+      const rowData = [t];
+      for (let i = 0; i < traces.length; i++) {
+        rowData.push(rowObj[i] !== undefined ? rowObj[i] : "");
+      }
+      csvString += rowData.join(",") + "\n";
+    }
+  
+    // 5) Trigger file download in browser
+    const blob = new Blob([csvString], { type: "text/csv" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "traces.csv";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const exportButton = document.getElementById("ExportButton");
+    if (exportButton) {
+        exportButton.addEventListener("click", function () {
+            const traces = plotData.getTraces();
+            if (!traces || traces.length === 0) {
+                showToast("No traces available. Please plot a graph before exporting.");
+                return;
+            }
+            downloadTracesAsCSV(traces);
+        });
+    }
+});

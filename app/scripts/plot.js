@@ -50,6 +50,11 @@ const plotData = {
     isAxisInUse(axis) {
         // Check if any trace has the specified yaxis
         return plotData.traces.some(trace => trace.yaxis === axis);
+    },
+
+    // Get all traces in the plotData object
+    getTraces() {
+        return this.traces;
     }
 };
 

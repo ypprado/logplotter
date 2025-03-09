@@ -7,7 +7,8 @@ const container = document.querySelector('.container');
 const sidebarConfigurations = {
     main: 'mainConfig',
     brush: 'brushConfig',
-    gear: 'gearConfig'
+    gear: 'gearConfig',
+    export: 'exportConfig'
 };
 
 function toggleSidebar() {
