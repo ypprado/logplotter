@@ -68,6 +68,14 @@ Contributions are welcome! To contribute:
 4. Push to the branch (`git push origin feature-branch`).
 5. Open a Pull Request.
 
+Support Us
+
+We are a small team at PAS Solutions, dedicated to developing innovative software solutions. If you find LogPlotter useful and would like to support our work, consider supporting us on Ko-Fi:
+https://ko-fi.com/passolutions
+![PAS](https://github.com/user-attachments/assets/4e1afa3b-93b4-4328-88d4-367c7f965f2e)
+
+Your support helps us continue improving and expanding our projects!
+
 ## License
 
 This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
