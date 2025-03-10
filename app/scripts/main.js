@@ -290,41 +290,6 @@ function addConfigListeners() {
             updatePlot();
         });
     });
-
-
-    // Add listener for Min and Max input fields
-    document.querySelectorAll('.min-input, .max-input').forEach(input => {
-        function handleInputChange(event) {
-            let value = parseFloat(event.target.value); // Convert to number
-            if (isNaN(value)) return; // Ignore invalid values
-
-            // Get correct dataset (instance) and then correct y axis of that instance
-            const index = event.target.dataset.index;
-            const axis = plotData.traces[index].yaxis;
-
-            let fieldType = event.target.classList.contains('min-input') ? 'min' : 'max'; // Determine field type
-            let MinOrMax = fieldType === 'min' ? 0 : 1; // Min corresponds to range[0], Max to range[1]
-
-            // Update the respective Y-axis property in plotLayout
-            updateYAxisProperty(axis, "autorange",  false);
-            updateYAxisProperty(axis, "range", { index: MinOrMax, value });
-
-            // Update all fields referring to the same axis
-            //updateAllFields(axis, fieldType, value);
-             console.log("plotLayout:", plotLayout);
-
-            updatePlot(); // Redraw the plot
-        }
-
-        // Trigger on losing focus (blur) or pressing Enter (keydown)
-        input.addEventListener('blur', handleInputChange);
-        input.addEventListener('keydown', function (event) {
-            if (event.key === 'Enter') {
-                handleInputChange(event);
-            }
-        });
-    });
-
 }
 
 /******************** Droplist Filter Options Scroll ********************/
@@ -390,6 +355,8 @@ function getSignalsForSource(source) {
     return [...new Set(matchingSignals)]; // Return unique signals
 }*/
 
+
+
 /******************** Button Plot ********************/
 /**
  * Processes all selected checkboxes within the container checkbox-signals, 
@@ -438,6 +405,9 @@ document.addEventListener("DOMContentLoaded", () => {
                     plotData.addData(traces); 
 
                     generatePlot();
+
+                    populateAxisFields();
+                    updateAxisFieldsState();
 
                     addConfigListeners();
 
@@ -845,4 +815,64 @@ document.addEventListener("DOMContentLoaded", function () {
             downloadTracesAsCSV(traces);
         });
     }
+});
+
+
+//******************* Gear Sidebar  ************************//
+// Ensure axis fields are initialized as disabled when the script loads
+document.addEventListener("DOMContentLoaded", updateAxisFieldsState);
+document.addEventListener("DOMContentLoaded", function () {
+    // Function to update the axis property
+    function updateAxisRange(axis, fieldType, value) {
+        if (isNaN(value)) return; // Ignore invalid values
+    
+        let MinOrMax = fieldType === 'min' ? 0 : 1; // Min corresponds to range[0], Max to range[1]
+    
+        // Round value to 3 decimal places
+        value = parseFloat(value.toFixed(3));
+    
+        // Update the respective Y-axis property in plotLayout
+        updateYAxisProperty(axis, "autorange", false);
+        updateYAxisProperty(axis, "range", { index: MinOrMax, value });
+    
+        console.log(`Updated ${axis}:`, plotLayout[axis]);
+    
+        updatePlot(); // Redraw the plot
+    }
+
+    // Add event listeners for each axis configuration field
+    const axisMappings = {
+        "y1-min": "yaxis",
+        "y1-max": "yaxis",
+        "y2-min": "yaxis2",
+        "y2-max": "yaxis2",
+        "y3-min": "yaxis3",
+        "y3-max": "yaxis3"
+    };
+
+    Object.keys(axisMappings).forEach(fieldId => {
+        const inputField = document.getElementById(fieldId);
+        if (inputField) {
+            inputField.addEventListener('blur', function (event) {
+                updateAxisRange(axisMappings[fieldId], fieldId.includes("min") ? "min" : "max", parseFloat(event.target.value));
+            });
+
+            inputField.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    updateAxisRange(axisMappings[fieldId], fieldId.includes("min") ? "min" : "max", parseFloat(event.target.value));
+                }
+            });
+        
+        // Update immediately when using up/down buttons
+        inputField.addEventListener('input', function (event) {
+            let value = event.target.value.replace(',', '.'); // Replace comma with dot
+            let parsedValue = parseFloat(value);
+        
+            if (!isNaN(parsedValue)) {
+                event.target.value = parsedValue % 1 === 0 ? parsedValue : parsedValue.toFixed(3).replace(/\.?0+$/, '');
+                updateAxisRange(axisMappings[fieldId], fieldId.includes("min") ? "min" : "max", parsedValue);
+            }
+        });
+        }
+    });
 });

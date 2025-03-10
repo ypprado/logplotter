@@ -96,14 +96,6 @@ function displayConfigurationControls(data) {
                 <option value="y3" ${assignedYAxis === "y3" ? "selected" : ""}>Y3 (Right side)</option>
             </select>
         </div>
-
-        <!-- Min and Max Input Fields -->
-        <div class="min-max-container">
-            <label for="min-value">Min:</label>
-            <input type="number" id="min-value" class="min-input" data-index="${index}" />
-            <label for="max-value">Max:</label>
-            <input type="number" id="max-value" class="max-input" data-index="${index}" />
-        </div>
         `;
         configContainer.appendChild(lineConfig);
     });

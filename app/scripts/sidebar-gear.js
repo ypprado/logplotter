@@ -1,31 +1,26 @@
-/*const dropArea = document.getElementById("drop-area");
-const fileInput = document.getElementById("fileInput");
-const dropText = document.getElementById("drop-text");
-
-function triggerFileInput() {
-    fileInput.click(); // Simulate click when container is clicked
+// Populate axis fields with initial values from the plot
+function populateAxisFields() {
+    const yAxes = ["yaxis", "yaxis2", "yaxis3"];
+    yAxes.forEach((axis, index) => {
+        const axisData = plotLayout[axis];
+        if (axisData && axisData.range) {
+            document.getElementById(`y${index + 1}-min`).value = axisData.range[0];
+            document.getElementById(`y${index + 1}-max`).value = axisData.range[1];
+        }
+    });
 }
 
-function handleFileSelect(event) {
-    const files = event.target.files || event.dataTransfer.files;
-    if (files.length > 0) {
-        dropArea.classList.add("active");
-        dropText.textContent = files[0].name; // Show file name
-    }
+function updateAxisFieldsState() {
+    const yAxes = ["y", "y2", "y3"];
+    
+    yAxes.forEach((axis, index) => {
+        const isUsed = plotData.isAxisInUse(axis);
+        const minField = document.getElementById(`y${index + 1}-min`);
+        const maxField = document.getElementById(`y${index + 1}-max`);
+
+        if (minField && maxField) {
+            minField.disabled = !isUsed;
+            maxField.disabled = !isUsed;
+        }
+    });
 }
-
-// Drag-and-drop event listeners
-dropArea.addEventListener("dragover", (e) => {
-    e.preventDefault();
-    dropArea.classList.add("active");
-});
-
-dropArea.addEventListener("dragleave", () => {
-    dropArea.classList.remove("active");
-});
-
-dropArea.addEventListener("drop", (e) => {
-    e.preventDefault();
-    fileInput.files = e.dataTransfer.files;
-    handleFileSelect({ target: fileInput });
-});*/
