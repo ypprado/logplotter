@@ -136,7 +136,9 @@ export function parseSYM(content) {
         }
     });
 
-    if (currentMessage) messages.push(currentMessage);
+    if (currentMessage && currentMessage.dlc != null && currentMessage.id != null && currentMessage.name) {
+        messages.push(currentMessage);
+    }
 
     return { messages, nodes: Array.from(nodes) };
 }
