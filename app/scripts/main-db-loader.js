@@ -125,7 +125,7 @@ const databaseHandler = {
                 warning('File format not supported!');
             };
     
-            reader.readAsText(file);
+            reader.readAsText(file, "windows-1252");
         });
     },
 };

@@ -45,6 +45,9 @@ function formatMessageId(messageId) {
  * @returns {Object} - Parsed data including messages and nodes.
  */
 export function parseDBC(content) {
+    // Workaround: Replace misinterpreted encoding issue "ï¿½" with "°"
+    content = content.replace(/\ï¿½/g, "°");
+    
     const lines = content.split("\n");
     const messages = [];
     const nodes = new Set();
