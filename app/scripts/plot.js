@@ -271,6 +271,8 @@ function updatePlot() {
 
     // Replot the graph with updated configuration
     Plotly.react('plot', data, plotLayout);
+
+    updateAxisFieldsState()
 }
 
 /**

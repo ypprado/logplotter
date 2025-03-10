@@ -87,10 +87,35 @@
                 </div>
                 <!-- Gear Configuration Content -->
                 <div class="sidebar-content" id="gearConfig">
-                    <p>Gear Settings will be shown here.</p>
-                    <div id="drop-area" class="drop-container" onclick="triggerFileInput()">
-                        <p id="drop-text">Drop your database here.</p>
-                        <input type="file" id="fileInput" onchange="handleFileSelect(event)" hidden>
+                    <p>Axis Configurations</p>
+                    <div class="axis-config-container">
+                        <label>Axis Y1 Limits</label>
+                        <div class="axis-inputs">
+                            <label for="y1-min">Min:</label>
+                            <input type="number" id="y1-min" class="axis-min" data-axis="y1">
+                            <label for="y1-max">Max:</label>
+                            <input type="number" id="y1-max" class="axis-max" data-axis="y1">
+                        </div>
+                    </div>
+                    
+                    <div class="axis-config-container">
+                        <label>Axis Y2 Limits</label>
+                        <div class="axis-inputs">
+                            <label for="y2-min">Min:</label>
+                            <input type="number" id="y2-min" class="axis-min" data-axis="y2">
+                            <label for="y2-max">Max:</label>
+                            <input type="number" id="y2-max" class="axis-max" data-axis="y2">
+                        </div>
+                    </div>
+                    
+                    <div class="axis-config-container">
+                        <label>Axis Y3 Limits</label>
+                        <div class="axis-inputs">
+                            <label for="y3-min">Min:</label>
+                            <input type="number" id="y3-min" class="axis-min" data-axis="y3">
+                            <label for="y3-max">Max:</label>
+                            <input type="number" id="y3-max" class="axis-max" data-axis="y3">
+                        </div>
                     </div>
                 </div>
             </div>
