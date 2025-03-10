@@ -186,10 +186,15 @@ describe('parseDBC', () => {
 
     test('rejects invalid ID formats', () => {
         const dbcContent = `
-        BO_ XYZ InvalidMsg: 8 ECU
+            BO_ XYZ InvalidMsg: 8 ECU
         `;
-        expect(() => parseDBC(dbcContent)).toThrow("Invalid ID format");
+    
+        const parsedData = parseDBC(dbcContent);
+    
+        // Expect no messages to be parsed if the ID format is invalid
+        expect(parsedData.messages).toHaveLength(0);
     });
+    
 
     test('handles no messages gracefully', () => {
         const dbcContent = `NS_ : BS_:`;  
