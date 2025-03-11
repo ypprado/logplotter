@@ -1,11 +1,16 @@
-let log = null; // Global variable to store the log
+import { parseTRC } from './parser-trc.js';
+import { parseASC } from './parser-asc.js';
+import { parseBLF } from './parser-blf.js';
 
-function resetLog() {
+
+export let log = null; // Global variable to store the log
+
+export function resetLog() {
     log = [];
 }
 
 // Check if log is not loaded.
-function isLogLoaded() {
+export function isLogLoaded() {
     if (!log) {
         return false;
     } else {
@@ -37,7 +42,7 @@ function selectFileLOG() {
 }
 
 
-async function parseFileLOG(file) {
+export async function parseFileLOG(file) {
     try {
         const fileExtension = file.name.split('.').pop().toLowerCase();
 
@@ -71,7 +76,7 @@ async function parseFileLOG(file) {
  * Converts parsed CAN messages into the unified log format.
  * @param {Array} parsedMessages - Array of parsed CAN messages from parseBLF.
  */
-function buildUnifiedLog(parsedMessages) {
+export function buildUnifiedLog(parsedMessages) {
 
     resetLog();
 

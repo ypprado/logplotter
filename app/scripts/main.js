@@ -1,5 +1,8 @@
 import databaseHandler from "./main-db-loader.js";
 
+import {buildUnifiedLog, parseFileLOG, isLogLoaded, resetLog, log} from "./main-log-loader.js";
+
+
 /************ Permanent Sidebar arrowButton *****************/
 document.addEventListener('DOMContentLoaded', function () {
     const arrowButton = document.getElementById('arrowButton');

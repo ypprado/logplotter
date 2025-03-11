@@ -8,7 +8,7 @@ class TRCFileVersion {
     static V2_1 = 201;
 }
 
-async function parseTRC(file) {
+export async function parseTRC(file) {
     const text = await file.text();
     const lines = text.split("\n").map(line => line.trim());
     let fileVersion = TRCFileVersion.UNKNOWN;

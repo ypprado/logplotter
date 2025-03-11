@@ -1,4 +1,4 @@
-async function parseASC(file) {
+export async function parseASC(file) {
     const text = await file.text();
     const lines = text.split('\n').map(line => line.trim());
     let messages = [];
