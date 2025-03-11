@@ -29,7 +29,7 @@ const TIME_TEN_MICS = 0x00000001;
 const TIME_ONE_NANS = 0x00000002;
 
 
-async function parseBLF(file) {
+export async function parseBLF(file) {
     try {
         const parsedMessages = []; // Initialize an array to store parsed messages
 
