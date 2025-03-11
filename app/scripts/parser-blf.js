@@ -568,7 +568,8 @@ function* parseData(data) {
 
     // Parsing loop
     while (true) {
-        this._pos = pos;
+        //this._pos = pos;
+        let parsePos = pos; // Use a local variable instead
 
         // Find next object with "LOBJ" signature
         try {
@@ -619,7 +620,7 @@ function* parseData(data) {
             case CAN_MESSAGE:
             case CAN_MESSAGE2: {
                 const [channel, flags, dlc, canId, canData] = unpackCanMsg(data, pos);
-                formattedMessage = unpackCanMsg(data, pos);
+                let formattedMessage = unpackCanMsg(data, pos);
                 yield {
                     timestamp,
                     arbitrationId: canId & 0x1FFFFFFF,
