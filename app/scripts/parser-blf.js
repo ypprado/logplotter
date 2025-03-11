@@ -81,12 +81,12 @@ export async function parseBLF(file) {
             for (const message of generator) {
                 parsedMessages.push({
                     timestamp: message.timestamp,           // Timestamp in seconds
-                    arbitrationId: message.arbitrationId, // Message ID in decimal
-                    data: message.data,                   // Raw CAN payload as Uint8Array
-                    channel: message.channel || null,     // CAN channel (null if not provided)
-                    isExtendedId: message.isExtendedId,   // Whether the ID is extended
-                    isRemoteFrame: message.isRemoteFrame, // Whether it's a remote frame
-                    isRx: message.isRx                   // Whether it's received
+                    arbitrationId: message.arbitrationId,     // Message ID in decimal
+                    data: message.data,                       // Raw CAN payload as Uint8Array
+                    channel: message.channel !== undefined ? message.channel : null, // Use actual channel (even if 0)
+                    isExtendedId: message.isExtendedId,       // Whether the ID is extended
+                    isRemoteFrame: message.isRemoteFrame,     // Whether it's a remote frame
+                    isRx: message.isRx                        // Whether it's received
                 });
             }
         }
@@ -564,12 +564,8 @@ function* parseData(data) {
     const maxPos = data.byteLength;
     let pos = 0;
 
-    //console.info(startTimestamp);
-
     // Parsing loop
     while (true) {
-        //this._pos = pos;
-        let parsePos = pos; // Use a local variable instead
 
         // Find next object with "LOBJ" signature
         try {
@@ -620,7 +616,6 @@ function* parseData(data) {
             case CAN_MESSAGE:
             case CAN_MESSAGE2: {
                 const [channel, flags, dlc, canId, canData] = unpackCanMsg(data, pos);
-                let formattedMessage = unpackCanMsg(data, pos);
                 yield {
                     timestamp,
                     arbitrationId: canId & 0x1FFFFFFF,
@@ -700,6 +695,7 @@ function* parseData(data) {
                 break;
             }
             default:
+                // This line has been commented out so as not to overflow the console, but the parser itself does not fully recognise the blf.
                 //console.warn(`Unknown object type (${objType})`);
         }
 

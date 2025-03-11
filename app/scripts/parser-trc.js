@@ -68,10 +68,10 @@ export async function parseTRC(file) {
     }
 
     function parseMsgV2_X(cols) {        
-        if (!columns["T"] || !columns["O"] || !columns["I"] || !columns["D"]) {
+        if (columns["T"] === undefined || columns["O"] === undefined || columns["I"] === undefined || columns["D"] === undefined) {
             console.warn("Missing required columns in mapping:", columns);
             return null;
-        }
+        }        
     
         const type = cols[columns["T"]];
         const timestamp = parseFloat(cols[columns["O"]]) / 1000 + startTime;
