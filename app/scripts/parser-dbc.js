@@ -37,7 +37,6 @@ function formatMessageId(messageId) {
     return { id: formattedId, isExtended };
 }
 
-
 /**
  * Parses the DBC file content into structured data.
  * 
@@ -47,11 +46,12 @@ function formatMessageId(messageId) {
 export function parseDBC(content) {
     // Workaround: Replace misinterpreted encoding issue "ï¿½" with "°"
     content = content.replace(/\ï¿½/g, "°");
-    
+
     const lines = content.split("\n");
     const messages = [];
     const nodes = new Set();
     const valueDescriptions = {}; // Temporary storage for VAL_ data
+    const pendingComments = {};
 
     let currentMessage = null;
 
@@ -61,6 +61,7 @@ export function parseDBC(content) {
         // Match message definitions (e.g., "BO_ 256 EngineData: 8 ECU1")
         const messageMatch = line.match(/^BO_\s+(\d+)\s+(\w+):\s+(\d+)\s+(\w+)$/);
         if (messageMatch) {
+
             if (currentMessage) {
                 messages.push(currentMessage);
             }
@@ -74,7 +75,7 @@ export function parseDBC(content) {
                 dlc: parseInt(messageMatch[3], 10),
                 sender: messageMatch[4],
                 signals: [],
-            };            
+            };
 
             nodes.add(messageMatch[4]); // Add sender node
             return;
@@ -115,14 +116,12 @@ export function parseDBC(content) {
 
         // Match value descriptions (e.g., "VAL_ 512 F1_Signal3 1 \"State 1\" 2 \"State 2\" ... ;")
         const valueMatch = line.match(/^VAL_\s+(\d+)\s+(\w+)\s+((?:\d+\s+"[^"]*"\s*)+);$/);
-        if (valueMatch) 
-        {
+        if (valueMatch) {
             const { id: messageId, isExtended } = formatMessageId(valueMatch[1]);
             const signalName = valueMatch[2];
             const valuePairs = valueMatch[3].match(/(\d+)\s+"([^"]*)"/g);
 
-            if (!valueDescriptions[messageId]) 
-            {
+            if (!valueDescriptions[messageId]) {
                 valueDescriptions[messageId] = {};
             }
 
@@ -132,18 +131,35 @@ export function parseDBC(content) {
                 return acc;
             }, {});
         }
+
+        // Match comment lines for messages (e.g., "CM_ BO_ 100 "Some description";")
+        const commentMatch = line.match(/^CM_\s+BO_\s+(\d+)\s+"([^"]*)";$/);
+        if (commentMatch) {
+            const { id: messageId, isExtended } = formatMessageId(commentMatch[1]);
+            const description = commentMatch[2];
+
+            if (!pendingComments[messageId]) {
+                pendingComments[messageId] = {};
+            }
+
+            pendingComments[messageId] = description;
+        }
     });
 
     if (currentMessage) {
         messages.push(currentMessage);
     }
 
-    // Add value descriptions to signals
+    // After parsing all lines, attach pending comments and value descriptions.
     messages.forEach((msg) => {
+        // 1) Attach pending comment if it exists
+        if (pendingComments[msg.id]) {
+            msg.description = pendingComments[msg.id];
+        }
+
+        // 2) Attach value descriptions to each signal
         msg.signals.forEach((signal) => {
             const signalDescriptions = valueDescriptions[msg.id]?.[signal.name];
-
-            // Ensure valueDescriptions is always an object, avoiding 'undefined' issues
             signal.valueDescriptions = signalDescriptions ?? {};
         });
     });

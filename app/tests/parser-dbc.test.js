@@ -225,4 +225,43 @@ describe('parseDBC', () => {
         expect(brakeMsg.signals[0].name).toBe('Pressure');
     });
 
+    test('parses message descriptions correctly', () => {
+        const dbcContent = `
+            BO_ 100 EngineMsg: 8 PCM
+            CM_ BO_ 100 "Engine message description";
+    
+            BO_ 101 BrakeMsg: 8 ABS
+            CM_ BO_ 101 "Brake message description";
+        `;
+    
+        const parsedData = parseDBC(dbcContent);
+        expect(parsedData.messages).toHaveLength(2);
+    
+        const engineMsg = parsedData.messages[0];
+        expect(engineMsg.description).toBe('Engine message description');
+    
+        const brakeMsg = parsedData.messages[1];
+        expect(brakeMsg.description).toBe('Brake message description');
+    });    
+
+    test('parses message descriptions correctly when comments are after frames', () => {
+        const dbcContent = `
+            BO_ 100 EngineMsg: 8 PCM
+            BO_ 101 BrakeMsg: 8 ABS
+            CM_ BO_ 100 "Engine message description";
+            CM_ BO_ 101 "Brake message description";
+        `;
+    
+        const parsedData = parseDBC(dbcContent);
+        expect(parsedData.messages).toHaveLength(2);
+    
+        // Find messages by name so we don't depend on order or key formatting
+        const engineMsg = parsedData.messages.find(msg => msg.name === 'EngineMsg');
+        const brakeMsg = parsedData.messages.find(msg => msg.name === 'BrakeMsg');
+    
+        expect(engineMsg.description).toBe('Engine message description');
+        expect(brakeMsg.description).toBe('Brake message description');
+    });
+    
+
 });
