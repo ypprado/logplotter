@@ -263,5 +263,43 @@ describe('parseDBC', () => {
         expect(brakeMsg.description).toBe('Brake message description');
     });
     
+    test('parses signal description correctly when comment is after frame', () => {
+        const dbcContent = `
+            BO_ 123 TestFrame: 8 NODE
+            SG_ Temperature : 0|8@1+ (1,0) [0|255] "°C"
+            CM_ SG_ 123 Temperature "Test signal description";
+        `;
+    
+        const parsedData = parseDBC(dbcContent);
+        expect(parsedData.messages).toHaveLength(1);
+    
+        const msg = parsedData.messages[0];
+        expect(msg.signals).toHaveLength(1);
+    
+        const signal = msg.signals[0];
+        expect(signal.name).toBe('Temperature');
+        expect(signal.description).toBe('Test signal description');
+    });
+    
+    test('parses both frame and signal descriptions correctly when comments are after frames', () => {
+        const dbcContent = `
+            BO_ 456 AnotherFrame: 8 NODE2
+            SG_ Pressure : 0|8@1+ (1,0) [0|255] "bar"
+            CM_ BO_ 456 "Test frame description for pressure";
+            CM_ SG_ 456 Pressure "Test signal description for pressure";
+        `;
+    
+        const parsedData = parseDBC(dbcContent);
+        expect(parsedData.messages).toHaveLength(1);
+    
+        const msg = parsedData.messages[0];
+        expect(msg.description).toBe('Test frame description for pressure');
+    
+        expect(msg.signals).toHaveLength(1);
+        const signal = msg.signals[0];
+        expect(signal.name).toBe('Pressure');
+        expect(signal.description).toBe('Test signal description for pressure');
+    });
+    
 
 });

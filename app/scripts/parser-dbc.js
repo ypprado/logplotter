@@ -51,7 +51,9 @@ export function parseDBC(content) {
     const messages = [];
     const nodes = new Set();
     const valueDescriptions = {}; // Temporary storage for VAL_ data
+    // Temporary storage for pending message and signal comments
     const pendingComments = {};
+    const pendingSignalComments = {};
 
     let currentMessage = null;
 
@@ -137,12 +139,22 @@ export function parseDBC(content) {
         if (commentMatch) {
             const { id: messageId, isExtended } = formatMessageId(commentMatch[1]);
             const description = commentMatch[2];
-
             if (!pendingComments[messageId]) {
                 pendingComments[messageId] = {};
             }
-
             pendingComments[messageId] = description;
+        }
+
+        // Match signal comment lines (e.g., "CM_ SG_ 100 Test "Test description";")
+        const signalCommentMatch = line.match(/^CM_\s+SG_\s+(\d+)\s+(\w+)\s+"([^"]+)";$/);
+        if (signalCommentMatch) {
+            const { id: messageId } = formatMessageId(signalCommentMatch[1]);
+            const signalName = signalCommentMatch[2];
+            const description = signalCommentMatch[3];
+            if (!pendingSignalComments[messageId]) {
+                pendingSignalComments[messageId] = {};
+            }
+            pendingSignalComments[messageId][signalName] = description;
         }
     });
 
@@ -159,6 +171,11 @@ export function parseDBC(content) {
 
         // 2) Attach value descriptions to each signal
         msg.signals.forEach((signal) => {
+            // Attach signal description if available
+            if (pendingSignalComments[msg.id] && pendingSignalComments[msg.id][signal.name]) {
+                signal.description = pendingSignalComments[msg.id][signal.name];
+            }
+            // Attach value descriptions (if any)
             const signalDescriptions = valueDescriptions[msg.id]?.[signal.name];
             signal.valueDescriptions = signalDescriptions ?? {};
         });
