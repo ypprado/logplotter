@@ -27,7 +27,7 @@ export function parseSYM(content) {
 
     // Second Pass: Extract all signals
     lines.forEach((line) => {
-        const signalDefMatch = line.match(/^Sig="([^"]+)"\s+(\w+)\s+(\d+)(\s+-m)?/);
+        const signalDefMatch = line.match(/^Sig="?([^"]+)"?\s+(\w+)\s+(\d+)(\s+-m)?/);
         if (signalDefMatch) {
             const name = signalDefMatch[1];
             const type = signalDefMatch[2];
@@ -43,18 +43,24 @@ export function parseSYM(content) {
                 offset: 0.0,
                 valueRange: [0, 1],
                 units: "",
-                valueDescriptions: {}
+                valueDescriptions: {},
+                description: "" // Default to empty string
             };
 
             // Extract additional attributes
             const attributesMatch = line.match(/\/f:(\d+(?:\.\d+)?)|\/o:(-?\d+(?:\.\d+)?)|\/min:(-?\d+(?:\.\d+)?)|\/max:(-?\d+(?:\.\d+)?)|\/u:"([^"]+)"|\/e:([^\s]+)/g);
             if (attributesMatch) {
                 attributesMatch.forEach(attr => {
-                    if (attr.startsWith("/f:")) signals[name].scaling = parseFloat(attr.split(":")[1]);
-                    if (attr.startsWith("/o:")) signals[name].offset = parseFloat(attr.split(":")[1]);
-                    if (attr.startsWith("/min:")) signals[name].valueRange[0] = parseFloat(attr.split(":")[1]);
-                    if (attr.startsWith("/max:")) signals[name].valueRange[1] = parseFloat(attr.split(":")[1]);
-                    if (attr.startsWith("/u:")) signals[name].units = attr.split(":")[1].replace(/"/g, '');
+                    if (attr.startsWith("/f:"))
+                        signals[name].scaling = parseFloat(attr.split(":")[1]);
+                    if (attr.startsWith("/o:"))
+                        signals[name].offset = parseFloat(attr.split(":")[1]);
+                    if (attr.startsWith("/min:"))
+                        signals[name].valueRange[0] = parseFloat(attr.split(":")[1]);
+                    if (attr.startsWith("/max:"))
+                        signals[name].valueRange[1] = parseFloat(attr.split(":")[1]);
+                    if (attr.startsWith("/u:"))
+                        signals[name].units = attr.split(":")[1].replace(/"/g, '');
                     if (attr.startsWith("/e:")) {
                         const enumName = attr.split(":")[1];
                         if (enumerations[enumName]) {
@@ -63,8 +69,15 @@ export function parseSYM(content) {
                     }
                 });
             }
+
+            // Extract optional description from inline comment (e.g., // SAEbs04)
+            const descriptionMatch = line.match(/\/\/\s*(.*)$/);
+            if (descriptionMatch) {
+                signals[name].description = descriptionMatch[1].trim();
+            }
         }
     });
+
 
     // Third Pass: Parse Messages and Assign Signals
     lines.forEach((line) => {
@@ -86,10 +99,14 @@ export function parseSYM(content) {
             return;
         }
 
-        // Parse CAN ID
-        const idMatch = line.match(/^ID=([0-9A-Fa-f]+)h$/);
+        // Parse CAN ID with optional commentary
+        const idMatch = line.match(/^ID=([0-9A-Fa-f]+)h(?:\s*\/\/\s*(.*))?$/);
         if (idMatch && currentMessage) {
             currentMessage.id = `0x${parseInt(idMatch[1], 16).toString(16).toUpperCase()}`;
+            // If commentary exists, store it in the message (e.g., as 'comment')
+            if (idMatch[2]) {
+                currentMessage.comment = idMatch[2];
+            }
             return;
         }
 
@@ -123,7 +140,7 @@ export function parseSYM(content) {
         }
 
         // Assign Signals to Messages
-        const signalRefMatch = line.match(/^Sig="([^"]+)"\s+(\d+)/);
+        const signalRefMatch = line.match(/^Sig="?([^"\s]+)"?\s+(\d+)/);
         if (signalRefMatch && currentMessage) {
             const signalName = signalRefMatch[1];
             const startBit = parseInt(signalRefMatch[2], 10);

@@ -305,4 +305,140 @@ test('parses multiple messages and checks node creation if applicable', () => {
       // expect(sig.valueRange).toEqual([]); // Empty array as default
   });
 
+  test('parses commentary from ID line correctly', () => {
+    const content = `
+      [Status_1]
+      ID=18FF7844h // qwertweqrwr443214
+      Type=Extended
+      Len=8
+      Sig=Status 0
+    `;
+    const parsedData = parseSYM(content);
+    expect(parsedData.messages).toHaveLength(1);
+    const msg = parsedData.messages[0];
+    expect(msg.comment).toBe('qwertweqrwr443214');
+  });
+
+  test('does not add comment property when no commentary is provided', () => {
+    const content = `
+      [NoCommentMsg]
+      ID=18FF7844h
+      Type=Standard
+      Len=8
+    `;
+    const parsedData = parseSYM(content);
+    expect(parsedData.messages).toHaveLength(1);
+    const msg = parsedData.messages[0];
+    expect(msg.comment).toBeUndefined();
+  });
+
+  test('trims extra whitespace in commentary', () => {
+    const content = `
+      [TrimMsg]
+      ID=18FF7844h   //   commentary with spaces    
+      Type=Extended
+      Len=8
+    `;
+    const parsedData = parseSYM(content);
+    expect(parsedData.messages).toHaveLength(1);
+    const msg = parsedData.messages[0];
+    expect(msg.comment).toBe('commentary with spaces');
+  });
+
+  test('extracts signal descriptions from global SIGNALS block and applies them in messages', () => {
+    const content = `
+      FormatVersion=6.0 // Do not edit this line!
+      Title="Test Database"
+
+      {SENDRECEIVE}
+
+      [Msg1]
+      ID=000h // Symbol description
+      Len=8
+      Sig=TestSignal1 0
+      Sig=TestSignal2 8
+
+      {SIGNALS}
+      Sig=TestSignal1 unsigned 8 /ln:"Label1" // Desc for TestSignal1
+      Sig=TestSignal2 unsigned 8 /ln:"Label2" // Desc for TestSignal2
+    `;
+    const parsedData = parseSYM(content);
+    expect(parsedData.messages).toHaveLength(1);
+    const msg = parsedData.messages[0];
+    expect(msg.signals).toHaveLength(2);
+
+    const sig1 = msg.signals.find(s => s.name === 'TestSignal1');
+    const sig2 = msg.signals.find(s => s.name === 'TestSignal2');
+
+    expect(sig1).toBeDefined();
+    expect(sig1.description).toBe('Desc for TestSignal1');
+
+    expect(sig2).toBeDefined();
+    expect(sig2.description).toBe('Desc for TestSignal2');
+  });
+
+  test('assigns an empty description when the global signal has no inline comment', () => {
+    const content = `
+      FormatVersion=6.0 // Do not edit this line!
+      Title="Test Database"
+
+      {SIGNALS}
+      Sig=TestSignal1 unsigned 8 /ln:"Label1" // Desc exists
+      Sig=TestSignal2 unsigned 8 /ln:"Label2"
+
+      {SENDRECEIVE}
+
+      [Msg1]
+      ID=001h // Another symbol description
+      Len=8
+      Sig=TestSignal1 0
+      Sig=TestSignal2 8
+    `;
+    const parsedData = parseSYM(content);
+    expect(parsedData.messages).toHaveLength(1);
+    const msg = parsedData.messages[0];
+    expect(msg.signals).toHaveLength(2);
+
+    const sig1 = msg.signals.find(s => s.name === 'TestSignal1');
+    const sig2 = msg.signals.find(s => s.name === 'TestSignal2');
+
+    expect(sig1).toBeDefined();
+    expect(sig1.description).toBe('Desc exists');
+
+    expect(sig2).toBeDefined();
+    expect(sig2.description).toBe(''); // No inline comment provided
+  });
+
+  test('trims extra whitespace in the inline description', () => {
+    const content = `
+      FormatVersion=6.0 // Do not edit this line!
+      Title="Test Database"
+
+      {SIGNALS}
+      Sig=TestSignal1 unsigned 8 /ln:"Label1" //    Desc with extra spaces    
+      Sig=TestSignal2 unsigned 8 /ln:"Label2" //DescWithoutSpaces
+
+      {SENDRECEIVE}
+
+      [Msg1]
+      ID=002h // Symbol description
+      Len=8
+      Sig=TestSignal1 0
+      Sig=TestSignal2 8
+    `;
+    const parsedData = parseSYM(content);
+    expect(parsedData.messages).toHaveLength(1);
+    const msg = parsedData.messages[0];
+    expect(msg.signals).toHaveLength(2);
+
+    const sig1 = msg.signals.find(s => s.name === 'TestSignal1');
+    const sig2 = msg.signals.find(s => s.name === 'TestSignal2');
+
+    expect(sig1).toBeDefined();
+    expect(sig1.description).toBe('Desc with extra spaces');
+
+    expect(sig2).toBeDefined();
+    expect(sig2.description).toBe('DescWithoutSpaces');
+  });
+
 });
