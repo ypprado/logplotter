@@ -14,7 +14,7 @@ function updateAxisFieldsState() {
     const yAxes = ["y", "y2", "y3"];
     
     yAxes.forEach((axis, index) => {
-        const isUsed = plotData.isAxisInUse(axis);
+        const isUsed = plotData.isYAxisInUse(axis);
         const minField = document.getElementById(`y${index + 1}-min`);
         const maxField = document.getElementById(`y${index + 1}-max`);
 

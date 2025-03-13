@@ -257,44 +257,67 @@ function addConfigListeners() {
             const index = event.target.dataset.index;
             const selIndex = event.target.selectedIndex;
             const newYAxis = selIndex === 0 ? "y" : `y${selIndex + 1}`; //y, y2, y3 are used in the trace
-            const axisKey = selIndex === 0 ? "yaxis" : `yaxis${selIndex + 1}`; //yaxis, yaxis2, yaxis3 are used in the layout
+            //const axisKey = selIndex === 0 ? "yaxis" : `yaxis${selIndex + 1}`; //yaxis, yaxis2, yaxis3 are used in the layout
 
             // Update the trace's yaxis property
             plotData.traces[index].yaxis = newYAxis;
             
-            // If axis is in use by a trace, make it visible in the layout
-            const yInUse  = plotData.isAxisInUse("y");
-            const y2InUse = plotData.isAxisInUse("y2");
-            const y3InUse = plotData.isAxisInUse("y3");
-            plotLayout["yaxis"].visible = yInUse;
-            plotLayout.annotations[0].visible = yInUse;
-            plotLayout["yaxis2"].visible = y2InUse;
-            plotLayout.annotations[1].visible = y2InUse;
-            plotLayout["yaxis3"].visible = y3InUse;
-            plotLayout.annotations[2].visible = y3InUse;
-
-            // If y and y2 are active, y shall make room for y2
-            // adjust label placement accordingly
-            if (yInUse && !y2InUse) {
-                plotLayout.annotations[0].x = 0; //Y1 label
-            } else if (!yInUse && y2InUse) {
-                plotLayout.annotations[1].x = 0; //Y2 label
-            }
-            if (yInUse && y2InUse){
-                plotLayout.xaxis.domain = [0.05, 1];
-                plotLayout.annotations[0].x = 0.05;
-                plotLayout.annotations[1].x = 0;
-            } else {
-                plotLayout.xaxis.domain = [0, 1];
-            }
-
+            manageMainYaxis();
 
             console.log("Updated plotLayout:", plotLayout);
 
             updatePlot();
         });
     });
-}
+
+    
+    document.querySelectorAll(".subplot-selector").forEach(select => {
+        select.addEventListener("change", event => {
+            const index = event.target.dataset.index;
+            const selectedValue = event.target.value; // e.g., "sp1", "sp2"
+              
+            // 1) Locate the .y-axis-selector for this trace and enable/disable
+            const yAxisSelect = document.querySelector(`.y-axis-selector[data-index="${index}"]`);
+            yAxisSelect.value = "y1";
+            if (yAxisSelect) {
+                if (selectedValue === "sp1") {
+                    yAxisSelect.disabled = false;  // Re-enable Y-Axis dropdown
+                } else {
+                    yAxisSelect.disabled = true;   // Disable Y-Axis dropdown if sp2..sp5
+                }
+            }
+
+            // 2) Switch-case to set the yaxis property
+            switch (selectedValue) {
+                case "sp1":
+                    plotData.traces[index].yaxis = "y";
+                    break;
+                case "sp2":
+                    plotData.traces[index].yaxis = "y20";
+                    break;
+                case "sp3":
+                    plotData.traces[index].yaxis = "y30";
+                    break;
+                case "sp4":
+                    plotData.traces[index].yaxis = "y40";
+                    break;
+                case "sp5":
+                    plotData.traces[index].yaxis = "y50";
+                    break;
+                default:
+                    plotData.traces[index].yaxis = "y";
+                    break;
+            }
+
+            manageMainYaxis();
+    
+            // 3) Update subplot statuses, layout, and re-plot
+            updateActiveSubplotsStatus();
+            updateSubplotLayout(getSelectedSubplots());
+            updatePlot();
+        });
+    });
+};
 
 /******************** Droplist Filter Options Scroll ********************/
 document.addEventListener('DOMContentLoaded', function () {
@@ -364,6 +387,8 @@ document.addEventListener("DOMContentLoaded", () => {
                     // Add the trace to the global plotData
                     plotData.addData(traces); 
 
+                    updateActiveSubplotsStatus();
+                    resetSubplotLayout();
                     generatePlot();
 
                     populateAxisFields();

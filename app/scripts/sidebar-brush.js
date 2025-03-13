@@ -9,6 +9,7 @@ function displayConfigurationControls(data) {
         const lineWidth = trace.line && trace.line.width ? trace.line.width : 2;
         const markerSize = trace.marker && trace.marker.size ? trace.marker.size : 6;
         const assignedYAxis = trace.yaxis || "y"; // Default to Y-axis 1
+        const assignedXAxis = trace.xaxis || "x"; // Default X-Axis
         //const traceColor = trace.line && trace.line.color ? trace.line.color : 'rgb(0, 0, 0)'; // Default black
 
         lineConfig.innerHTML = `
@@ -94,6 +95,18 @@ function displayConfigurationControls(data) {
                 <option value="y1" ${assignedYAxis === "y1" ? "selected" : ""}>Y1 (Primary)</option>
                 <option value="y2" ${assignedYAxis === "y2" ? "selected" : ""}>Y2 (Secondary)</option>
                 <option value="y3" ${assignedYAxis === "y3" ? "selected" : ""}>Y3 (Right side)</option>
+            </select>
+        </div>
+
+        <!-- Subplot Selector -->
+        <div class="subplot-selector-container">
+            <label>Subplots</label>
+            <select class="subplot-selector" data-index="${index}">
+                <option value="sp1">Main Plot</option>
+                <option value="sp2">Subplot A</option>
+                <option value="sp3">Subplot B</option>
+                <option value="sp4">Subplot C</option>
+                <option value="sp5">Subplot D</option>
             </select>
         </div>
         `;

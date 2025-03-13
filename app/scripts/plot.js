@@ -3,7 +3,15 @@ const plotData = {
     // Trace is commonly used in Plotly's terminology for a single plotted dataset
     // Multiple data sets are called traces
     traces: [], // Traces is a group of Trace.
-    //yAxes: ["y"], // List of available Y-axes (initially only "y")
+
+    activeSubplots: 
+    {
+        sp1: true,
+        sp2: false,
+        sp3: false,
+        sp4: false,
+        sp5: false,
+    },
 
     // Clear all traces from the group
     clearTraces() {
@@ -47,7 +55,7 @@ const plotData = {
         }
     },
 
-    isAxisInUse(axis) {
+    isYAxisInUse(axis) {
         // Check if any trace has the specified yaxis
         return plotData.traces.some(trace => trace.yaxis === axis);
     },
@@ -63,7 +71,6 @@ const plotLayout = {
     responsive: true,
     hovermode: 'x',
     dragmode: 'pan',
-    grid: { rows: 1, columns: 1 },
     xaxis: { domain: [0.0, 1] },
     yaxis: 
     {  
@@ -92,6 +99,37 @@ const plotLayout = {
         overlaying: 'y', 
         side: 'right', 
         visible: false
+    },
+    yaxis20: 
+    { 
+        title: { text: 'Subplot A' }, 
+        visible: false,
+        showline: true, 
+    },
+    yaxis30: 
+    { 
+        title: { text: 'Subplot B' }, 
+        visible: false,
+        showline: true, 
+    },
+    yaxis40: 
+    { 
+        title: { text: 'Subplot C' }, 
+        visible: false,
+        showline: true, 
+    },
+    yaxis50: 
+    { 
+        title: { text: 'Subplot D' }, 
+        visible: false,
+        showline: true, 
+    },
+    grid: 
+    {
+        rows: 1,
+        columns: 1,
+        //subplots:[['xy'],['xy20'],['xy30'],['xy40'],['xy50']],
+        roworder:'bottom to top'
     },
     annotations: [
         {
@@ -339,4 +377,176 @@ function showToast(message) {
         toast.classList.remove("show");
         setTimeout(() => toast.remove(), 300);
     }, 5000);
+}
+
+function resetSubplotLayout() {
+    // Standard case: only "xy" is used, so 1 row x 1 column
+    plotLayout.grid = {
+        rows: 1,
+        columns: 1,
+        subplots: [["xy"]]
+    };
+
+    // Make sure yaxis object exists
+    if (!plotLayout.yaxis) {
+        plotLayout.yaxis = {};
+    }
+    // Set main Y-axis visible
+    plotLayout.yaxis.visible = true;
+    plotLayout.yaxis.domain = [0, 1];
+
+    // Ensure the extra Y-axes exist, then mark them invisible
+    const extraYAxes = ["yaxis20", "yaxis30", "yaxis40", "yaxis50"];
+    extraYAxes.forEach(axisName => {
+        if (!plotLayout[axisName]) {
+            plotLayout[axisName] = {};
+        }
+        plotLayout[axisName].visible = false;
+    });
+
+    console.log("Layout reset to standard case:", plotLayout);
+}
+
+function updateActiveSubplotsStatus() {
+    // Ensure plotData.activeSubplots exists
+    if (!plotData.activeSubplots) {
+        plotData.activeSubplots = {
+            sp1: false,
+            sp2: false,
+            sp3: false,
+            sp4: false,
+            sp5: false,
+        };
+    }
+
+    // Set all subplots to false without replacing the object reference
+    Object.keys(plotData.activeSubplots).forEach(key => {
+        plotData.activeSubplots[key] = false;
+    });
+
+    // Iterate through all subplot selectors and update active status
+    document.querySelectorAll(".subplot-selector").forEach((dropdown) => {
+        const selectedValue = dropdown.value; // e.g., "sp1", "sp2"
+        
+        if (plotData.activeSubplots.hasOwnProperty(selectedValue)) {
+            plotData.activeSubplots[selectedValue] = true;
+        }
+    });
+
+    console.log(plotData.activeSubplots); // Debugging output
+}
+
+
+function getSelectedSubplots() {
+    const selections = {};
+
+    document.querySelectorAll(".subplot-selector").forEach((dropdown) => {
+        const index = dropdown.dataset.index; // Identify which trace it belongs to
+        const selectedValue = dropdown.value; // e.g., "sp1", "sp2"
+        selections[index] = selectedValue;
+    });
+
+    // 1) Gather all subplot values (e.g. ["sp2", "sp2", "sp3", "sp4"]).
+    const values = Object.values(selections);
+
+    // 2) Remove duplicates (Set).
+    const unique = new Set(values); // e.g. { "sp2", "sp3", "sp4" }
+
+    // 3) Convert to an array.
+    const selectedSubplots = [...unique]; // e.g. ["sp2", "sp3", "sp4"]
+
+    return selectedSubplots;
+}
+
+function updateSubplotLayout(selectedSubplots) {
+    // Step 1: Extract unique subplots from values
+    const activeSubplots = getSelectedSubplots(selectedSubplots);
+    const activeCount = activeSubplots.length;
+
+    //console.log("Active Subplots:", activeSubplots); 
+    //console.log("Number of Active Subplots:", activeCount);
+
+    // Step 2: Adjust your grid rows 
+    plotLayout.grid.rows = activeCount || 1; // At least 1 row if all subplots are empty
+
+    // Step 2a: Build subplots array based on active subplots
+    //   sp1 => "xy"
+    //   sp2 => "xy20"
+    //   sp3 => "xy30"
+    //   sp4 => "xy40"
+    //   sp5 => "xy50"
+    let subplotsArray = [];
+    if (activeCount > 0) {
+        activeSubplots.forEach(sp => {
+            if (sp === "sp1") {
+                subplotsArray.push(["xy"]);
+            } else {
+                // e.g. sp2 => "xy20"
+                const num = sp.substring(2);
+                subplotsArray.push([`xy${num}0`]);
+            }
+        });
+    } else {
+        // If no active subplots, default to the main plot
+        subplotsArray = [["xy"]];
+    }
+    // Assign the constructed array to the layout
+    plotLayout.grid.subplots = subplotsArray;
+
+    // Step 3: Reset Y-axis visibility to false (or create them if missing)
+    const yAxes = ["yaxis", "yaxis20", "yaxis30", "yaxis40", "yaxis50"];
+    yAxes.forEach(axis => {
+        if (!plotLayout[axis]) {
+            plotLayout[axis] = {};
+        }
+        plotLayout[axis].visible = false;
+    });
+
+    // Step 4: Evenly divide domain
+    const step = 1 / (activeCount || 1); 
+    let position = 0;
+
+    // Step 5: For each active subplot, set domain, show it
+    activeSubplots.forEach(sp => {
+        // sp1 => "yaxis"
+        // sp2 => "yaxis20"
+        // sp3 => "yaxis30"
+        // etc.
+        const axisKey = sp === "sp1" ? "yaxis" : `yaxis${sp.substring(2)}0`;
+
+        plotLayout[axisKey].domain = [position, position + step - 0.02];
+        plotLayout[axisKey].visible = true;
+        position += step;
+    });
+
+    //console.log("Updated plotLayout:", plotLayout);
+}
+
+// If axis is in use by a trace, make it visible in the layout
+function manageMainYaxis() {
+    // If axis is in use by a trace, make it visible in the layout
+    const yInUse  = plotData.isYAxisInUse("y");
+    const y2InUse = plotData.isYAxisInUse("y2");
+    const y3InUse = plotData.isYAxisInUse("y3");
+    plotLayout["yaxis"].visible = yInUse;
+    plotLayout.annotations[0].visible = yInUse;
+    plotLayout["yaxis2"].visible = y2InUse;
+    plotLayout.annotations[1].visible = y2InUse;
+    plotLayout["yaxis3"].visible = y3InUse;
+    plotLayout.annotations[2].visible = y3InUse;
+
+    // If y and y2 are active, y shall make room for y2
+    // adjust label placement accordingly
+    if (yInUse && !y2InUse) {
+        plotLayout.annotations[0].x = 0; //Y1 label
+    } else if (!yInUse && y2InUse) {
+        plotLayout.annotations[1].x = 0; //Y2 label
+    }
+    if (yInUse && y2InUse){
+        plotLayout.xaxis.domain = [0.05, 1];
+        plotLayout.annotations[0].x = 0.05;
+        plotLayout.annotations[1].x = 0;
+    } else {
+        plotLayout.xaxis.domain = [0, 1];
+    }
 }
