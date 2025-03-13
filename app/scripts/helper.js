@@ -40,10 +40,20 @@ export function extractRawValue(data, startBit, length, byteOrder) {
     }
 
     // Convert to binary and extract bits
-    const binaryString = valueBytes.map(byte => byte.toString(2).padStart(8, '0')).join('');
-    const rawBinary = byteOrder === "BigEndian"
-        ? binaryString.substring(7 - bitOffset, 7 - bitOffset + length)
-        : binaryString.substring(bitOffset, bitOffset + length);
+    const binaryString = valueBytes
+        .map(byte => byte.toString(2).padStart(8, '0'))
+        .join('');
+
+    let rawBinary;
+    if (byteOrder === "BigEndian") {
+        rawBinary = binaryString.substring(7 - bitOffset, 7 - bitOffset + length);
+    } else {
+        // For little endian, count from the right side of the binary string.
+        rawBinary = binaryString.substring(
+            binaryString.length - (bitOffset + length),
+            binaryString.length - bitOffset
+        );
+    }
 
     return parseInt(rawBinary, 2);
 }
