@@ -71,11 +71,18 @@ const plotLayout = {
     responsive: true,
     hovermode: 'x',
     dragmode: 'pan',
-    xaxis: { domain: [0.0, 1] },
+    xaxis: 
+    { 
+        domain: [0.0, 1],
+        anchor: 'free',    // do not anchor to a Y-axis domain
+        side: 'bottom',    // draw axis along the bottom
+        position: 0        // place it at the bottom of the entire figure 
+    },
     yaxis: 
     {  
-        title: { text: '' }, 
-        domain: [0, 1], 
+        title: { text: ''}, 
+        domain: [0, 1],
+        anchor: 'x',
         side: 'left', 
         visible: true, 
         showline: true
@@ -103,24 +110,28 @@ const plotLayout = {
     yaxis20: 
     { 
         title: { text: 'Subplot A' }, 
+        anchor: 'x',
         visible: false,
         showline: true, 
     },
     yaxis30: 
     { 
         title: { text: 'Subplot B' }, 
+        anchor: 'x',
         visible: false,
         showline: true, 
     },
     yaxis40: 
     { 
         title: { text: 'Subplot C' }, 
+        anchor: 'x',
         visible: false,
         showline: true, 
     },
     yaxis50: 
     { 
         title: { text: 'Subplot D' }, 
+        anchor: 'x',
         visible: false,
         showline: true, 
     },
@@ -169,12 +180,7 @@ const plotLayout = {
             font: { size: 12, color: 'black' },
             align: 'center'
         }
-    ]/*,
-    legend: {
-        x: 1,
-        xanchor: 'right',
-        y: 1
-      }*/ 
+    ]
 };
 
 const plotConfiguration = {
@@ -311,6 +317,7 @@ function updatePlot() {
     Plotly.react('plot', data, plotLayout);
 
     updateAxisFieldsState()
+    console.log("plotLayout:", plotLayout);
 }
 
 /**
@@ -343,6 +350,7 @@ function generatePlotlyDatasets(processedLogs) {
                 y: y,
                 mode: "lines+markers",
                 type: "scattergl",
+                xaxis: 'x',
                 yaxis: 'y',
                 name: `${signalName}${unit}`, // Updated name with unit
             };
@@ -432,8 +440,6 @@ function updateActiveSubplotsStatus() {
             plotData.activeSubplots[selectedValue] = true;
         }
     });
-
-    console.log(plotData.activeSubplots); // Debugging output
 }
 
 
@@ -460,7 +466,7 @@ function getSelectedSubplots() {
 
 function updateSubplotLayout(selectedSubplots) {
     // Step 1: Extract unique subplots from values
-    const activeSubplots = getSelectedSubplots(selectedSubplots);
+    const activeSubplots = getSelectedSubplots();
     const activeCount = activeSubplots.length;
 
     //console.log("Active Subplots:", activeSubplots); 
@@ -477,11 +483,23 @@ function updateSubplotLayout(selectedSubplots) {
     //   sp5 => "xy50"
     let subplotsArray = [];
     if (activeCount > 0) {
-        activeSubplots.forEach(sp => {
-            if (sp === "sp1") {
-                subplotsArray.push(["xy"]);
+        // 1) Check if sp1 is in the activeSubplots
+        if (activeSubplots.includes("sp1")) {
+            // If so, push the main subplot "xy" first
+            subplotsArray.push(["xy"]);
+            // title only if there are no subplots
+            if(activeCount > 1)
+            {
+                plotLayout.yaxis.title.text = 'Main Plot';
             } else {
-                // e.g. sp2 => "xy20"
+                plotLayout.yaxis.title.text = '';
+            }
+        }
+        
+        // 2) Now handle other subplots sp2..sp5 in a fixed bottom-to-top order
+        const subplotOrder = ["sp2", "sp3", "sp4", "sp5"];
+        subplotOrder.forEach(sp => {
+            if (activeSubplots.includes(sp)) {
                 const num = sp.substring(2);
                 subplotsArray.push([`xy${num}0`]);
             }
@@ -490,6 +508,7 @@ function updateSubplotLayout(selectedSubplots) {
         // If no active subplots, default to the main plot
         subplotsArray = [["xy"]];
     }
+
     // Assign the constructed array to the layout
     plotLayout.grid.subplots = subplotsArray;
 
@@ -506,17 +525,16 @@ function updateSubplotLayout(selectedSubplots) {
     const step = 1 / (activeCount || 1); 
     let position = 0;
 
-    // Step 5: For each active subplot, set domain, show it
-    activeSubplots.forEach(sp => {
-        // sp1 => "yaxis"
-        // sp2 => "yaxis20"
-        // sp3 => "yaxis30"
-        // etc.
-        const axisKey = sp === "sp1" ? "yaxis" : `yaxis${sp.substring(2)}0`;
-
-        plotLayout[axisKey].domain = [position, position + step - 0.02];
-        plotLayout[axisKey].visible = true;
-        position += step;
+    // Step 5: Assign domains in a fixed priority order too, 
+    //         so sp1 is bottom if it's active, then sp2, sp3, etc.
+    const domainOrder = ["sp1","sp2","sp3","sp4","sp5"];
+    domainOrder.forEach(sp => {
+        if (activeSubplots.includes(sp)) {
+            const axisKey = (sp === "sp1") ? "yaxis" : `yaxis${sp.substring(2)}0`;
+            plotLayout[axisKey].domain = [position, position + step - 0.02];
+            plotLayout[axisKey].visible = true;
+            position += step;
+        }
     });
 
     //console.log("Updated plotLayout:", plotLayout);
@@ -524,6 +542,18 @@ function updateSubplotLayout(selectedSubplots) {
 
 // If axis is in use by a trace, make it visible in the layout
 function manageMainYaxis() {
+
+    const activeSubplots = getSelectedSubplots();
+    const activeCount = activeSubplots.length;
+    if ((activeCount === 1) && (activeSubplots.includes("sp1")))
+    {
+        plotLayout["yaxis2"].domain = plotLayout["yaxis"].domain;
+        plotLayout["yaxis3"].domain = plotLayout["yaxis"].domain;
+    } else {
+        plotLayout["yaxis2"].domain = [0,1];
+        plotLayout["yaxis3"].domain = [0,1];
+    }
+
     // If axis is in use by a trace, make it visible in the layout
     const yInUse  = plotData.isYAxisInUse("y");
     const y2InUse = plotData.isYAxisInUse("y2");

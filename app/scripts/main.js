@@ -309,11 +309,11 @@ function addConfigListeners() {
                     break;
             }
 
-            manageMainYaxis();
-    
+            
             // 3) Update subplot statuses, layout, and re-plot
             updateActiveSubplotsStatus();
             updateSubplotLayout(getSelectedSubplots());
+            manageMainYaxis();
             updatePlot();
         });
     });
