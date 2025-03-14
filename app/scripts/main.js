@@ -678,43 +678,55 @@ document.getElementById("plot").addEventListener("wheel", function(event) {
         });
     }
 
-// ---- Y-Axis Zoom (Shift + Scroll) ----
-if (!event.ctrlKey) {
-    // Use deltaY if available, otherwise fallback to deltaX
-    let delta = event.deltaY !== 0 ? event.deltaY : event.deltaX;
-    let direction = delta < 0 ? 1 : -1; // negative delta means zoom in, positive means zoom out
+    // ---- Y-Axis Zoom (Scroll or Shift+Scroll) ----
+    // Only execute if ctrlKey is not pressed (or modify as needed)
+    if (!event.ctrlKey) {
+        // Get the bounding rectangle of the plot container
+        // Calculate the mouse Y position relative to the container (normalized between 0 and 1)
+        //const rect = plotDiv.getBoundingClientRect();
+        //const relativeY = 1 - ((event.clientY - rect.top) / rect.height);
+        const rect = plotDiv.getBoundingClientRect();
+        const marginTop = plotLayout.margin ? (plotLayout.margin.t || 0) : 100; //FIXME: hardcoded value, margin from top to subplot
+        const marginBottom = plotLayout.margin ? (plotLayout.margin.b || 0) : 70; //FIXME: hardcoded value, margin from bottom to subplot
+        const effectiveHeight = rect.height - marginTop - marginBottom;
+        const adjustedY = event.clientY - rect.top - marginTop;
+        const relativeY = 1 - (adjustedY / effectiveHeight);
 
-    // List of y-axis keys in your layout (adjust as needed)
-    const yAxes = ["yaxis", "yaxis2", "yaxis3"];
-    yAxes.forEach((axisKey) => {
-        let axisObj = plotDiv.layout[axisKey];
-        // Only update if the axis is visible and has a range defined
-        if (axisObj && axisObj.visible && axisObj.range) {
-            let currentYRange = axisObj.range;
-            let yMin = currentYRange[0];
-            let yMax = currentYRange[1];
-            let yRangeWidth = yMax - yMin;
-            let yZoomStep = yRangeWidth * zoomFactor;
-            // Use deltaY (or deltaX fallback if needed)
-            let delta = event.deltaY !== 0 ? event.deltaY : event.deltaX;
-            let direction = delta < 0 ? 1 : -1;
-            
-            // Compute new range boundaries symmetrically
-            let newYMin = yMin + direction * yZoomStep;
-            let newYMax = yMax - direction * yZoomStep;
-            let center = (yMin + yMax) / 2;
-            let halfYRange = (newYMax - newYMin) / 2;
-            newYMin = center - halfYRange;
-            newYMax = center + halfYRange;
-            
-            // Update the axis; disable autorange so manual range is used
-            let updateObj = {};
-            updateObj[axisKey + ".autorange"] = false;
-            updateObj[axisKey + ".range"] = [newYMin, newYMax];
-            Plotly.relayout(plotDiv, updateObj);
-        }
-    });
-}
+        // List of all potential y-axes (adjust as needed for your subplots)
+        const yAxes = ["yaxis", "yaxis20", "yaxis30", "yaxis40", "yaxis50"];
+        
+        // Loop over each y-axis and check if the mouse is hovering over its domain
+        yAxes.forEach(axisKey => {
+            const axisObj = plotLayout[axisKey];
+            if (axisObj && axisObj.visible && axisObj.range && axisObj.domain) {
+                // If the relativeY is within this axis's domain, apply the zoom
+                if (relativeY >= axisObj.domain[0] && relativeY <= axisObj.domain[1]) {
+                    const currentYRange = axisObj.range;
+                    const yMin = currentYRange[0];
+                    const yMax = currentYRange[1];
+                    const yRangeWidth = yMax - yMin;
+                    const yZoomStep = yRangeWidth * zoomFactor;
+                    // Determine zoom direction (scroll up: zoom in, scroll down: zoom out)
+                    const delta = event.deltaY !== 0 ? event.deltaY : event.deltaX;
+                    const direction = delta < 0 ? 1 : -1;
+                    
+                    // Calculate new range boundaries symmetrically
+                    let newYMin = yMin + direction * yZoomStep;
+                    let newYMax = yMax - direction * yZoomStep;
+                    const center = (yMin + yMax) / 2;
+                    const halfYRange = (newYMax - newYMin) / 2;
+                    newYMin = center - halfYRange;
+                    newYMax = center + halfYRange;
+                    
+                    // Update only the hovered y-axis
+                    const updateObj = {};
+                    updateObj[axisKey + ".autorange"] = false;
+                    updateObj[axisKey + ".range"] = [newYMin, newYMax];
+                    Plotly.relayout(plotDiv, updateObj);
+                }
+            }
+        });
+    }
 });
 /*
         updateXAxisProperty("autorange", false); // Disable X-axis autorange
