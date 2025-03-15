@@ -4,20 +4,20 @@
         {
             "name": "Launch Edge - Local File",
             "request": "launch",
-            "type": "chrome",
+            "type": "msedge",
             "file": "${workspaceFolder}/index.html",
             "webRoot": "${workspaceFolder}"
-        },
-        {
-            "type": "msedge",
-            "request": "launch",
+          },
+          {
             "name": "Launch Edge with Live Server",
-            "url": "http://localhost:8080",
+            "request": "launch",
+            "type": "msedge",
+            "url": "http://localhost:5500",
             "webRoot": "${workspaceFolder}",
             "sourceMaps": true,
             "trace": true,
             "smartStep": true
-        },
+          },
         {
             "type": "node",
             "request": "launch",
