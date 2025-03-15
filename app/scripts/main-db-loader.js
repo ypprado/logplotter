@@ -65,6 +65,7 @@ const databaseHandler = {
                 name: msg.name,
                 dlc: msg.dlc,
                 sender: msg.sender,
+                description: msg.comment,
                 signals: msg.signals.map((sig) => ({
                     name: sig.name,
                     startBit: sig.startBit,
@@ -76,6 +77,7 @@ const databaseHandler = {
                     units: sig.units,
                     valueRange: sig.valueRange,
                     defaultValue: sig.defaultValue,
+                    description: sig.description,
                     ...(sig.valueDescriptions && { valueDescriptions: sig.valueDescriptions }),
                     ...(sig.isMultiplexer && { isMultiplexer: true }),
                     ...(sig.multiplexerValue !== undefined && { multiplexerValue: sig.multiplexerValue }),
@@ -129,4 +131,8 @@ const databaseHandler = {
         });
     },
 };
+
+// Expose it globally for non-module scripts
+window.databaseHandler = databaseHandler;
+
 export default databaseHandler;

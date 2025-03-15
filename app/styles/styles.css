@@ -122,3 +122,17 @@ button:hover {
     border-radius: 20px; /* Adjust the value as needed */
     overflow: hidden;
 }
+
+/* Basic tooltip styling */
+#custom-tooltip {
+    position: absolute;
+    display: none;
+    pointer-events: none; /* Don’t block mouse events */
+    background-color: #333;
+    color: #fff;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    z-index: 9999;
+}
+  
