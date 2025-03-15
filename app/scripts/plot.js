@@ -186,7 +186,9 @@ const plotLayout = {
 const plotConfiguration = {
     displaylogo: false,
     modeBarButtonsToRemove: ['select2d','lasso2d','resetScale2d'],
+    modeBarButtonsToAdd: ['toggleHover','hovercompare','hoverclosest'], //https://plotly.com/javascript/reference/layout/#layout-modebar-add
     displayModeBar: true,
+    responsive: true // auto resize
 }
 
 function updateYAxisProperty(axisNumber, property, value) {
