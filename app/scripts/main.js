@@ -6,6 +6,10 @@ import {downloadTracesAsCSV} from "./csv-export.js";
 
 import {extractRawValue} from "./helper.js";
 
+import {handleFilterOptionsScroll} from "./sidebar-main.js";
+import {populateCheckboxGroup} from "./sidebar-main.js";
+import {populateSignals} from "./sidebar-main.js";
+
 /* Helper: Show/hide tooltip at mouse position */
 window.showTooltip = function (event, text) {
     // Check if text is empty or only whitespace

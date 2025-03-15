@@ -1,3 +1,5 @@
+import databaseHandler from "./main-db-loader.js";
+
 /**
 * Helper function to populate a list of checkboxes.
 * 
@@ -102,6 +104,16 @@ function handleSignalMouseLeave() {
  * Populates the checkbox-signals container based on selected sources (or displays all signals if no source is selected).
  */
 function populateSignals(database) {
+
+    // If no database is provided, get it from the handler.
+    if (!database) {
+      database = databaseHandler.getDatabase();
+      if (!database) {
+        console.error("Database not loaded.");
+        return;
+      }
+    }
+
     const checkboxGroup = document.querySelector('#checkbox-signals .checkbox-group');
     const selectedSources = Array.from(
       document.querySelectorAll('#checkbox-sources .checkbox-group input[type="checkbox"]:checked')
@@ -279,3 +291,9 @@ function handleFilterOptionsScroll(event) {
     }
 }
 
+export { populateSignals }; // Export if used in other modules
+export { populateCheckboxGroup }; // Export if used in other modules
+export { handleFilterOptionsScroll }; // Export if used in other modules
+export { updateButtonColor }; // Export if used in other modules
+export { handleSignalMouseMove }; // Export if used in other modules
+export { handleSignalMouseLeave }; // Export if used in other modules

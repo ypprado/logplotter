@@ -131,4 +131,8 @@ const databaseHandler = {
         });
     },
 };
+
+// Expose it globally for non-module scripts
+window.databaseHandler = databaseHandler;
+
 export default databaseHandler;
