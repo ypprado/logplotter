@@ -12,7 +12,7 @@ function populateCheckboxList(list, container, emptyMessage) {
       let html = "";
       list.forEach(item => {
         // Parse out the two parts (before and inside parentheses)
-        let descriptionText = "No description available";
+        let descriptionText = "";
         const match = item.match(/^(.*)\s*\((.*)\)$/);
         if (match) {
           const part1 = match[1].trim();
@@ -24,26 +24,24 @@ function populateCheckboxList(list, container, emptyMessage) {
           if (!msgObj) {
             msgObj = findMessageInDatabaseByName(part1) || findMessageInDatabaseByName(part2);
           }
-          if (msgObj && msgObj.description) {
+          if (msgObj && msgObj.description && msgObj.description.trim() !== "") {
             descriptionText = msgObj.description;
           }
         }
-        // Build the label with tooltip events using single quotes for onmousemove
+        // Build the label with tooltip events only if a valid description exists.
         html += `
-            <label
-              onmousemove='showTooltip(event, ${JSON.stringify(descriptionText)})'
-              onmouseleave="hideTooltip()"
-            >
-              <input type="checkbox" value="${item}"> ${item}
-            </label>`;
+          <label
+            ${descriptionText ? `onmousemove='showTooltip(event, ${JSON.stringify(descriptionText)})'` : ""}
+            onmouseleave="hideTooltip()"
+          >
+            <input type="checkbox" value="${item}"> ${item}
+          </label>`;
       });
       container.innerHTML = html;
     } else {
       container.innerHTML = `<p>${emptyMessage}</p>`;
     }
   }
-  
-  
 
 /**
  * Populates the checkbox group based on the selected filter option.
@@ -163,14 +161,14 @@ function populateSignals(database) {
         const sigName = parts[0];
         const msgName = parts[1] ? parts[1].replace(")", "") : "";
         // Get the description from the database.
-        // If your findSignalInDatabase should consider msgName, update its definition accordingly.
         const signalObj = findSignalInDatabase(sigName, msgName);
-        const description = (signalObj && signalObj.description)
-            ? signalObj.description
-            : "No description available";        
+        // Check if there's a valid description.
+        const hasDescription = signalObj && signalObj.description && signalObj.description.trim() !== "";
+        const description = hasDescription ? signalObj.description : "";
+        
         html += `
             <label
-              onmousemove='showTooltip(event, ${JSON.stringify(description)})'
+              ${hasDescription ? `onmousemove='showTooltip(event, ${JSON.stringify(description)})'` : ""}
               onmouseleave="hideTooltip()"
             >
               <input type="checkbox" value="${signalString}" ${isChecked ? 'checked' : ''} />

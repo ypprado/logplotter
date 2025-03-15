@@ -8,12 +8,16 @@ import {extractRawValue} from "./helper.js";
 
 /* Helper: Show/hide tooltip at mouse position */
 window.showTooltip = function (event, text) {
+    // Check if text is empty or only whitespace
+    if (!text || text.trim() === "") {
+        return;
+    }
     const tooltip = document.getElementById("custom-tooltip");
     tooltip.style.display = "block";
-    tooltip.textContent = text || "No description available";
+    tooltip.textContent = text;
     tooltip.style.left = (event.pageX + 10) + "px";
     tooltip.style.top = (event.pageY + 10) + "px";
- };
+};
 
 window.hideTooltip = function () {
     const tooltip = document.getElementById("custom-tooltip");
