@@ -6,6 +6,43 @@ import {downloadTracesAsCSV} from "./csv-export.js";
 
 import {extractRawValue} from "./helper.js";
 
+import {handleFilterOptionsScroll} from "./sidebar-main.js";
+import {populateCheckboxGroup} from "./sidebar-main.js";
+import {populateSignals} from "./sidebar-main.js";
+
+/* Helper: Show/hide tooltip at mouse position */
+window.showTooltip = function (event, text) {
+    // Check if text is empty or only whitespace
+    if (!text || text.trim() === "") {
+        return;
+    }
+    const tooltip = document.getElementById("custom-tooltip");
+    tooltip.style.display = "block";
+    tooltip.textContent = text;
+    tooltip.style.left = (event.pageX + 10) + "px";
+    tooltip.style.top = (event.pageY + 10) + "px";
+};
+
+window.hideTooltip = function () {
+    const tooltip = document.getElementById("custom-tooltip");
+    tooltip.style.display = "none";
+ };
+
+function findMessageInDatabaseByName(name) {
+    const db = databaseHandler.getDatabase();
+    if (!db) return null;
+    return db.messages.find(msg => msg.name === name) || null;
+ }
+
+/* Helpers to find messages/signals in the database */
+function findMessageInDatabaseById(hexId) {
+    const db = databaseHandler.getDatabase();
+    if (!db) return null;
+    return db.messages.find(msg =>
+      parseInt(msg.id, 16) === parseInt(hexId, 16)
+    ) || null;
+ }
+
 /************ Permanent Sidebar arrowButton *****************/
 document.addEventListener('DOMContentLoaded', function () {
     const arrowButton = document.getElementById('arrowButton');
@@ -505,13 +542,19 @@ function findSignalInDatabase(signalName) {
                     offset: signal.offset,
                     valueType: signal.valueType,
                     unit: signal.units,
-                    valueDescription: signal.valueDescription 
+                    valueDescription: signal.valueDescription,
+                    description: signal.description || ""
                 };
             }
         }
     }
     return null; // Signal not found
 }
+
+// Make these helper functions available globally:
+window.findMessageInDatabaseById = findMessageInDatabaseById;
+window.findMessageInDatabaseByName = findMessageInDatabaseByName;
+window.findSignalInDatabase = findSignalInDatabase;
 
 /******************** Plot Container ********************/
 window.addEventListener('resize', () => {
