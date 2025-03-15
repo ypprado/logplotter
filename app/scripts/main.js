@@ -7,13 +7,13 @@ import {downloadTracesAsCSV} from "./csv-export.js";
 import {extractRawValue} from "./helper.js";
 
 /************ Permanent Sidebar arrowButton *****************/
-/*document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     const arrowButton = document.getElementById('arrowButton');
     arrowButton.addEventListener('click', toggleSidebar);
-    window.addEventListener('resize', () => {
+    /*window.addEventListener('resize', () => {
         //Plotly.Plots.resize('plot');
-    });
-});*/
+    });*/
+});
 
 /******************** Drop area Database ********************/
 document.addEventListener("DOMContentLoaded", () => {

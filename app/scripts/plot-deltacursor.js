@@ -3,7 +3,32 @@ let deltaPointA = null;
 let deltaPointB = null;
 let originalHovermode = null;
 
+function clearAnnotationsAndShapes() {
+    const plotEl = document.getElementById('plot');
+    // Clear any previous annotations and shapes when starting a new measurement cycle
+    // Preserve axis annotations while removing only delta cursor annotations
+    const preservedAnnotations = plotEl.layout.annotations.filter(ann => !ann.text.startsWith("X: "));
+    Plotly.relayout(plotEl, { annotations: preservedAnnotations, shapes: [] });
+}
+
 function toogleDeltaCursor() {
+    // Check if only "sp1" (Main Plot) is active
+    const activeSubplots = getSelectedSubplots();
+    if (activeSubplots.length > 1 || (activeSubplots.length === 1 && activeSubplots[0] !== "sp1")) {
+        showToast("Delta Cursor is only supported for the Main Plot.");
+        return;
+    }
+
+    // Check if only "y" (Main Y-Axis) is active
+    const yInUse = plotData.isYAxisInUse("y");
+    const y2InUse = plotData.isYAxisInUse("y2");
+    const y3InUse = plotData.isYAxisInUse("y3");
+
+    if (!yInUse || y2InUse || y3InUse) {
+        showToast("Delta Cursor is only supported on the Main Y-Axis.");
+        return;
+    }
+
     deltaModeActive = !deltaModeActive;
     const plotEl = document.getElementById('plot');
     
@@ -13,28 +38,34 @@ function toogleDeltaCursor() {
         deltaPointB = null;
         
         // Clear any previous annotations and shapes when starting a new measurement cycle
-        Plotly.relayout(plotEl, { annotations: [], shapes: [] });
-        
+        clearAnnotationsAndShapes();
+
         // Store the original hovermode and switch to 'closest'
         if (!originalHovermode) {
             originalHovermode = plotEl._fullLayout.hovermode || 'compare';
         }
         Plotly.relayout(plotEl, { hovermode: 'closest' });
         
-        // Delay adding the click listener to avoid capturing the toggle click
+        // Ensure previous event listener is removed before adding a new one
+        plotEl.removeListener('plotly_click', deltaClickHandler);
         setTimeout(() => { plotEl.on('plotly_click', deltaClickHandler); }, 0);
         console.log("Delta Cursor activated.");
     } else {
         plotEl.style.cursor = 'default';
-        // Remove our click listener by overriding with a no-op function
-        plotEl.on('plotly_click', function(){});
+        // Properly remove event listener when delta mode is deactivated
+        plotEl.removeListener('plotly_click', deltaClickHandler);
         
         // Revert hovermode and clear annotations and shapes
         if (originalHovermode) {
             Plotly.relayout(plotEl, { hovermode: originalHovermode });
             originalHovermode = null;
         }
-        Plotly.relayout(plotEl, { annotations: [], shapes: [] });
+        clearAnnotationsAndShapes();
+
+        let deltaOverlay = document.getElementById('delta-overlay');
+        if (deltaOverlay) {
+            deltaOverlay.style.display = 'none';
+        }
         console.log("Delta Cursor deactivated.");
     }
 }
@@ -51,7 +82,7 @@ function deltaClickHandler(data) {
     
     if (!deltaPointA) {
         // New measurement cycle: clear previous annotations and shapes
-        Plotly.relayout(plotEl, { annotations: [], shapes: [] });
+        clearAnnotationsAndShapes();
         deltaPointA = { x: x, y: y };
         console.log("Point A set at:", deltaPointA);
         addAnnotationAndLines(x, y);
@@ -60,11 +91,56 @@ function deltaClickHandler(data) {
         console.log("Point B set at:", deltaPointB);
         addAnnotationAndLines(x, y);
         
-        const deltaX = deltaPointB.x - deltaPointA.x;
-        const deltaY = deltaPointB.y - deltaPointA.y;
-        console.log("Delta X:", deltaX, "Delta Y:", deltaY);
+        // Convert timestamp strings to Date objects
+        const timeA = new Date(deltaPointA.x);
+        const timeB = new Date(deltaPointB.x);
+
+        const deltaMs = Math.abs(new Date(Math.max(timeA, timeB)) - new Date(Math.min(timeA, timeB)));
+
+        // Format ΔX dynamically
+        let deltaXFormatted = "";
+        let remainingMs = deltaMs;
+
+        const hours = Math.floor(remainingMs / (60 * 60 * 1000));
+        remainingMs %= (60 * 60 * 1000);
+        const minutes = Math.floor(remainingMs / (60 * 1000));
+        remainingMs %= (60 * 1000);
+        const seconds = Math.floor(remainingMs / 1000);
+        const milliseconds = remainingMs % 1000;
+
+        // Build the formatted string dynamically
+        if (hours > 0) deltaXFormatted += `${hours}h `;
+        if (minutes > 0 || hours > 0) deltaXFormatted += `${minutes}m `;
+        if (seconds > 0 || minutes > 0 || hours > 0) deltaXFormatted += `${seconds}s `;
+        if (milliseconds > 0 || (hours === 0 && minutes === 0 && seconds === 0)) deltaXFormatted += `${milliseconds}ms`;
+
+        // Trim any extra spaces
+        deltaXFormatted = deltaXFormatted.trim();
         
-        // (Optionally, you could add an annotation for the delta measurement itself here.)
+        console.log("Delta X:", deltaXFormatted);
+        
+        // Update overlay
+        let deltaOverlay = document.getElementById('delta-overlay');
+        if (!deltaOverlay) {
+            deltaOverlay = document.createElement('div');
+            deltaOverlay.id = 'delta-overlay';
+            deltaOverlay.style.position = 'absolute';
+            deltaOverlay.style.bottom = '20px';
+            deltaOverlay.style.right = '20px';
+            deltaOverlay.style.background = 'rgba(0,0,0,0.7)';
+            deltaOverlay.style.color = 'white';
+            deltaOverlay.style.padding = '8px 12px';
+            deltaOverlay.style.borderRadius = '5px';
+            deltaOverlay.style.fontSize = '14px';
+            deltaOverlay.style.display = 'none';
+            document.body.appendChild(deltaOverlay);
+        }
+
+        const deltaY = deltaPointB.x > deltaPointA.x ? deltaPointB.y - deltaPointA.y : deltaPointA.y - deltaPointB.y;
+        // Format ΔY to avoid trailing zeros
+        const deltaYFormatted = parseFloat(deltaY.toFixed(10)).toString();
+        deltaOverlay.innerHTML = `ΔX: ${deltaXFormatted} | ΔY: ${deltaYFormatted}`;
+        deltaOverlay.style.display = 'block';
         
         // Reset for the next measurement cycle
         deltaPointA = null;
@@ -125,11 +201,6 @@ function addAnnotationAndLines(x, y) {
         yref: 'y'
     };
     
-    // Determine the first x value in the dataset
-    /*let firstXValue = plotEl.data.length > 0 
-        ? Math.min(...plotEl.data[0].x.map(val => (typeof val === "string" ? Date.parse(val) : val)).filter(num => !isNaN(num))) 
-        : plotEl._fullLayout.xaxis.range[0];*/
-
     // Determine the first x value in the dataset without converting it into a timestamp
     let firstXValue = plotEl.data.length > 0 
     ? plotEl.data[0].x[0]  // Simply take the first x-value in the dataset
