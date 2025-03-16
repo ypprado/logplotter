@@ -7,10 +7,15 @@ const plotData = {
     activeSubplots: 
     {
         sp1: true,
+        sp1domain: [0, 1],
         sp2: false,
+        sp2domain: [0, 1],
         sp3: false,
+        sp3domain: [0, 1],
         sp4: false,
+        sp4domain: [0, 1],
         sp5: false,
+        sp5domain: [0, 1],
     },
 
     // Clear all traces from the group
@@ -66,7 +71,6 @@ const plotData = {
     }
 };
 
-
 const plotLayout = {
     responsive: true,
     hovermode: 'x',
@@ -87,7 +91,7 @@ const plotLayout = {
         visible: true, 
         showline: true
     },
-    yaxis2: 
+    /*yaxis2: 
     { 
         title: { text: '' }, 
         domain: [0, 1], 
@@ -134,12 +138,11 @@ const plotLayout = {
         anchor: 'x',
         visible: false,
         showline: true, 
-    },
+    },*/
     grid: 
     {
         rows: 1,
         columns: 1,
-        //subplots:[['xy'],['xy20'],['xy30'],['xy40'],['xy50']],
         roworder:'bottom to top'
     },
     annotations: [
@@ -157,7 +160,7 @@ const plotLayout = {
         },
         {
             text: 'Y2',
-            x: 0.05,
+            x: 0.07,
             y: 1.02, 
             xref: 'paper',
             yref: 'paper',
@@ -225,9 +228,9 @@ function updateYAxisProperty(axisNumber, property, value) {
     }
 }
 
-function updateXAxisProperty(property, value) {
+/*function updateXAxisProperty(property, value) {
     plotLayout.xaxis[property] = value;
-}
+}*/
 
 // Example usage:
 //updatePlotLayout('yaxis2:visible', true);   // Makes yaxis2 visible
@@ -405,19 +408,20 @@ function resetSubplotLayout() {
 
     // Make sure yaxis object exists
     if (!plotLayout.yaxis) {
-        plotLayout.yaxis = {};
+        plotLayout.yaxis = createYAxisConfig('yaxis');
     }
     // Set main Y-axis visible
     plotLayout.yaxis.visible = true;
     plotLayout.yaxis.domain = [0, 1];
 
-    // Ensure the extra Y-axes exist, then mark them invisible
-    const extraYAxes = ["yaxis20", "yaxis30", "yaxis40", "yaxis50"];
+    // Delete all additional Y axis
+    const extraYAxes = ["yaxis2", "yaxis3", "yaxis20", "yaxis30", "yaxis40", "yaxis50"];
     extraYAxes.forEach(axisName => {
-        if (!plotLayout[axisName]) {
+        /*if (!plotLayout[axisName]) {
             plotLayout[axisName] = {};
         }
-        plotLayout[axisName].visible = false;
+        plotLayout[axisName].visible = false;*/
+        delete plotLayout[axisName];
     });
 
     console.log("Layout reset to standard case:", plotLayout);
@@ -474,7 +478,7 @@ function getSelectedSubplots() {
 
 function updateSubplotLayout(selectedSubplots) {
     // Step 1: Extract unique subplots from values
-    const activeSubplots = getSelectedSubplots();
+    const activeSubplots = selectedSubplots;
     const activeCount = activeSubplots.length;
 
     //console.log("Active Subplots:", activeSubplots); 
@@ -495,13 +499,6 @@ function updateSubplotLayout(selectedSubplots) {
         if (activeSubplots.includes("sp1")) {
             // If so, push the main subplot "xy" first
             subplotsArray.push(["xy"]);
-            // title only if there are no subplots
-            if(activeCount > 1)
-            {
-                plotLayout.yaxis.title.text = 'Main Plot';
-            } else {
-                plotLayout.yaxis.title.text = '';
-            }
         }
         
         // 2) Now handle other subplots sp2..sp5 in a fixed bottom-to-top order
@@ -521,13 +518,13 @@ function updateSubplotLayout(selectedSubplots) {
     plotLayout.grid.subplots = subplotsArray;
 
     // Step 3: Reset Y-axis visibility to false (or create them if missing)
-    const yAxes = ["yaxis", "yaxis20", "yaxis30", "yaxis40", "yaxis50"];
+    /*const yAxes = ["yaxis", "yaxis20", "yaxis30", "yaxis40", "yaxis50"];
     yAxes.forEach(axis => {
         if (!plotLayout[axis]) {
             plotLayout[axis] = {};
         }
         plotLayout[axis].visible = false;
-    });
+    });*/
 
     // Step 4: Evenly divide domain
     const step = 1 / (activeCount || 1); 
@@ -539,39 +536,21 @@ function updateSubplotLayout(selectedSubplots) {
     domainOrder.forEach(sp => {
         if (activeSubplots.includes(sp)) {
             const axisKey = (sp === "sp1") ? "yaxis" : `yaxis${sp.substring(2)}0`;
-            plotLayout[axisKey].domain = [position, position + step - 0.02];
+            const domain = [position, position + step - 0.02];
+            // Update plotLayout with the new domain
+            plotLayout[axisKey].domain = domain;
             plotLayout[axisKey].visible = true;
+            // Store the domain in activeSubplots
+            plotData.activeSubplots[`${sp}domain`] = domain;
             position += step;
         }
     });
-
-    //console.log("Updated plotLayout:", plotLayout);
 }
 
-// If axis is in use by a trace, make it visible in the layout
 function manageMainYaxis() {
-
-    const activeSubplots = getSelectedSubplots();
-    const activeCount = activeSubplots.length;
-    if ((activeCount === 1) && (activeSubplots.includes("sp1")))
-    {
-        plotLayout["yaxis2"].domain = plotLayout["yaxis"].domain;
-        plotLayout["yaxis3"].domain = plotLayout["yaxis"].domain;
-    } else {
-        plotLayout["yaxis2"].domain = [0,1];
-        plotLayout["yaxis3"].domain = [0,1];
-    }
-
-    // If axis is in use by a trace, make it visible in the layout
     const yInUse  = plotData.isYAxisInUse("y");
     const y2InUse = plotData.isYAxisInUse("y2");
     const y3InUse = plotData.isYAxisInUse("y3");
-    plotLayout["yaxis"].visible = yInUse;
-    plotLayout.annotations[0].visible = yInUse;
-    plotLayout["yaxis2"].visible = y2InUse;
-    plotLayout.annotations[1].visible = y2InUse;
-    plotLayout["yaxis3"].visible = y3InUse;
-    plotLayout.annotations[2].visible = y3InUse;
 
     // If y and y2 are active, y shall make room for y2
     // adjust label placement accordingly
@@ -580,11 +559,46 @@ function manageMainYaxis() {
     } else if (!yInUse && y2InUse) {
         plotLayout.annotations[1].x = 0; //Y2 label
     }
+
+    // Ensure sp1domain exists and is an array
+    const referenceDomain = Array.isArray(plotData.activeSubplots.sp1domain) 
+        ? [...plotData.activeSubplots.sp1domain] 
+        : [0, 1];
+    
     if (yInUse && y2InUse){
-        plotLayout.xaxis.domain = [0.05, 1];
-        plotLayout.annotations[0].x = 0.05;
+        plotLayout.xaxis.domain = [0.07, 1];
+        plotLayout.annotations[0].x = 0.07;
         plotLayout.annotations[1].x = 0;
     } else {
         plotLayout.xaxis.domain = [0, 1];
+    }
+        
+    if (yInUse) {
+        plotLayout["yaxis"] = plotLayout["yaxis"] || createYAxisConfig('yaxis');
+        plotLayout["yaxis"].visible = true;
+        plotLayout.annotations[0].visible = true;
+    } else {
+        delete plotLayout["yaxis"];
+        plotLayout.annotations[0].visible = false;
+    }
+
+    if (y2InUse) {
+        plotLayout["yaxis2"] = plotLayout["yaxis2"] || createYAxisConfig('yaxis2');
+        plotLayout["yaxis2"].domain = referenceDomain;
+        plotLayout["yaxis2"].visible = true;
+        plotLayout.annotations[1].visible = true;
+    } else {
+        delete plotLayout["yaxis2"];
+        plotLayout.annotations[1].visible = false;
+    }
+
+    if (y3InUse) {
+        plotLayout["yaxis3"] = plotLayout["yaxis3"] || createYAxisConfig('yaxis3');
+        plotLayout["yaxis3"].domain = referenceDomain;
+        plotLayout["yaxis3"].visible = true;
+        plotLayout.annotations[2].visible = true;
+    } else {
+        delete plotLayout["yaxis3"];
+        plotLayout.annotations[2].visible = false;
     }
 }

@@ -326,7 +326,10 @@ function addConfigListeners() {
                 }
             }
 
-            // 2) Switch-case to set the yaxis property
+            // 2) Update subplot statuses, layout, and re-plot
+            updateActiveSubplotsStatus();
+
+            // 3) Switch-case to set the yaxis property
             switch (selectedValue) {
                 case "sp1":
                     plotData.traces[index].yaxis = "y";
@@ -349,8 +352,7 @@ function addConfigListeners() {
             }
 
             
-            // 3) Update subplot statuses, layout, and re-plot
-            updateActiveSubplotsStatus();
+            createActiveYAxes();
             updateSubplotLayout(getSelectedSubplots());
             manageMainYaxis();
             updatePlot();
