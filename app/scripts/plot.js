@@ -290,6 +290,10 @@ function generatePlot() {
     // Plot the data using Plotly
     if (plotData.traces.length > 0) {
         Plotly.newPlot('plot', plotData.traces, plotLayout, plotConfiguration);  
+        
+        // Prevent existing cursor annotations to persist in a new plot
+        clearAnnotationsAndShapes();
+        
         // Show the configuration panel and populate it with the controls
         displayConfigurationControls(plotData.traces); 
     } else {
