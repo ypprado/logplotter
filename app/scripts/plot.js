@@ -73,6 +73,7 @@ const plotData = {
 
 const plotLayout = {
     responsive: true,
+    //editable: true,    // Enables editing of shapes and annotations
     hovermode: 'x',
     dragmode: 'pan',
     xaxis: 
@@ -91,54 +92,6 @@ const plotLayout = {
         visible: true, 
         showline: true
     },
-    /*yaxis2: 
-    { 
-        title: { text: '' }, 
-        domain: [0, 1], 
-        range: [0, 100],
-        overlaying: 'y', 
-        side: 'left', 
-        visible: false,
-        showline: false, 
-        position: 0
-    },
-    yaxis3: 
-    { 
-        title: { text: '' }, 
-        domain: [0, 1], 
-        range: [0, 100],
-        overlaying: 'y', 
-        side: 'right', 
-        visible: false
-    },
-    yaxis20: 
-    { 
-        title: { text: 'Subplot A' }, 
-        anchor: 'x',
-        visible: false,
-        showline: true, 
-    },
-    yaxis30: 
-    { 
-        title: { text: 'Subplot B' }, 
-        anchor: 'x',
-        visible: false,
-        showline: true, 
-    },
-    yaxis40: 
-    { 
-        title: { text: 'Subplot C' }, 
-        anchor: 'x',
-        visible: false,
-        showline: true, 
-    },
-    yaxis50: 
-    { 
-        title: { text: 'Subplot D' }, 
-        anchor: 'x',
-        visible: false,
-        showline: true, 
-    },*/
     grid: 
     {
         rows: 1,
@@ -189,6 +142,7 @@ const plotLayout = {
 const plotConfiguration = {
     displaylogo: false,
     displayModeBar: true,
+    //editable: true,    // Enables editing of shapes and annotations
     responsive: true, // auto resize
     modeBarButtonsToRemove: ['select2d','lasso2d','resetScale2d'],
     modeBarButtonsToAdd: ['toggleHover','hovercompare','hoverclosest',
@@ -289,6 +243,18 @@ function generatePlot() {
 
     // Plot the data using Plotly
     if (plotData.traces.length > 0) {
+
+        // Pre-truncate trace names to avoid legend overflow
+        plotData.traces.forEach((trace) => {
+            if (trace.name && trace.name.length > 45) {
+                trace.name =
+                    trace.name.substring(0, 30) +
+                    '...' +
+                    trace.name.substring(trace.name.length - 10);
+            }
+        });
+
+
         Plotly.newPlot('plot', plotData.traces, plotLayout, plotConfiguration);  
         
         // Prevent existing cursor annotations to persist in a new plot
