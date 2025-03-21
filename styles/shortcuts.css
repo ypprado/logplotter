@@ -39,6 +39,24 @@
     margin-bottom: 10px;
 }
 
+.feature-media {
+    flex: 1;
+    max-width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .media-gif, .media-image {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    max-height: 300px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
 .feature-gif {
     flex: 1;
     max-width: 50%;
@@ -47,8 +65,8 @@
 }
 
 .feature-gif img {
-    width: 100%;
-    max-width: 400px;
+    width: 50%;
+    max-width: 50%;
     height: auto;
 }
 
