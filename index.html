@@ -4,27 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Landing Page</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="styles/style.css">
 </head>
 <body>
   <!-- Navigation Bar -->
-  <nav class="navbar">
-    <a href="index.html">Home</a>
-    <a href="app/index.html">CAN Log Plotter</a>
-    <a href="about.html">About</a>
-  </nav>
+  <div id="navbar-container"></div>
+  <script src="scripts/navbar.js"></script>
 
   <!-- Hero / Welcome Section -->
   <section class="hero">
     <div class="hero-content">
       <h1>Yes you CAN!</h1>
       <p>Discover the ultimate, user-friendly tool for effortlessly visualizing signals captured from a CAN communication bus. All for free.</p>
-      <a href="app/index.html" class="cta-button">Explore the Log Plotter</a>
     </div>
   </section>
-  
+
+  <a href="app/index.html" class="cta-button">Explore the Log Plotter</a>
+
   <section class="image-section">
-    <img src="demo.png" alt="Demo Image" style="width: 70vw; height: auto; display: block; margin: 0 auto;">
+    <img src="images/demo.png" alt="Demo Image" style="width: 60vw; height: auto; display: block; margin: 0 auto;">
   </section>
 
   <section id="blog-previews">

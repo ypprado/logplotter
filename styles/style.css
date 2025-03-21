@@ -6,6 +6,11 @@
     font-family: Arial, sans-serif;
   }
   
+  /* Ensures a scrollbar is always present */
+  html {
+    overflow-y: scroll;
+  }
+
   body {
     background-color: #ffffff;
     color: #000;
@@ -40,17 +45,13 @@
     background: #3b82f6;
     border-radius: 5px;
   }
-
-  a[href="blog.html"] {
-    display: none;
-}
   
   /* Hero / Welcome Section */
   .hero {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 30vh;
+    height: 20vh;
     background-color: #f3f4f6;
     padding: 50px 20px;
     text-align: center;
@@ -81,6 +82,7 @@
     text-decoration: none;
     border-radius: 5px;
     transition: 0.3s;
+    margin: 20px;      /* Adds extra space above the button */
   }
   
   .cta-button:hover {
@@ -176,9 +178,13 @@
     color: #1e3a8a;
     margin-bottom: 20px;
   }
+
+  #about-disclaimer h2 {
+    margin-bottom: 10px;
+  }
   
   #about-disclaimer p {
     font-size: 16px;
     line-height: 1.5;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
   }
