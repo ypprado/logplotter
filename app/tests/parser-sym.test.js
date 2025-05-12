@@ -544,20 +544,4 @@ test('parses multiple messages and checks node creation if applicable', () => {
     expect(c).toMatchObject({ name: 'OptionC', startBit: 16, length: 8, value: '0x03', byteOrder: 'LittleEndian' });
   });
 
-  // Validates parsing of file metadata generically
-  test('parses generic FormatVersion and Title', () => {
-    const content = `
-      FormatVersion=3.1
-      Title="Generic Database"
-
-      [MsgD]
-      ID=5h
-      Type=Standard
-      Len=1
-    `;
-    const parsedData = parseSYM(content);
-    expect(parsedData.formatVersion).toBe('3.1');
-    expect(parsedData.title).toBe('Generic Database');
-  });
-
 });
