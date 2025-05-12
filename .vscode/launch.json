@@ -25,7 +25,8 @@
             "request": "launch",
             "type": "msedge",
             "file": "${workspaceFolder}/index.html",
-            "webRoot": "${workspaceFolder}"
+            "webRoot": "${workspaceFolder}",
+            "runtimeExecutable": "stable"
         }
     ]
 }
