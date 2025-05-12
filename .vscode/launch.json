@@ -9,8 +9,9 @@
             "type": "msedge",
             "request": "launch",
             "name": "launch Edge against localhost",
-            "url": "http://localhost:8080",
-            "webRoot": "${workspaceFolder}"
+            "url": "http://127.0.0.1:5500/",
+            "webRoot": "${workspaceFolder}",
+            "runtimeExecutable": "stable"
         },
         {
             "name": "Launch chrome - Local File",

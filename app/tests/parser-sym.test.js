@@ -441,4 +441,123 @@ test('parses multiple messages and checks node creation if applicable', () => {
     expect(sig2.description).toBe('DescWithoutSpaces');
   });
 
+  // Validates an enum with generic names and entries
+  test('parses enumeration with generic entries', () => {
+    const content = `
+      Enum=EnumA(0="Zero", 1="One", 2="Two", 3="Three")
+      [MsgA]
+      ID=1h
+      Type=Standard
+      Len=8
+      Sig="FieldA" 0
+      Sig="FieldA" unsigned 2 /e:EnumA
+    `;
+    const parsedData = parseSYM(content);
+    expect(parsedData.messages).toHaveLength(1);
+
+    const sig = parsedData.messages[0].signals[0];
+    expect(sig.name).toBe('FieldA');
+    expect(sig.length).toBe(2);
+    expect(sig.valueDescriptions).toMatchObject({
+      '0': 'Zero',
+      '1': 'One',
+      '2': 'Two',
+      '3': 'Three',
+    });
+  });
+
+  // Validates that multi-line enum definitions are parsed with generic labels
+  test('handles multi-line enumeration with generic labels', () => {
+    const content = `
+      Enum=EnumB(
+        0="Label0", 1="Label1",
+        2="Label2", 3="Label3",
+        4="Label4", 5="Label5"
+      )
+      [MsgB]
+      ID=10h
+      Type=Standard
+      Len=1
+      Sig="FieldB" 0
+      Sig="FieldB" unsigned 3 /e:EnumB
+    `;
+    const parsedData = parseSYM(content);
+    expect(parsedData.messages).toHaveLength(1);
+
+    const sig = parsedData.messages[0].signals[0];
+    expect(sig.valueDescriptions['0']).toBe('Label0');
+    expect(sig.valueDescriptions['3']).toBe('Label3');
+    expect(sig.valueDescriptions['5']).toBe('Label5');
+  });
+
+  // Validates parsing of string-type signals with generic field names
+  test('parses string signals generically', () => {
+    const content = `
+      {SIGNALS}
+      Sig=FieldC string 12
+
+      {SENDRECEIVE}
+      [MsgC]
+      ID=1Ah
+      Type=Standard
+      Len=8
+      Sig=FieldC 0
+    `;
+    const parsedData = parseSYM(content);
+    expect(parsedData.messages).toHaveLength(1);
+
+    const sig = parsedData.messages[0].signals[0];
+    expect(sig.name).toBe('FieldC');
+    expect(sig.valueType).toBe('String');
+    expect(sig.length).toBe(12);
+    expect(sig.startBit).toBe(0);
+  });
+
+  // Validates merging of repeated message definitions with generic mux names
+  test('merges repeated message definitions with generic mux entries', () => {
+    const content = `
+      {SEND}
+      [MuxMsg]
+      ID=1h
+      Len=8
+      Mux=OptionA 0,8 01h -m
+
+      [MuxMsg]
+      Len=8
+      Mux=OptionB 8,8 02h -m
+
+      [MuxMsg]
+      Len=8
+      Mux=OptionC 16,8 03h
+    `;
+    const parsedData = parseSYM(content);
+    expect(parsedData.messages).toHaveLength(1);
+
+    const msg = parsedData.messages[0];
+    expect(msg.name).toBe('MuxMsg');
+    expect(msg.id).toBe('0x1');
+    expect(msg.muxDefinitions).toHaveLength(3);
+
+    const [a, b, c] = msg.muxDefinitions;
+    expect(a).toMatchObject({ name: 'OptionA', startBit: 0, length: 8, value: '0x01', byteOrder: 'BigEndian' });
+    expect(b.name).toBe('OptionB');
+    expect(c).toMatchObject({ name: 'OptionC', startBit: 16, length: 8, value: '0x03', byteOrder: 'LittleEndian' });
+  });
+
+  // Validates parsing of file metadata generically
+  test('parses generic FormatVersion and Title', () => {
+    const content = `
+      FormatVersion=3.1
+      Title="Generic Database"
+
+      [MsgD]
+      ID=5h
+      Type=Standard
+      Len=1
+    `;
+    const parsedData = parseSYM(content);
+    expect(parsedData.formatVersion).toBe('3.1');
+    expect(parsedData.title).toBe('Generic Database');
+  });
+
 });
