@@ -13,9 +13,17 @@
             "webRoot": "${workspaceFolder}"
         },
         {
-            "name": "Launch Edge - Local File",
+            "name": "Launch chrome - Local File",
             "request": "launch",
             "type": "chrome",
+            "file": "${workspaceFolder}/index.html",
+            "webRoot": "${workspaceFolder}"
+        }
+        ,
+        {
+            "name": "Launch edge - Local File",
+            "request": "launch",
+            "type": "msedge",
             "file": "${workspaceFolder}/index.html",
             "webRoot": "${workspaceFolder}"
         }
