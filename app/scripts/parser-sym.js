@@ -1,10 +1,10 @@
 /**
- * Parses the SYM file content into structured data matching parser expectations.
+ * Parses the SYM file content into structured data matching parser-dbc output.
  * @param {string} content - The raw SYM file content.
  * @returns {{ messages: Array, nodes: Array }} - Parsed messages and nodes.
  */
 export function parseSYM(content) {
-  const lines = content.split("\n").map(l => l.trim());
+  const lines = content.split('\n').map(l => l.trim());
   const messages = [];
   const nodes = new Set();
   const signalsDefs = {};
@@ -12,189 +12,142 @@ export function parseSYM(content) {
 
   // 1) Extract multi-line enums
   for (let i = 0; i < lines.length; i++) {
-    if (!lines[i].startsWith("Enum=")) continue;
-    let accum = lines[i];
-    while (!accum.includes(")")) {
+    const line = lines[i];
+    if (!line.startsWith('Enum=')) continue;
+    let accum = line;
+    while (!accum.includes(')') && i < lines.length - 1) {
       i++;
-      if (i >= lines.length) break;
-      accum += " " + lines[i];
+      accum += ' ' + lines[i];
     }
-    const m = accum.match(/^Enum=([^()]+)\(([\s\S]+)\)$/);
+    const m = accum.match(/^Enum=([^()]+)\(([^)]+)\)$/);
     if (!m) continue;
-    const name = m[1].trim();
+    const enumName = m[1].trim();
     const entries = m[2]
-      .split(/,(?=(?:[^"]*"[^"]*")*[^"]*$)/)
+      .split(/,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/)
       .map(p => p.trim())
       .filter(Boolean);
     const map = {};
-    entries.forEach(p => {
-      const [k, v] = p.split("=").map(x => x.trim().replace(/^"|"$/g, ""));
+    for (const p of entries) {
+      const [k, v] = p.split('=').map(x => x.trim().replace(/^"|"$/g, ''));
       map[k] = v;
-    });
-    enumerations[name] = map;
+    }
+    enumerations[enumName] = map;
   }
 
-  // 2) Global signal definitions (Sig= lines anywhere)
+  // 2) Global signal definitions
   for (const line of lines) {
-    const sigMatch = line.match(/^Sig="?([^"]+)"?\s+(\w+)\s+(\d+)(\s+-m)?/);
+    const sigMatch = line.match(/^Sig="?([^"\s]+)"?\s+(\w+)\s+(\d+)(\s+-m)?/);
     if (!sigMatch) continue;
-
-    const [ , name, rawTypeRaw, lenRaw, muxFlag ] = sigMatch;
+    const [, name, rawTypeRaw, lenRaw, muxFlag] = sigMatch;
     const rawType = rawTypeRaw.toLowerCase();
-    const length  = parseInt(lenRaw, 10);
-    const isBig   = !!muxFlag;
-
+    const length = parseInt(lenRaw, 10);
+    const isMux = !!muxFlag;
     const valueType =
-      rawType === "string"   ? "String"   :
-      rawType === "unsigned" ? "Unsigned" : "Signed";
+      rawType === 'string'   ? 'String'   :
+      rawType === 'unsigned' ? 'Unsigned' :
+                               'Signed';
 
     signalsDefs[name] = {
       name,
       length,
-      byteOrder:        isBig ? "BigEndian" : "LittleEndian",
+      byteOrder:        isMux ? 'BigEndian' : 'LittleEndian',
       valueType,
       scaling:          1.0,
       offset:           0.0,
       valueRange:       [0, 1],
-      units:            "",
-      description:      "",
+      units:            '',
+      description:      '',
       valueDescriptions:{},
       defaultValue:     0,
-      isMultiplexer:    isBig
+      isMultiplexer:    isMux
     };
 
-    // parse attributes: /f:, /o:, /min:, /max:, /u:, /e:
     const attrs = line.match(
       /\/[fo]:(-?\d+(\.\d+)?)|\/min:(-?\d+(\.\d+)?)|\/max:(-?\d+(\.\d+)?)|\/u:"([^"]+)"|\/e:([^\s]+)/g
     ) || [];
-    attrs.forEach(attr => {
-      if (attr.startsWith("/f:")) {
-        signalsDefs[name].scaling = parseFloat(attr.slice(3));
-      }
-      if (attr.startsWith("/o:")) {
-        signalsDefs[name].offset = parseFloat(attr.slice(3));
-      }
-      if (attr.startsWith("/min:")) {
-        signalsDefs[name].valueRange[0] = parseFloat(attr.slice(5));
-      }
-      if (attr.startsWith("/max:")) {
-        signalsDefs[name].valueRange[1] = parseFloat(attr.slice(5));
-      }
-      if (attr.startsWith("/u:")) {
-        signalsDefs[name].units = attr.slice(3).replace(/"/g, "");
-      }
-      if (attr.startsWith("/e:")) {
+    for (const attr of attrs) {
+      if (attr.startsWith('/f:')) signalsDefs[name].scaling = parseFloat(attr.slice(3));
+      if (attr.startsWith('/o:')) signalsDefs[name].offset  = parseFloat(attr.slice(3));
+      if (attr.startsWith('/min:')) signalsDefs[name].valueRange[0] = parseFloat(attr.slice(5));
+      if (attr.startsWith('/max:')) signalsDefs[name].valueRange[1] = parseFloat(attr.slice(5));
+      if (attr.startsWith('/u:')) signalsDefs[name].units   = attr.slice(3).replace(/"/g,'');
+      if (attr.startsWith('/e:')) {
         const en = attr.slice(3);
-        if (enumerations[en]) {
-          signalsDefs[name].valueDescriptions = {
-            ...enumerations[en]
-          };
-        }
+        if (enumerations[en]) signalsDefs[name].valueDescriptions = { ...enumerations[en] };
       }
-    });
-
-    // inline description after //
-    const desc = line.match(/\/\/\s*(.*)$/);
-    if (desc) {
-      signalsDefs[name].description = desc[1].trim();
     }
+
+    const desc = line.match(/\/\/\s*(.*)$/);
+    if (desc) signalsDefs[name].description = desc[1].trim();
   }
 
-  // 3) Third pass: build messages, merge repeated blocks
+  // 3) Build messages
   const msgMap = {};
-  const muxValues = {}; // per-message map of { signalName: numericValue }
+  const muxValues = {};
   let current = null;
 
   for (const line of lines) {
-    // [MessageName]
     const hdr = line.match(/^\[(.+)\]$/);
     if (hdr) {
-      const name = hdr[1].replace(/"/g, "");
-      if (!msgMap[name]) {
-        msgMap[name] = {
-          name,
-          id:             null,
-          rawId:          null,
-          isExtendedId:   false,
-          dlc:            null,
-          sender:         "Unknown",
-          comment:        undefined,
-          signals:        [],
-          muxDefinitions: []
+      const msgName = hdr[1].replace(/"/g, '');
+      if (!msgMap[msgName]) {
+        msgMap[msgName] = {
+          id:            null,
+          rawId:         null,
+          isExtendedId:  false,
+          name:          msgName,
+          dlc:           null,
+          sender:        'Unknown',
+          comment:       undefined,
+          signals:       []
         };
       }
-      current = msgMap[name];
+      current = msgMap[msgName];
       if (!messages.includes(current)) messages.push(current);
-      muxValues[name] = {};
+      muxValues[msgName] = {};
       continue;
     }
     if (!current) continue;
 
-    // ID=123h // optional comment
+    // ID=...h with optional comment
     const idm = line.match(/^ID=([0-9A-Fa-f]+)h(?:\s*\/\/\s*(.*))?$/);
     if (idm) {
       const raw = parseInt(idm[1], 16);
       current.rawId = raw;
-      // default to standard (11-bit) mask
+      // default Standard: 11-bit mask, no padding
       const masked = raw & 0x7FF;
-      current.id = "0x" + masked.toString(16).toUpperCase();
-      current.isExtendedId = false;
-      if (idm[2]) {
-        current.comment = idm[2].trim();
-      }
+      current.id            = '0x' + masked.toString(16).toUpperCase();
+      current.isExtendedId  = false;
+      if (idm[2]) current.comment = idm[2].trim();
       continue;
     }
 
-    // Type=Standard|Extended
     const tm = line.match(/^Type=(Standard|Extended)$/);
-    if (tm && current.rawId !== null) {
-      const isExt = tm[1] === "Extended";
+    if (tm && current.rawId != null) {
+      const isExt = tm[1] === 'Extended';
       current.isExtendedId = isExt;
-      const mask = isExt ? 0x1FFFFFFF : 0x7FF;
+      const mask   = isExt ? 0x1FFFFFFF : 0x7FF;
       const masked = current.rawId & mask;
-      if (isExt) {
-        // extended → pad to 8 hex digits
-        current.id = "0x" + masked.toString(16).toUpperCase().padStart(8, "0");
-      } else {
-        // standard → no zero-padding
-        current.id = "0x" + masked.toString(16).toUpperCase();
-      }
+      current.id = isExt
+        ? '0x' + masked.toString(16).toUpperCase().padStart(8, '0')
+        : '0x' + masked.toString(16).toUpperCase();
       continue;
     }
 
-    // Len=#
     const lm = line.match(/^Len=(\d+)$/);
     if (lm) {
       current.dlc = parseInt(lm[1], 10);
       continue;
     }
 
-    // Mux=Name start,length hexh [-m]
-    const muxm = line.match(
-      /^Mux=(\w+)\s+(\d+),(\d+)\s+([0-9A-Fa-f]+)h(\s+-m)?$/
-    );
+    // record Mux= values for later
+    const muxm = line.match(/^Mux=(\w+)\s+\d+,\d+\s+([0-9A-Fa-f]+)h/);
     if (muxm) {
-      const [, mname, sb, ln, hv, bigFlag] = muxm;
-      const big = !!bigFlag;
-      const rawVal = parseInt(hv, 16);
-      const hexVal = "0x" +
-        rawVal.toString(16).toUpperCase().padStart(2, "0");
-
-      // record for later Sig/Var
-      muxValues[current.name][mname] = rawVal;
-
-      // push into muxDefinitions
-      current.muxDefinitions.push({
-        name:     mname,
-        startBit: parseInt(sb, 10),
-        length:   parseInt(ln, 10),
-        value:    hexVal,
-        byteOrder: big ? "BigEndian" : "LittleEndian"
-      });
+      const [, mname, hv] = muxm;
+      muxValues[current.name][mname] = parseInt(hv, 16);
       continue;
     }
 
-    // Var=Name type start,length [attrs]
     const vrm = line.match(/^Var=([^ ]+)\s+(\w+)\s+(\d+),(\d+)(.*)$/);
     if (vrm) {
       const [, vname, rawTypeRaw, sb, ln, rest] = vrm;
@@ -202,60 +155,45 @@ export function parseSYM(content) {
       const length   = parseInt(ln, 10);
       const rt       = rawTypeRaw.toLowerCase();
       const valueType =
-        rt === "string"   ? "String"   :
-        rt === "unsigned" ? "Unsigned" : "Signed";
+        rt === 'string'   ? 'String'   :
+        rt === 'unsigned' ? 'Unsigned' :
+                            'Signed';
 
       const sig = {
         name:             vname,
         startBit,
         length,
-        byteOrder:        "LittleEndian",
+        byteOrder:        'LittleEndian',
         valueType,
         scaling:          1.0,
         offset:           0.0,
         valueRange:       [0, 1],
-        units:            "",
-        description:      "",
+        units:            '',
+        description:      '',
         valueDescriptions:{},
         defaultValue:     0,
         isMultiplexer:    false,
         multiplexerValue: muxValues[current.name]?.[vname]
       };
-
-      // same attr parsing as global Sig
-      const attrs2 = (rest.match(
+      const attrs2 = rest.match(
         /\/[fo]:(-?\d+(\.\d+)?)|\/min:(-?\d+(\.\d+)?)|\/max:(-?\d+(\.\d+)?)|\/u:"([^"]+)"|\/e:([^\s]+)/g
-      ) || []);
-      attrs2.forEach(attr => {
-        if (attr.startsWith("/f:")) {
-          sig.scaling = parseFloat(attr.slice(3));
-        }
-        if (attr.startsWith("/o:")) {
-          sig.offset = parseFloat(attr.slice(3));
-        }
-        if (attr.startsWith("/min:")) {
-          sig.valueRange[0] = parseFloat(attr.slice(5));
-        }
-        if (attr.startsWith("/max:")) {
-          sig.valueRange[1] = parseFloat(attr.slice(5));
-        }
-        if (attr.startsWith("/u:")) {
-          sig.units = attr.slice(3).replace(/"/g, "");
-        }
-        if (attr.startsWith("/e:")) {
+      ) || [];
+      for (const attr of attrs2) {
+        if (attr.startsWith('/f:')) sig.scaling = parseFloat(attr.slice(3));
+        if (attr.startsWith('/o:')) sig.offset  = parseFloat(attr.slice(3));
+        if (attr.startsWith('/min:')) sig.valueRange[0] = parseFloat(attr.slice(5));
+        if (attr.startsWith('/max:')) sig.valueRange[1] = parseFloat(attr.slice(5));
+        if (attr.startsWith('/u:')) sig.units = attr.slice(3).replace(/"/g,'');
+        if (attr.startsWith('/e:')) {
           const en = attr.slice(3);
-          if (enumerations[en]) {
-            sig.valueDescriptions = { ...enumerations[en] };
-          }
+          if (enumerations[en]) sig.valueDescriptions = { ...enumerations[en] };
         }
-      });
-
+      }
       current.signals.push(sig);
       continue;
     }
 
-    // Sig="Name" bitPosition
-    const srm = line.match(/^Sig="?([^"\s]+)"?\s+(\d+)/);
+    const srm = line.match(/^Sig="?([^"\s]+)"?\s+(\d+)$/);
     if (srm) {
       const [, nm, sbRaw] = srm;
       const sb = parseInt(sbRaw, 10);
@@ -263,36 +201,28 @@ export function parseSYM(content) {
       if (def) {
         const mv = muxValues[current.name]?.[nm];
         current.signals.push({
-          name:             def.name,
-          startBit:         sb,
-          length:           def.length,
-          byteOrder:        def.byteOrder,
-          valueType:        def.valueType,
-          scaling:          def.scaling,
-          offset:           def.offset,
-          valueRange:       [...def.valueRange],
-          units:            def.units,
-          defaultValue:     def.defaultValue,
-          multiplexerValue: mv,
-          valueDescriptions:{ ...def.valueDescriptions },
-          description:      def.description,
-          isMultiplexer:    def.isMultiplexer
+          name:              def.name,
+          startBit:          sb,
+          length:            def.length,
+          byteOrder:         def.byteOrder,
+          valueType:         def.valueType,
+          scaling:           def.scaling,
+          offset:            def.offset,
+          valueRange:        [...def.valueRange],
+          units:             def.units,
+          description:       def.description,
+          valueDescriptions: { ...def.valueDescriptions },
+          defaultValue:      def.defaultValue,
+          multiplexerValue:  mv
         });
       }
       continue;
     }
-
-    // (You can parse TxNode= here if your SYM uses it to populate sender & nodes)
   }
 
-  // 4) Filter out any message without a valid ID
+  // 4) Filter & sort
   const clean = messages.filter(m => m.id != null);
-
-  // 5) Optionally sort by numeric ID
   clean.sort((a, b) => parseInt(a.id, 16) - parseInt(b.id, 16));
 
-  return {
-    messages: clean,
-    nodes:    Array.from(nodes)
-  };
+  return { messages: clean, nodes: Array.from(nodes) };
 }

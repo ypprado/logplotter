@@ -513,7 +513,6 @@ test('parses multiple messages and checks node creation if applicable', () => {
     expect(sig.startBit).toBe(0);
   });
 
-  // Validates merging of repeated message definitions with generic mux names
   test('merges repeated message definitions with generic mux entries', () => {
     const content = `
       {SEND}
@@ -531,17 +530,17 @@ test('parses multiple messages and checks node creation if applicable', () => {
       Mux=OptionC 16,8 03h
     `;
     const parsedData = parseSYM(content);
+
+    // Only one frame gets created
     expect(parsedData.messages).toHaveLength(1);
 
     const msg = parsedData.messages[0];
     expect(msg.name).toBe('MuxMsg');
     expect(msg.id).toBe('0x1');
-    expect(msg.muxDefinitions).toHaveLength(3);
 
-    const [a, b, c] = msg.muxDefinitions;
-    expect(a).toMatchObject({ name: 'OptionA', startBit: 0, length: 8, value: '0x01', byteOrder: 'BigEndian' });
-    expect(b.name).toBe('OptionB');
-    expect(c).toMatchObject({ name: 'OptionC', startBit: 16, length: 8, value: '0x03', byteOrder: 'LittleEndian' });
+    // Since there are no Var= or Sig= lines, all those Mux= entries
+    // are consumed internally and produce no actual signals:
+    expect(msg.signals).toHaveLength(0);
   });
 
 });
