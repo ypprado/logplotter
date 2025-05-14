@@ -464,93 +464,104 @@ function toSigned(value, bitLength) {
 }
 
 /**
- * Processes the log to extract values for selected signals.
+ * Processes the log to extract values for selected signals,
+ * including honoring mux‐field filters for multiplexed children.
  * @param {Array<string>} selectedSignals - List of selected signal names.
  */
 function processSelectedSignals(selectedSignals) {
-    const processedLogs = {}; // Object to store processed logs for each signal
+  const processedLogs = {};
 
-    // Iterate over the selected signals
-    selectedSignals.forEach((signalName) => {
-        // Find the corresponding messages in the database
-        const databaseSignal = findSignalInDatabase(signalName);
-        if (!databaseSignal) {
-            console.warn(`Signal "${signalName}" not found in the database.`);
-            return; // Skip if the signal is not in the database
-        }
+  selectedSignals.forEach(signalName => {
+    const dbSig = findSignalInDatabase(signalName);
+    if (!dbSig) {
+      console.warn(`Signal "${signalName}" not found.`);
+      return;
+    }
 
-        // Find all message IDs associated with this signal
-        const messageId = databaseSignal.messageId;
+    // Pre‐compute: is this a multiplexed child?
+    const isChild = Boolean(dbSig.isMultiplexed);
 
-        // Filter log entries by message ID
-        const filteredMessages = log.filter((msg) => parseInt(msg.id, 16) === parseInt(messageId, 16));
-
-        // Process the log entries for this signal
-        const signalLog = filteredMessages.map((msg) => {
-            const rawValue = extractRawValue(
-                msg.data,
-                databaseSignal.startBit,
-                databaseSignal.length,
-                databaseSignal.byteOrder
-            );
-
-            // Ensure rawValue is interpreted correctly before applying scaling
-            let correctedValue = rawValue;
-
-            if (databaseSignal.valueType === "Signed") {
-                // Convert rawValue to signed based on its bit length
-                correctedValue = toSigned(rawValue, databaseSignal.length);
-            }
-
-            // Apply scaling and offset
-            const scaledValue = correctedValue * databaseSignal.scaling + databaseSignal.offset;
-
-            return {
-                timestamp: msg.timestamp, // Timestamp in seconds
-                value: scaledValue        // Scaled signal value
-            };
-        });
-
-
-        // Sanitize the unit before passing it
-        const cleanUnit = sanitizeUnit(databaseSignal.unit || "");
-
-        // Store the processed log along with the unit
-        processedLogs[signalName] = {
-            data: signalLog,
-            unit: cleanUnit
-        };
+    // Filter on message ID
+    const filtered = log.filter(msg =>
+      parseInt(msg.id, 16) === parseInt(dbSig.messageId, 16)
+    ).filter(msg => {
+      if (!isChild) return true;
+      // extract mux raw first:
+      const muxRaw = extractRawValue(
+        msg.data,
+        dbSig.multiplexerStartBit,
+        dbSig.multiplexerLength,
+        dbSig.multiplexerByteOrder
+      );
+      return muxRaw === dbSig.multiplexerValue;
     });
 
-    return processedLogs; // Return the processed logs for further use
+    // Build time‐series
+    const series = filtered.map(msg => {
+      let raw = extractRawValue(
+        msg.data,
+        dbSig.startBit, dbSig.length, dbSig.byteOrder
+      );
+      if (dbSig.valueType === "Signed") {
+        raw = toSigned(raw, dbSig.length);
+      }
+      const scaled = raw * dbSig.scaling + dbSig.offset;
+      return { timestamp: msg.timestamp, value: scaled };
+    });
+
+    processedLogs[signalName] = {
+      data: series,
+      unit: sanitizeUnit(dbSig.unit || "")
+    };
+  });
+
+  return processedLogs;
 }
 
 /**
- * Finds a signal in the database by its name.
+ * Finds a signal in the database by its name, including multiplex info.
  * @param {string} signalName - Name of the signal.
  * @returns {Object|null} - Signal object with messageId and properties, or null if not found.
  */
 function findSignalInDatabase(signalName) {
-    const database = databaseHandler.getDatabase();
-    for (const message of database.messages) {
-        for (const signal of message.signals) {
-            if (signal.name === signalName) {
-                return {
-                    messageId: message.id,
-                    startBit: signal.startBit,
-                    length: signal.length,
-                    byteOrder: signal.byteOrder,
-                    scaling: signal.scaling,
-                    offset: signal.offset,
-                    valueType: signal.valueType,
-                    unit: signal.units,
-                    valueDescription: signal.valueDescription,
-                    description: signal.description || ""
-                };
-            }
+  const db = databaseHandler.getDatabase();
+  for (const message of db.messages) {
+    for (const signal of message.signals) {
+      if (signal.name === signalName) {
+        // base info
+        const res = {
+          messageId: message.id,
+          startBit:  signal.startBit,
+          length:    signal.length,
+          byteOrder: signal.byteOrder,
+          scaling:   signal.scaling,
+          offset:    signal.offset,
+          valueType: signal.valueType,
+          unit:      signal.units,
+          description: signal.description || ""
+        };
+
+        // regular value‐to‐text map (for mux signals)
+        if (signal.isMultiplexer) {
+          res.isMultiplexer = true;
+          res.valueDescriptions = { ...signal.valueDescriptions };
         }
+
+        // multiplexed‐child metadata
+        if (signal.isMultiplexed) {
+          res.isMultiplexed        = true;
+          res.multiplexerValue     = signal.multiplexerValue;
+          res.multiplexerStartBit  = signal.multiplexerStartBit;
+          res.multiplexerLength    = signal.multiplexerLength;
+          res.multiplexerByteOrder = signal.multiplexerByteOrder;
+        }
+
+        return res;
+      }
     }
-    return null; // Signal not found
+  }
+
+  return null; // not found
 }
 
 // Make these helper functions available globally:

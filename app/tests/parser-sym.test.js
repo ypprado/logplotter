@@ -279,13 +279,13 @@ test('parses multiple messages and checks node creation if applicable', () => {
   });
 
   test('applies default values to missing signal properties', () => {
-      // const content = `
-      //   [TestMsg]
-      //   ID=101h
-      //   Type=Standard
-      //   Len=1
-      //   Sig="IncompleteSignal" 0
-      // `;
+      //   const content = `
+      //     [TestMsg]
+      //     ID=101h
+      //     Type=Standard
+      //     Len=1
+      //     Sig="IncompleteSignal" 0
+      //   `;
       // const parsedData = parseSYM(content);
 
       // expect(parsedData.messages).toHaveLength(1);
@@ -303,6 +303,90 @@ test('parses multiple messages and checks node creation if applicable', () => {
       // expect(sig.byteOrder).toBe('LittleEndian'); // Assuming Little-Endian is the default
       // expect(sig.valueType).toBe('Unsigned'); // Assuming unsigned if not specified
       // expect(sig.valueRange).toEqual([]); // Empty array as default
+  });
+
+  test('parses test1.sym and returns the expected messages and signals', () => {
+    // load the symbol file
+      const content = `
+        FormatVersion=6.0 // Do not edit this line!
+        Title="Unbenannt"
+
+        {SIGNALS}
+        Sig=Signal1 unsigned 8 /max:1
+        Sig=Signal2 unsigned 8 /max:1
+
+        {SENDRECEIVE}
+
+        [Symbol1]
+        ID=123h
+        Len=8
+        Mux=Multiplexer1 0,1 0 
+        Var=Variable1 unsigned 8,8 /max:1
+
+        [Symbol1]
+        Len=8
+        Mux=Multiplexer2 0,1 1 
+        Var=Variable1 unsigned 8,8 /max:1
+
+        [Symbol2]
+        ID=321h
+        Len=8
+        Mux=Multiplexer1 0,1 0 
+        Sig=Signal1 8
+
+        [Symbol2]
+        Len=8
+        Mux=Multiplexer2 0,1 1 
+        Sig=Signal2 8
+
+        [Symbol3]
+        ID=222h
+        Len=8
+        Mux=Multiplexer1 0,16 1234h  -m
+        Var=Variable1 unsigned 16,1
+
+        [Symbol3_Copy]
+        ID=223h
+        Len=8
+        Mux=Multiplexer1 0,16 1234h 
+        Var=Variable1 unsigned 16,1
+      `;
+
+    const parsed = parseSYM(content);
+
+    // we expect four messages in this file
+    expect(parsed.messages).toHaveLength(4);
+
+    // pick them off in order
+    const [msg1, msg2, msg3, msg4] = parsed.messages;
+
+    // --- Message 1 ---
+    expect(msg1.name).toBe('Symbol1');
+    expect(msg1.id).toBe('0x123');      // ID=123h in the file
+    expect(msg1.dlc).toBe(8);           // Len=8
+    expect(msg1.signals).toHaveLength(4);
+    // check one of its signals
+    expect(msg1.signals[0].name).toBe('Multiplexer1');
+    expect(msg1.signals[0].startBit).toBe(0);
+    expect(msg1.signals[0].length).toBe(1);
+
+    // --- Message 2 ---
+    expect(msg2.name).toBe('Symbol3');
+    expect(msg2.id).toBe('0x222');
+    expect(msg2.signals).toHaveLength(2);
+
+    // --- Message 3 (duplicate name case) ---
+    expect(msg3.name).toBe('Symbol3_Copy');
+    expect(msg3.id).toBe('0x223');
+    expect(msg3.signals).toHaveLength(2);
+
+    // --- Message 4 ---
+    expect(msg4.name).toBe('Symbol2');
+    expect(msg4.id).toBe('0x321');
+    expect(msg4.signals).toHaveLength(4);
+
+    // no nodes are defined in this SYM
+    expect(parsed.nodes).toEqual([]);
   });
 
   test('parses commentary from ID line correctly', () => {
@@ -511,36 +595,6 @@ test('parses multiple messages and checks node creation if applicable', () => {
     expect(sig.valueType).toBe('String');
     expect(sig.length).toBe(12);
     expect(sig.startBit).toBe(0);
-  });
-
-  test('merges repeated message definitions with generic mux entries', () => {
-    const content = `
-      {SEND}
-      [MuxMsg]
-      ID=1h
-      Len=8
-      Mux=OptionA 0,8 01h -m
-
-      [MuxMsg]
-      Len=8
-      Mux=OptionB 8,8 02h -m
-
-      [MuxMsg]
-      Len=8
-      Mux=OptionC 16,8 03h
-    `;
-    const parsedData = parseSYM(content);
-
-    // Only one frame gets created
-    expect(parsedData.messages).toHaveLength(1);
-
-    const msg = parsedData.messages[0];
-    expect(msg.name).toBe('MuxMsg');
-    expect(msg.id).toBe('0x1');
-
-    // Since there are no Var= or Sig= lines, all those Mux= entries
-    // are consumed internally and produce no actual signals:
-    expect(msg.signals).toHaveLength(0);
   });
 
 });

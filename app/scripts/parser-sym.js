@@ -9,6 +9,8 @@ export function parseSYM(content) {
   const nodes = new Set();
   const signalsDefs = {};
   const enumerations = {};
+  let currentMuxName = null;
+  let currentMuxValue = null;
 
   // 1) Extract multi-line enums
   for (let i = 0; i < lines.length; i++) {
@@ -35,42 +37,50 @@ export function parseSYM(content) {
   }
 
   // 2) Global signal definitions
+  let section = '';
   for (const line of lines) {
-    const sigMatch = line.match(/^Sig="?([^"\s]+)"?\s+(\w+)\s+(\d+)(\s+-m)?/);
+    if (line.startsWith('{')) {
+      section = line.replace(/[{}]/g, '').toUpperCase();
+      continue;
+    }
+    if (section !== 'SIGNALS') continue;
+    const sigMatch = line.match(/^Sig=(?:"([^"]+)"|(\S+))\s+(\w+)\s+(\d+)(?:\s+(-m))?/);
     if (!sigMatch) continue;
-    const [, name, rawTypeRaw, lenRaw, muxFlag] = sigMatch;
+    const [, quotedName, bareName, rawTypeRaw, lenRaw, muxFlag] = sigMatch;
+    const name = quotedName || bareName;
     const rawType = rawTypeRaw.toLowerCase();
     const length = parseInt(lenRaw, 10);
-    const isMux = !!muxFlag;
+    //m == Motorola (BigEndian), otherwise Intel (LittleEndian)
+    const byteOrder = muxFlag ? 'BigEndian' : 'LittleEndian';
     const valueType =
-      rawType === 'string'   ? 'String'   :
-      rawType === 'unsigned' ? 'Unsigned' :
-                               'Signed';
+      rawType === 'string' ? 'String' :
+        rawType === 'unsigned' ? 'Unsigned' :
+          'Signed';
 
     signalsDefs[name] = {
       name,
       length,
-      byteOrder:        isMux ? 'BigEndian' : 'LittleEndian',
+      byteOrder,
       valueType,
-      scaling:          1.0,
-      offset:           0.0,
-      valueRange:       [0, 1],
-      units:            '',
-      description:      '',
-      valueDescriptions:{},
-      defaultValue:     0,
-      isMultiplexer:    isMux
+      scaling: 1.0,
+      offset: 0.0,
+      valueRange: [0, 1],
+      units: '',
+      description: '',
+      valueDescriptions: {},
+      defaultValue: 0,
+      isMultiplexer: false // templates are never mux-selectors
     };
 
     const attrs = line.match(
-      /\/[fo]:(-?\d+(\.\d+)?)|\/min:(-?\d+(\.\d+)?)|\/max:(-?\d+(\.\d+)?)|\/u:"([^"]+)"|\/e:([^\s]+)/g
+      /\/[fo]:(-?\d+(\.\d+)?)|\/min:(-?\d+(\.\d+)?)|\/max:(-?\d+(\.\d+)?)|\/u:"([^"]+)"|\/e:([^\s]+)|\/d:(-?\d+(\.\d+)?)|\/p:"([^"]*)"/g
     ) || [];
     for (const attr of attrs) {
       if (attr.startsWith('/f:')) signalsDefs[name].scaling = parseFloat(attr.slice(3));
-      if (attr.startsWith('/o:')) signalsDefs[name].offset  = parseFloat(attr.slice(3));
+      if (attr.startsWith('/o:')) signalsDefs[name].offset = parseFloat(attr.slice(3));
       if (attr.startsWith('/min:')) signalsDefs[name].valueRange[0] = parseFloat(attr.slice(5));
       if (attr.startsWith('/max:')) signalsDefs[name].valueRange[1] = parseFloat(attr.slice(5));
-      if (attr.startsWith('/u:')) signalsDefs[name].units   = attr.slice(3).replace(/"/g,'');
+      if (attr.startsWith('/u:')) signalsDefs[name].units = attr.slice(3).replace(/"/g, '');
       if (attr.startsWith('/e:')) {
         const en = attr.slice(3);
         if (enumerations[en]) signalsDefs[name].valueDescriptions = { ...enumerations[en] };
@@ -81,43 +91,137 @@ export function parseSYM(content) {
     if (desc) signalsDefs[name].description = desc[1].trim();
   }
 
-  // 3) Build messages
   const msgMap = {};
   const muxValues = {};
   let current = null;
+  const pendingInstances = {};        // { [msgName]: { [sigName]: [startBit, …] } }
 
   for (const line of lines) {
+
+    if (line.startsWith('{')) {
+      section = line.replace(/[{}]/g, '').toUpperCase();
+      continue;
+    }
+
+    if (section === 'SENDRECEIVE') {
+      // e.g. lines like "SymName ECU1 ECU2"
+      const m = line.match(/^(\w+)\s+(\w+(?:\s+\w+)*)$/);
+      if (m) {
+        const [, msgName, ecus] = m;
+        msgMap[msgName].sender = ecus.split(/\s+/)[0];       // primary sender
+        ecus.split(/\s+/).forEach(e => nodes.add(e));        // collect all nodes
+      }
+    }
+
     const hdr = line.match(/^\[(.+)\]$/);
     if (hdr) {
       const msgName = hdr[1].replace(/"/g, '');
+      pendingInstances[msgName] = {};  // reset pending for this message
+      current = msgMap[msgName];
       if (!msgMap[msgName]) {
         msgMap[msgName] = {
-          id:            null,
-          rawId:         null,
-          isExtendedId:  false,
-          name:          msgName,
-          dlc:           null,
-          sender:        'Unknown',
-          comment:       undefined,
-          signals:       []
+          id: null, rawId: null, isExtendedId: false,
+          name: msgName, dlc: null, sender: 'Unknown',
+          comment: undefined, signals: []
         };
+        muxValues[msgName] = {};     // ← initialize here
       }
       current = msgMap[msgName];
+      currentMuxName = null;
+      currentMuxValue = null;
       if (!messages.includes(current)) messages.push(current);
-      muxValues[msgName] = {};
       continue;
     }
+    
+    // —————— Inline signal‐template in a message ——————
+    const defm = line.match(
+      /^Sig="?([^"\s]+)"?\s+(\w+)\s+(\d+)(?:\s+(-m))?(.*)$/
+    );
+    if (defm) {
+      const [, nm, rawTypeRaw, lenRaw, endianFlag, rest] = defm;
+      // only treat this as a template if the 2nd token isn't a plain bit-offset
+      if (!/^\d+$/.test(rawTypeRaw)) {
+        const name       = nm;
+        const rawType    = rawTypeRaw.toLowerCase();
+        const length     = parseInt(lenRaw, 10);
+        const byteOrder  = endianFlag ? 'BigEndian' : 'LittleEndian';
+        const valueType  = rawType === 'string'   ? 'String'
+                          : rawType === 'unsigned' ? 'Unsigned'
+                                                    : 'Signed';
+        // initialize or augment the global template
+        signalsDefs[name] = {
+          name,
+          length,
+          byteOrder,
+          valueType,
+          scaling: 1.0,
+          offset: 0.0,
+          valueRange: [0, 1],
+          units: '',
+          description: '',
+          valueDescriptions: {},
+          defaultValue: 0,
+          isMultiplexer: false
+        };
+        
+        // copy any /f:, /o:, /min:, /max:, /u:, /e:, /d:, /p: attrs
+        const attrs = rest.match(
+          /\/[fo]:(-?\d+(\.\d+)?)|\/min:(-?\d+(\.\d+)?)|\/max:(-?\d+(\.\d+)?)|\/u:"([^"]+)"|\/e:([^\s]+)|\/d:(-?\d+(\.\d+)?)|\/p:"([^"]*)"/g
+        ) || [];
+        for (const attr of attrs) {
+          if (attr.startsWith('/f:'))   signalsDefs[name].scaling     = parseFloat(attr.slice(3));
+          if (attr.startsWith('/o:'))   signalsDefs[name].offset      = parseFloat(attr.slice(3));
+          if (attr.startsWith('/min:')) signalsDefs[name].valueRange[0] = parseFloat(attr.slice(5));
+          if (attr.startsWith('/max:')) signalsDefs[name].valueRange[1] = parseFloat(attr.slice(5));
+          if (attr.startsWith('/u:'))   signalsDefs[name].units       = attr.slice(3).replace(/"/g, '');
+          if (attr.startsWith('/e:')) {
+            const en = attr.slice(3);
+            if (enumerations[en]) signalsDefs[name].valueDescriptions = { ...enumerations[en] };
+          }
+        }
+        // capture a trailing // comment
+        const d = rest.match(/\/\/\s*(.*)$/);
+        if (d) signalsDefs[name].description = d[1].trim();
+
+        if (current && pendingInstances[current.name]) {
+          const pending = pendingInstances[current.name][nm] || [];
+          for (const sbRaw of pending) {
+            const sb  = parseInt(sbRaw, 10);
+            const def = signalsDefs[nm];
+            const bo  = def.byteOrder;
+            current.signals.push({
+              name:               def.name,
+              startBit:           sb,
+              length:             def.length,
+              byteOrder:          bo,
+              valueType:          def.valueType,
+              scaling:            def.scaling,
+              offset:             def.offset,
+              valueRange:         [...def.valueRange],
+              units:              def.units,
+              description:        def.description,
+              valueDescriptions:  { ...def.valueDescriptions },
+              defaultValue:       def.defaultValue,
+              multiplexerValue:   currentMuxValue,
+              isMultiplexed:      currentMuxValue != null
+            });
+          }
+          // clear out the queue
+          pendingInstances[current.name][nm] = [];
+        }
+      }
+      continue;
+    }
+
     if (!current) continue;
 
-    // ID=...h with optional comment
     const idm = line.match(/^ID=([0-9A-Fa-f]+)h(?:\s*\/\/\s*(.*))?$/);
     if (idm) {
       const raw = parseInt(idm[1], 16);
       current.rawId = raw;
-      // default Standard: 11-bit mask, no padding
       const masked = raw & 0x7FF;
-      current.id            = '0x' + masked.toString(16).toUpperCase();
-      current.isExtendedId  = false;
+      current.id = '0x' + masked.toString(16).toUpperCase();
+      current.isExtendedId = false;
       if (idm[2]) current.comment = idm[2].trim();
       continue;
     }
@@ -126,7 +230,7 @@ export function parseSYM(content) {
     if (tm && current.rawId != null) {
       const isExt = tm[1] === 'Extended';
       current.isExtendedId = isExt;
-      const mask   = isExt ? 0x1FFFFFFF : 0x7FF;
+      const mask = isExt ? 0x1FFFFFFF : 0x7FF;
       const masked = current.rawId & mask;
       current.id = isExt
         ? '0x' + masked.toString(16).toUpperCase().padStart(8, '0')
@@ -140,87 +244,151 @@ export function parseSYM(content) {
       continue;
     }
 
-    // record Mux= values for later
-    const muxm = line.match(/^Mux=(\w+)\s+\d+,\d+\s+([0-9A-Fa-f]+)h/);
+    const muxm = line.match(
+      // 1: name     2: startBit  3: length  4: hexValue    5: optional "-m"
+      /^Mux\s*=\s*(\w+)\s+(\d+)\s*,\s*(\d+)\s+([0-9A-Fa-f]+)(?:h)?(?:\s+(-m))?$/
+    );
     if (muxm) {
-      const [, mname, hv] = muxm;
-      muxValues[current.name][mname] = parseInt(hv, 16);
+      const [, baseName, sb, ln, hv, mSuffix] = muxm;
+      const mname = baseName;
+      const isMotorola  = Boolean(mSuffix);
+      const startBit = parseInt(sb, 10);
+      const length = parseInt(ln, 10);
+      // strip trailing “h” if present
+      let rawHex = hv.replace(/h$/i, '');
+      // if odd-length, pad with leading zero so match(/../g) works
+      if (rawHex.length % 2 === 1) rawHex = '0' + rawHex;
+      // split into bytes (or empty array if somehow still no match)
+      const bytes = rawHex.match(/../g) || [];
+      // reverse byte order, or fall back to rawHex
+      const revHex = bytes.length ? bytes.reverse().join('') : rawHex;
+      const value = parseInt(revHex, 16);
+
+      // store the raw Mux value
+      muxValues[current.name][mname] = value;
+
+      currentMuxName = mname;
+      currentMuxValue = value;
+
+      // ensure the definition object exists
+      if (!signalsDefs[mname]) signalsDefs[mname] = {};
+
+      // update definition
+      signalsDefs[mname].name = mname;
+      signalsDefs[mname].startBit = startBit;
+      signalsDefs[mname].length = length;
+      signalsDefs[mname].byteOrder = 'LittleEndian';// isMotorola ? 'BigEndian' : 'LittleEndian';
+      signalsDefs[mname].isMultiplexer = true;
+
+      current.signals.push({ ...signalsDefs[mname] });
+
       continue;
     }
 
-    const vrm = line.match(/^Var=([^ ]+)\s+(\w+)\s+(\d+),(\d+)(.*)$/);
+    const vrm = line.match(/^Var=([^ ]+)\s+(\w+)\s+(\d+),(\d+)(?:\s+(-m))?(.*)$/);
     if (vrm) {
-      const [, vname, rawTypeRaw, sb, ln, rest] = vrm;
+      const [, vname, rawTypeRaw, sb, ln, endianFlag, rest] = vrm;
       const startBit = parseInt(sb, 10);
-      const length   = parseInt(ln, 10);
-      const rt       = rawTypeRaw.toLowerCase();
-      const valueType =
-        rt === 'string'   ? 'String'   :
-        rt === 'unsigned' ? 'Unsigned' :
-                            'Signed';
+      const length = parseInt(ln, 10);
+      const rt = rawTypeRaw.toLowerCase();
+      const valueType = rt === 'string' ? 'String' : rt === 'unsigned' ? 'Unsigned' : 'Signed';
+      const mv = currentMuxValue;
+      // use the current Mux context
+      const muxSignal = currentMuxName ? signalsDefs[currentMuxName] : null;
+
+      if (signalsDefs[vname]?.isMultiplexer) {
+        signalsDefs[vname].startBit = startBit;
+        signalsDefs[vname].length = length;
+        signalsDefs[vname].byteOrder = 'LittleEndian'; // fixed
+      }
 
       const sig = {
-        name:             vname,
+        name: vname,
         startBit,
         length,
-        byteOrder:        'LittleEndian',
+        byteOrder: endianFlag ? 'BigEndian' : 'LittleEndian',
         valueType,
-        scaling:          1.0,
-        offset:           0.0,
-        valueRange:       [0, 1],
-        units:            '',
-        description:      '',
-        valueDescriptions:{},
-        defaultValue:     0,
-        isMultiplexer:    false,
-        multiplexerValue: muxValues[current.name]?.[vname]
+        scaling: 1.0,
+        offset: 0.0,
+        valueRange: [0, 1],
+        units: '',
+        description: '',
+        valueDescriptions: {},
+        defaultValue: 0,
+        multiplexerValue: mv,
+        isMultiplexed: mv !== null && mv !== undefined,
+        ...(mv !== undefined && muxSignal && {
+          multiplexerStartBit: muxSignal.startBit,
+          multiplexerLength: muxSignal.length,
+          multiplexerByteOrder: 'LittleEndian'//muxSignal.byteOrder
+        })
       };
-      const attrs2 = rest.match(
-        /\/[fo]:(-?\d+(\.\d+)?)|\/min:(-?\d+(\.\d+)?)|\/max:(-?\d+(\.\d+)?)|\/u:"([^"]+)"|\/e:([^\s]+)/g
-      ) || [];
+
+      const attrs2 = rest.match(/\/[fo]:(-?\d+(\.\d+)?)|\/min:(-?\d+(\.\d+)?)|\/max:(-?\d+(\.\d+)?)|\/u:"([^"]+)"|\/e:([^\s]+)|\/d:(-?\d+(\.\d+)?)|\/p:"([^"]*)"/g) || [];
       for (const attr of attrs2) {
         if (attr.startsWith('/f:')) sig.scaling = parseFloat(attr.slice(3));
-        if (attr.startsWith('/o:')) sig.offset  = parseFloat(attr.slice(3));
+        if (attr.startsWith('/o:')) sig.offset = parseFloat(attr.slice(3));
         if (attr.startsWith('/min:')) sig.valueRange[0] = parseFloat(attr.slice(5));
         if (attr.startsWith('/max:')) sig.valueRange[1] = parseFloat(attr.slice(5));
-        if (attr.startsWith('/u:')) sig.units = attr.slice(3).replace(/"/g,'');
+        if (attr.startsWith('/u:')) sig.units = attr.slice(3).replace(/"/g, '');
         if (attr.startsWith('/e:')) {
           const en = attr.slice(3);
           if (enumerations[en]) sig.valueDescriptions = { ...enumerations[en] };
         }
       }
+      const localDesc = rest.match(/\/\/\s*(.*)$/);
+      if (localDesc) sig.description = localDesc[1].trim();
       current.signals.push(sig);
       continue;
     }
-
-    const srm = line.match(/^Sig="?([^"\s]+)"?\s+(\d+)$/);
+    
+    const srm = line.match(/^Sig="?([^"\s]+)"?\s+(\d+)(?:\s+(-m))?$/);
     if (srm) {
-      const [, nm, sbRaw] = srm;
+      const [, nm, sbRaw, endianFlag] = srm;
       const sb = parseInt(sbRaw, 10);
       const def = signalsDefs[nm];
+      // if we have no template yet, buffer and skip
+      if (!def) {
+        pendingInstances[current.name][nm] = pendingInstances[current.name][nm] || [];
+        pendingInstances[current.name][nm].push(sbRaw);
+        continue;
+      }
+      const bo  = endianFlag ? 'BigEndian' : def.byteOrder;
+      const mv = currentMuxValue;
+      const muxSignal = currentMuxName ? signalsDefs[currentMuxName] : null;
+
       if (def) {
-        const mv = muxValues[current.name]?.[nm];
+        if (def.isMultiplexer) {
+          def.startBit = sb;
+          def.byteOrder = 'BigEndian';
+        }
+
         current.signals.push({
-          name:              def.name,
-          startBit:          sb,
-          length:            def.length,
-          byteOrder:         def.byteOrder,
-          valueType:         def.valueType,
-          scaling:           def.scaling,
-          offset:            def.offset,
-          valueRange:        [...def.valueRange],
-          units:             def.units,
-          description:       def.description,
+          name: def.name,
+          startBit: sb,
+          length: def.length,
+          byteOrder: bo,
+          valueType: def.valueType,
+          scaling: def.scaling,
+          offset: def.offset,
+          valueRange: [...def.valueRange],
+          units: def.units,
+          description: def.description,
           valueDescriptions: { ...def.valueDescriptions },
-          defaultValue:      def.defaultValue,
-          multiplexerValue:  mv
+          defaultValue: def.defaultValue,
+          multiplexerValue: mv,
+          isMultiplexed: mv !== null && mv !== undefined,
+          ...(mv !== null && muxSignal && {
+            multiplexerStartBit: muxSignal.startBit,
+            multiplexerLength: muxSignal.length,
+            multiplexerByteOrder: 'LittleEndian' // muxSignal.byteOrder
+          })
         });
       }
       continue;
     }
   }
 
-  // 4) Filter & sort
   const clean = messages.filter(m => m.id != null);
   clean.sort((a, b) => parseInt(a.id, 16) - parseInt(b.id, 16));
 

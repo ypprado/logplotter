@@ -10,8 +10,8 @@
  */
 function formatMessageId(messageId) {
     const EXT_FLAG = 0x80000000;
-    const STD_ID_MASK = 0x7FF;       // 11-bit Standard ID Mask
-    const EXT_ID_MASK = 0x1FFFFFFF;  // 29-bit Extended ID Mask
+    const STD_ID_MASK = 0x7FF;
+    const EXT_ID_MASK = 0x1FFFFFFF;
     const STD_ID_LENGTH = 3;
     const EXT_ID_LENGTH = 8;
 
@@ -20,15 +20,9 @@ function formatMessageId(messageId) {
         throw new Error("Invalid messageId: Must be a number.");
     }
 
-    // Determine if it's an Extended ID
     const isExtended = (messageId & EXT_FLAG) !== 0;
+    const truncatedId = isExtended ? (messageId & EXT_ID_MASK) : (messageId & STD_ID_MASK);
 
-    // **Truncate ID properly** based on Standard (11-bit) or Extended (29-bit)
-    const truncatedId = isExtended
-        ? (messageId & EXT_ID_MASK)  // Keep only 29 bits
-        : (messageId & STD_ID_MASK); // Keep only 11 bits
-
-    // Format the ID as hex string
     const formattedId = `0x${truncatedId.toString(16).toUpperCase().padStart(
         isExtended ? EXT_ID_LENGTH : STD_ID_LENGTH,
         '0'
@@ -44,14 +38,12 @@ function formatMessageId(messageId) {
  * @returns {Object} - Parsed data including messages and nodes.
  */
 export function parseDBC(content) {
-    // Workaround: Replace misinterpreted encoding issue "ï¿½" with "°"
     content = content.replace(/\ï¿½/g, "°");
 
     const lines = content.split("\n");
     const messages = [];
     const nodes = new Set();
-    const valueDescriptions = {}; // Temporary storage for VAL_ data
-    // Temporary storage for pending message and signal comments
+    const valueDescriptions = {};
     const pendingComments = {};
     const pendingSignalComments = {};
 
@@ -60,10 +52,8 @@ export function parseDBC(content) {
     lines.forEach((line) => {
         line = line.trim();
 
-        // Match message definitions (e.g., "BO_ 256 EngineData: 8 ECU1")
         const messageMatch = line.match(/^BO_\s+(\d+)\s+(\w+):\s+(\d+)\s+(\w+)$/);
         if (messageMatch) {
-
             if (currentMessage) {
                 messages.push(currentMessage);
             }
@@ -71,22 +61,19 @@ export function parseDBC(content) {
             const { id, isExtended } = formatMessageId(messageMatch[1]);
 
             currentMessage = {
-                id: id,  // Formatted message ID
-                isExtendedId: isExtended,  // Boolean indicating if it's an extended ID
+                id,
+                isExtendedId: isExtended,
                 name: messageMatch[2],
                 dlc: parseInt(messageMatch[3], 10),
                 sender: messageMatch[4],
                 signals: [],
             };
 
-            nodes.add(messageMatch[4]); // Add sender node
+            nodes.add(messageMatch[4]);
             return;
         }
 
-        // Match signal definitions (e.g., "SG_ EngineSpeed : 0|16@1+ (1,0) [0|8000] \"RPM\"")
-        const signalMatch = line.match(
-            /^SG_\s+(\w+)\s+(:?\s+M|m(\d+))?\s*:\s+(\d+)\|(\d+)@(\d)([+-])\s+\(([\d.]+),([\d.-]+)\)\s+\[([\d.-]+)\|([\d.-]+)\]\s+"([^"]*)".*$/
-        );
+        const signalMatch = line.match(/^SG_\s+(\w+)(?:\s+(M|m(\d+)))?\s*:\s+(\d+)\|(\d+)@([01])([+-])\s*\(\s*([\d.]+)\s*,\s*([-]?\d*\.?\d+)\s*\)\s*\[\s*([-]?\d*\.?\d+)\s*\|\s*([-]?\d*\.?\d+)\s*\]\s*"([^"]*)".*$/);
 
         if (signalMatch && currentMessage) {
             const signal = {
@@ -99,15 +86,13 @@ export function parseDBC(content) {
                 offset: parseFloat(signalMatch[9]),
                 valueRange: [parseFloat(signalMatch[10]), parseFloat(signalMatch[11])],
                 units: signalMatch[12],
-                defaultValue: 0, // Default value not included in the DBC definition
+                defaultValue: 0,
             };
 
-            // Check for multiplexer
             if (signalMatch[2]?.trim() === "M") {
                 signal.isMultiplexer = true;
             }
 
-            // Check for multiplexed signals
             if (signalMatch[3]) {
                 signal.multiplexerValue = parseInt(signalMatch[3], 10);
             }
@@ -116,36 +101,30 @@ export function parseDBC(content) {
             return;
         }
 
-        // Match value descriptions (e.g., "VAL_ 512 F1_Signal3 1 \"State 1\" 2 \"State 2\" ... ;")
-        const valueMatch = line.match(/^VAL_\s+(\d+)\s+(\w+)\s+((?:\d+\s+"[^"]*"\s*)+);$/);
+        const valueMatch = line.match(/^VAL_\s+(\d+)\s+(\w+)\s+((?:\d+\s+\"[^\"]*\"\s*)+);$/);
         if (valueMatch) {
-            const { id: messageId, isExtended } = formatMessageId(valueMatch[1]);
+            const { id: messageId } = formatMessageId(valueMatch[1]);
             const signalName = valueMatch[2];
-            const valuePairs = valueMatch[3].match(/(\d+)\s+"([^"]*)"/g);
+            const valuePairs = valueMatch[3].match(/(\d+)\s+\"([^\"]*)\"/g);
 
             if (!valueDescriptions[messageId]) {
                 valueDescriptions[messageId] = {};
             }
 
             valueDescriptions[messageId][signalName] = valuePairs.reduce((acc, pair) => {
-                const [value, description] = pair.match(/(\d+)\s+"([^"]*)"/).slice(1, 3);
+                const [value, description] = pair.match(/(\d+)\s+\"([^\"]*)\"/).slice(1, 3);
                 acc[value] = description;
                 return acc;
             }, {});
         }
 
-        // Match comment lines for messages (e.g., "CM_ BO_ 100 "Some description";")
         const commentMatch = line.match(/^CM_\s+BO_\s+(\d+)\s+"([^"]*)";$/);
         if (commentMatch) {
-            const { id: messageId, isExtended } = formatMessageId(commentMatch[1]);
+            const { id: messageId } = formatMessageId(commentMatch[1]);
             const description = commentMatch[2];
-            if (!pendingComments[messageId]) {
-                pendingComments[messageId] = {};
-            }
             pendingComments[messageId] = description;
         }
 
-        // Match signal comment lines (e.g., "CM_ SG_ 100 Test "Test description";")
         const signalCommentMatch = line.match(/^CM_\s+SG_\s+(\d+)\s+(\w+)\s+"([^"]+)";$/);
         if (signalCommentMatch) {
             const { id: messageId } = formatMessageId(signalCommentMatch[1]);
@@ -162,25 +141,32 @@ export function parseDBC(content) {
         messages.push(currentMessage);
     }
 
-    // After parsing all lines, attach pending comments and value descriptions.
     messages.forEach((msg) => {
-        // 1) Attach pending comment if it exists
         if (pendingComments[msg.id]) {
             msg.description = pendingComments[msg.id];
         }
 
-        // 2) Attach value descriptions to each signal
+        const muxSignal = msg.signals.find(sig => sig.isMultiplexer);
+
         msg.signals.forEach((signal) => {
-            // Attach signal description if available
             if (pendingSignalComments[msg.id] && pendingSignalComments[msg.id][signal.name]) {
                 signal.description = pendingSignalComments[msg.id][signal.name];
             }
-            // Attach value descriptions (if any)
             const signalDescriptions = valueDescriptions[msg.id]?.[signal.name];
             signal.valueDescriptions = signalDescriptions ?? {};
+
+            if (signal.multiplexerValue !== undefined) {
+                signal.isMultiplexed = true;
+                if (muxSignal) {
+                    signal.multiplexerStartBit = muxSignal.startBit;
+                    signal.multiplexerLength = muxSignal.length;
+                    signal.multiplexerByteOrder = muxSignal.byteOrder;
+                }
+            } else {
+                signal.isMultiplexed = false;
+            }
         });
     });
 
     return { messages, nodes: Array.from(nodes) };
-
 }

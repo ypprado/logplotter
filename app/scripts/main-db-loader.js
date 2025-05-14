@@ -60,29 +60,47 @@ const databaseHandler = {
 
     buildUnifiedDatabase(parsedData) {
         return {
-            messages: parsedData.messages.map((msg) => ({
-                id: msg.id,
-                name: msg.name,
-                dlc: msg.dlc,
-                sender: msg.sender,
-                description: msg.comment,
-                signals: msg.signals.map((sig) => ({
-                    name: sig.name,
-                    startBit: sig.startBit,
-                    length: sig.length,
-                    byteOrder: sig.byteOrder,
-                    valueType: sig.valueType,
-                    scaling: sig.scaling,
-                    offset: sig.offset,
-                    units: sig.units,
-                    valueRange: sig.valueRange,
-                    defaultValue: sig.defaultValue,
-                    description: sig.description,
-                    ...(sig.valueDescriptions && { valueDescriptions: sig.valueDescriptions }),
-                    ...(sig.isMultiplexer && { isMultiplexer: true }),
-                    ...(sig.multiplexerValue !== undefined && { multiplexerValue: sig.multiplexerValue }),
-                })),
-            })),
+            messages: parsedData.messages.map((msg) => {
+                // Detect if message contains multiplexed signals and try to infer mux definition
+                const muxSignal = msg.signals.find(sig => sig.isMultiplexer);
+
+                return {
+                    id: msg.id,
+                    name: msg.name,
+                    dlc: msg.dlc,
+                    sender: msg.sender,
+                    description: msg.comment,
+                    signals: msg.signals.map((sig) => {
+                        const isMultiplexed = sig.multiplexerValue !== undefined && sig.multiplexerValue !== null;
+
+                        return {
+                            name: sig.name,
+                            startBit: sig.startBit,
+                            length: sig.length,
+                            byteOrder: sig.byteOrder,
+                            valueType: sig.valueType,
+                            scaling: sig.scaling,
+                            offset: sig.offset,
+                            units: sig.units,
+                            valueRange: sig.valueRange,
+                            defaultValue: sig.defaultValue,
+                            description: sig.description,
+                            ...(sig.valueDescriptions && { valueDescriptions: sig.valueDescriptions }),
+
+                            ...(sig.isMultiplexer && { isMultiplexer: true }),
+                            ...(isMultiplexed && {
+                                isMultiplexed: true,
+                                multiplexerValue: sig.multiplexerValue,
+                                // Inherit the multiplexer signal definition from the message
+                                multiplexerStartBit: muxSignal?.startBit ?? 0,
+                                multiplexerLength: muxSignal?.length ?? 8,
+                                multiplexerByteOrder: muxSignal?.byteOrder ?? 'LittleEndian',
+                            }),
+                        };
+                    })
+                };
+            }),
+
             nodes: parsedData.nodes.map((node) => ({
                 name: node,
                 transmitMessages: parsedData.messages.filter((msg) => msg.sender === node).map((msg) => msg.name),
