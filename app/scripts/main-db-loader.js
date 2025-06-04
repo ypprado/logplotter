@@ -130,7 +130,7 @@ const databaseHandler = {
                             break;
                         default:
                             reject(new Error('Unsupported file format.'));
-                            warning('File format not supported!');
+                            console.warn('File format not supported!');
                             break;
                     }
                 } catch (error) {
@@ -142,7 +142,7 @@ const databaseHandler = {
     
             reader.onerror = function () {
                 reject(new Error("Error reading file."));
-                warning('File format not supported!');
+                console.warn('File format not supported!');
             };
     
             reader.readAsText(file, "windows-1252");
