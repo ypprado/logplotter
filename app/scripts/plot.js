@@ -150,7 +150,7 @@ const plotConfiguration = {
             name: 'Delta Cursor',
             icon: Plotly.Icons.spikeline,   //https://github.com/plotly/plotly.js/blob/master/src/fonts/ploticon.js
             direction: 'up',
-            click: function(gd) {toogleDeltaCursor();}
+            click: function(gd) {toggleDeltaCursor();}
         }], //https://plotly.com/javascript/reference/layout/#layout-modebar-add
 }
 

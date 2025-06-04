@@ -11,7 +11,7 @@ function clearAnnotationsAndShapes() {
     Plotly.relayout(plotEl, { annotations: preservedAnnotations, shapes: [] });
 }
 
-function toogleDeltaCursor() {
+function toggleDeltaCursor() {
     // Check if only "sp1" (Main Plot) is active
     const activeSubplots = getSelectedSubplots();
     if (activeSubplots.length > 1 || (activeSubplots.length === 1 && activeSubplots[0] !== "sp1")) {

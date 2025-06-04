@@ -157,4 +157,23 @@ describe('parseBLF', () => {
     expect(messages).toHaveLength(1);
     expect(messages[0]).toEqual(expectedMessage);
   });
+
+  test('returns empty array for invalid BLF signature', async () => {
+    const buffer = new ArrayBuffer(72);
+    const u8 = new Uint8Array(buffer);
+    // Write an invalid signature "BAD!"
+    u8[0] = 'B'.charCodeAt(0);
+    u8[1] = 'A'.charCodeAt(0);
+    u8[2] = 'D'.charCodeAt(0);
+    u8[3] = '!'.charCodeAt(0);
+
+    const fakeFile = {
+      slice: (start, end) => ({
+        arrayBuffer: async () => buffer.slice(start, end)
+      })
+    };
+
+    const messages = await parseBLF(fakeFile);
+    expect(messages).toEqual([]);
+  });
 });

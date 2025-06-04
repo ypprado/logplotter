@@ -46,7 +46,7 @@ describe('extractRawValue', () => {
     // So the extraction index becomes substring(16 - 4 - 8, 16 - 4) = substring(4, 12).
     // The concatenated binary string from [0x34, 0x12] is:
     //   "00110100" + "00010010" = "0011010000010010"
-    // Characters 4 to 11 of that string are "01000010", which is binary for 66.
+    // Characters 4 to 11 of that string are "01000001", which is binary for 65.
     const data = [0x12, 0x34];
     const startBit = 4;
     const length = 8;
