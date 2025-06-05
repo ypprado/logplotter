@@ -1,2 +1,8 @@
 ascreader.py
 blfreader.py
+
+# Ignore node modules, OS and IDE files
+node_modules/
+.DS_Store
+.vscode/
+.idea/
