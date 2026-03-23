@@ -19,7 +19,7 @@ export async function parseTRC(file) {
     function parseMessage(cols) {
         if (fileVersion === TRCFileVersion.V1_0) {
             return parseMsgV1_0(cols);
-        } else if (fileVersion === TRCFileVersion.V1_1) {
+        } else if (fileVersion === TRCFileVersion.V1_1 || fileVersion === TRCFileVersion.V1_2) {
             return parseMsgV1_1(cols);
         } else if (fileVersion === TRCFileVersion.V1_3) {
             return parseMsgV1_3(cols);
@@ -40,7 +40,8 @@ export async function parseTRC(file) {
             arbitrationId: parseInt(cols[2], 16),
             isExtendedId: cols[2].length > 3,
             dlc: parseInt(cols[3]),
-            data: cols.slice(4, 4 + parseInt(cols[3])).map(hex => parseInt(hex, 16))
+            data: cols.slice(4, 4 + parseInt(cols[3])).map(hex => parseInt(hex, 16)),
+            isRx: false
         };
     }
 
@@ -77,12 +78,12 @@ export async function parseTRC(file) {
         const timestamp = parseFloat(cols[columns["O"]]) / 1000 + startTime;
         const arbitrationId = parseInt(cols[columns["I"]], 16);
         const isExtendedId = cols[columns["I"]].length > 4;
-        const channel = columns["B"] ? parseInt(cols[columns["B"]]) : 1;
+        const channel = columns["B"] !== undefined ? parseInt(cols[columns["B"]]) : 1;
         
         let dlc = 0;
-        if (columns["L"]) {
+        if (columns["L"] !== undefined) {
             dlc = parseInt(cols[columns["L"]]);
-        } else if (columns["l"]) {
+        } else if (columns["l"] !== undefined) {
             dlc = parseInt(cols[columns["l"]]);
         } else {
             console.warn("No DLC column found, setting to 0");
@@ -133,10 +134,10 @@ export async function parseTRC(file) {
     return messages.map(message => ({
         timestamp: message.timestamp,           // Timestamp in seconds
         arbitrationId: message.arbitrationId,  // Message ID in decimal
-        data: message.data,                    // Raw CAN payload as Uint8Array
+        data: new Uint8Array(message.data || []), // Raw CAN payload as Uint8Array
         channel: message.channel || null,      // CAN channel (null if not provided)
         isExtendedId: message.isExtendedId,    // Whether the ID is extended
         isRemoteFrame: message.isRemoteFrame || false, // Whether it's a remote frame
-        isRx: message.isRx                     // Whether it's received
+        isRx: message.isRx || false            // Whether it's received
     }));    
 }

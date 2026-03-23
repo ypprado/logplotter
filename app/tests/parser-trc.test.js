@@ -15,11 +15,11 @@ M1 2001 FFFFFFFF 3 0A 0B 0C
         expect(messages[0]).toEqual({
             timestamp: 2000 / 1000, // 2 seconds
             arbitrationId: 1234,
-            data: [10, 11, 12],
+            data: new Uint8Array([10, 11, 12]),
             channel: null,
             isExtendedId: false,
             isRemoteFrame: false,
-            isRx: undefined
+            isRx: false
         });
     });
 
@@ -41,7 +41,32 @@ M1 2000 Rx 1234 3 0A 0B 0C
         expect(messages[0]).toEqual({
             timestamp: 2000 / 1000 + expectedStartTime, // 2 + startTime
             arbitrationId: 1234,
-            data: [10, 11, 12],
+            data: new Uint8Array([10, 11, 12]),
+            channel: null,
+            isExtendedId: false,
+            isRemoteFrame: false,
+            isRx: true
+        });
+    });
+
+    test('parses V1.2 messages correctly', async () => {
+        const baseDate = new Date(Date.UTC(1899, 11, 30, 0, 0, 0, 0));
+        const daysOffset = 43831.5;
+        const expectedStartTime = (baseDate.getTime() + daysOffset * 24 * 60 * 60 * 1000) / 1000;
+
+        const fileContent = `
+;$FILEVERSION=1.2
+;$STARTTIME=43831.5
+M1 2000 Rx 1234 3 0A 0B 0C
+        `.trim();
+        const file = { text: async () => fileContent };
+        const messages = await parseTRC(file);
+
+        expect(messages).toHaveLength(1);
+        expect(messages[0]).toEqual({
+            timestamp: 2000 / 1000 + expectedStartTime,
+            arbitrationId: 1234,
+            data: new Uint8Array([10, 11, 12]),
             channel: null,
             isExtendedId: false,
             isRemoteFrame: false,
@@ -73,7 +98,7 @@ M1 3000 1 Rx 1A2B 99 3 0A 0B 0C
         expect(messages[0]).toEqual({
             timestamp: 3000 / 1000 + expectedStartTime, // 3 + startTime
             arbitrationId: parseInt("1A2B", 16), // 6699
-            data: [10, 11, 12],
+            data: new Uint8Array([10, 11, 12]),
             channel: 1,
             isExtendedId: false,
             isRemoteFrame: false,
@@ -109,7 +134,7 @@ FB 4000 1A2B 2 3 Rx 0A 0B 0C
         expect(messages[0]).toEqual({
             timestamp: 4000 / 1000 + expectedStartTime, // 4 + startTime
             arbitrationId: parseInt("1A2B", 16), // 6699
-            data: [10, 11, 12],
+            data: new Uint8Array([10, 11, 12]),
             channel: 2,
             isExtendedId: false,
             isRemoteFrame: false,
